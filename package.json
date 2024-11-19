@@ -1,0 +1,14 @@
+{
+  "name": "th-coke-qa",
+  "version": "1.0.0",
+  "description": "This repo is managed by QA team for Coke-Playwright Automation",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.9.0"
+  }
+}
