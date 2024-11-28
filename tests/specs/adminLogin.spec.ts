@@ -3,12 +3,12 @@ import { chromium } from "@playwright/test";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 
 const config = {
-  adminUrl: "https://admin.dev.hospitality.thinfra.net/login",
+  adminUrl: "https://admin.qa.hospitality.thinfra.net/login",
   email: "prabhav.joshi@techholding.co",
   password: "Test@123",
   incorrectPassword: "Test@@123",
   expectedTitle: "TBD",
-  errorMessage: "Failed to initiate authentication for user prabhav.joshi@techholding.co in Cognito user pool: Incorrect username or password."
+  errorMessage: "Incorrect email or password. Please try again."
 };
 
 let browser: Browser;
@@ -30,9 +30,8 @@ test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
     // Navigate to the Admin Portal
     await loginPage.navigate(config.adminUrl);
-
-    await page.waitForTimeout(2000);
     // Verify that the login Page is visible
+    await page.waitForTimeout(3000);
     const isVisible = await loginPage.isLoginPageVisible();
     expect(isVisible).toBe(true);
   } catch (error: any) {
@@ -45,15 +44,12 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
 
     await loginPage.navigate(config.adminUrl);
-
     // Enter email and password into the LoginPage
     await loginPage.enterEmail(config.email);
     await loginPage.enterPassword(config.password);
-
     // Validate  entered values are correct
     const enteredEmail = await loginPage.getEnteredEmail();
     const enteredPassword = await loginPage.getEnteredPassword();
-
     expect(enteredEmail).toBe(config.email);
     expect(enteredPassword).toBe(config.password);
   } catch (error: any) {
@@ -66,10 +62,8 @@ test("TC0003 - Verify that admins who have appropriate access can access the sys
   try {
 
     await loginPage.navigate(config.adminUrl);
-
     // Enter Valid Email and Valid Password
     await loginPage.login(config.email, config.password);
-
     // Validate Successful Login
     await page.waitForTimeout(5000);
     expect(await loginPage.isCokeLogoVisible()).toBe(true);
@@ -83,10 +77,8 @@ test("TC0004 - Verify that non-admins - those without appropriate access - canno
   try {
     // Navigate to the Admin Portal
     await loginPage.navigate(config.adminUrl);
-
     // Enter Valid Email and Invalid Password
     await loginPage.loginInvalid(config.email, config.incorrectPassword);
-
     // Validate the Error message
     const message: string | null = await loginPage.getErrorMessage();
     expect(message).toEqual(config.errorMessage);
