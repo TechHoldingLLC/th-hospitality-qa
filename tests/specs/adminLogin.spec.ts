@@ -1,15 +1,7 @@
 import { expect, test, Browser, Page } from "@playwright/test";
 import { chromium } from "@playwright/test";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
-
-const config = {
-  adminUrl: "https://admin.qa.hospitality.thinfra.net/login",
-  email: "prabhav.joshi@techholding.co",
-  password: "Test@123",
-  incorrectPassword: "Test@@123",
-  expectedTitle: "TBD",
-  errorMessage: "Incorrect email or password. Please try again."
-};
+import { config } from "../config/config.qa";
 
 let browser: Browser;
 let page: Page;
@@ -29,7 +21,7 @@ test.afterEach(async () => {
 test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
     // Navigate to the Admin Portal
-    await loginPage.navigate(config.adminUrl);
+    await loginPage.navigate(config.adminPortalUrl);
     // Verify that the login Page is visible
     await page.waitForTimeout(3000);
     const isVisible = await loginPage.isLoginPageVisible();
@@ -39,15 +31,11 @@ test("TC0001 - Verify that users are presented with a login page", async () => {
     throw error;
   }
 });
-
 test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
-
-    await loginPage.navigate(config.adminUrl);
-    // Enter email and password into the LoginPage
+    await loginPage.navigate(config.adminPortalUrl);
     await loginPage.enterEmail(config.email);
     await loginPage.enterPassword(config.password);
-    // Validate  entered values are correct
     const enteredEmail = await loginPage.getEnteredEmail();
     const enteredPassword = await loginPage.getEnteredPassword();
     expect(enteredEmail).toBe(config.email);
@@ -57,14 +45,10 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
     throw error;
   }
 });
-
 test("TC0003 - Verify that admins who have appropriate access can access the system", async () => {
   try {
-
-    await loginPage.navigate(config.adminUrl);
-    // Enter Valid Email and Valid Password
+    await loginPage.navigate(config.adminPortalUrl);
     await loginPage.login(config.email, config.password);
-    // Validate Successful Login
     await page.waitForTimeout(5000);
     expect(await loginPage.isCokeLogoVisible()).toBe(true);
   } catch (error: any) {
@@ -72,11 +56,9 @@ test("TC0003 - Verify that admins who have appropriate access can access the sys
     throw error;
   }
 });
-
 test("TC0004 - Verify that non-admins - those without appropriate access - cannot access the system.", async () => {
   try {
-    // Navigate to the Admin Portal
-    await loginPage.navigate(config.adminUrl);
+    await loginPage.navigate(config.adminPortalUrl);
     // Enter Valid Email and Invalid Password
     await loginPage.loginInvalid(config.email, config.incorrectPassword);
     // Validate the Error message
@@ -87,3 +69,4 @@ test("TC0004 - Verify that non-admins - those without appropriate access - canno
     throw error;
   }
 });
+
