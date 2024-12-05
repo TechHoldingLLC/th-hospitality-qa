@@ -17,39 +17,19 @@ test.beforeEach(async () => {
     viewProgramsPage = new adminViewProgramsPage(page);
     loginPage = new adminLoginPage(page);
     basePage = new BasePage(page);
+    //Navigation to admin portal
+    await basePage.navigateTo(config.adminPortalUrl);
+    //Login
+    await loginPage.login(config.email, config.password);
+    //Navigation to Programs Listing page
+    await basePage.clickElement(viewProgramsPage.programsButton);
 });
 
 test.afterEach(async () => {
     await browser.close();
 });
 
-test("Verify navigation to View Programs page", async () => {
-    try {
-        await basePage.navigateTo(config.adminPortalUrl);
-        await page.waitForTimeout(3000);
-        //Login
-        await loginPage.login(config.email, config.password);
-        await page.waitForTimeout(3000);
-        //Navigation to Programs Listing page
-        await basePage.clickElement(viewProgramsPage.programsButton);
-        await basePage.waitForElementVisible(viewProgramsPage.addProgramButton);
-        //Verify navigation to Program listing page
-        expect(await basePage.isElementVisible(viewProgramsPage.addProgramButton)).toBe(true);
-        await page.waitForTimeout(3000);
-    } catch (error: any) {
-        console.error(`Test failed: ${error.message}`);
-        throw error;
-    }
-});
-//Verify the program list displays the expected columns
-test("Verify UI components on Programs Listing page", async () => {
-    await basePage.navigateTo(config.adminPortalUrl);
-    await page.waitForTimeout(3000);
-    //Login
-    await loginPage.login(config.email, config.password);
-    await page.waitForTimeout(3000);
-    //Navigation to Programs Listing page
-    await basePage.clickElement(viewProgramsPage.programsButton);
+test("TC0037 - Verify the program list displays the expected data", async () => {
     await basePage.waitForElementVisible(viewProgramsPage.addProgramButton);
     expect(await basePage.isElementVisible(viewProgramsPage.addProgramButton)).toBe(true);
 
@@ -94,28 +74,14 @@ test("Verify UI components on Programs Listing page", async () => {
     }
 });
 //Verify the presence and functionality of the EDIT action buttons
-test("Verify Call-To-Actions - EDIT program", async () => {
-    await basePage.navigateTo(config.adminPortalUrl);
-    await page.waitForTimeout(3000);
-    //Login
-    await loginPage.login(config.email, config.password);
-    await page.waitForTimeout(3000);
-    //Navigation to Programs Listing page
-    await basePage.clickElement(viewProgramsPage.programsButton);
+test("TC0095 - Verify the CTA to edit a program", async () => {
     await basePage.clickElement(viewProgramsPage.kebabMenuIcon);
     await basePage.clickElement(viewProgramsPage.editButton);
     //Verify edit action
     await expect(viewProgramsPage.editProgramHeader).toBeVisible();
 });
 //Verify the presence and functionality of the DELETE action buttons
-test("Verify Call-To-Actions - DELETE program", async () => {
-    await basePage.navigateTo(config.adminPortalUrl);
-    await page.waitForTimeout(3000);
-    //Login
-    await loginPage.login(config.email, config.password);
-    await page.waitForTimeout(3000);
-    //Navigation to Programs Listing page
-    await basePage.clickElement(viewProgramsPage.programsButton);
+test("TC0096 - Verify the CTA delete a program", async () => {
     await basePage.clickElement(viewProgramsPage.kebabMenuIcon);
     await basePage.clickElement(viewProgramsPage.deleteButton);
     await basePage.clickElement(viewProgramsPage.confirmDeleteButton);
@@ -123,14 +89,7 @@ test("Verify Call-To-Actions - DELETE program", async () => {
     await expect(viewProgramsPage.deleteProgramConfirmation).toBeVisible();
 });
 //Verify the presence and functionality of the CREATE action buttons
-test("Verify Call-To-Actions - CREATE program", async () => {
-    await basePage.navigateTo(config.adminPortalUrl);
-    await page.waitForTimeout(3000);
-    //Login
-    await loginPage.login(config.email, config.password);
-    await page.waitForTimeout(3000);
-    //Navigation to Programs Listing page
-    await basePage.clickElement(viewProgramsPage.programsButton);
+test("TC0039 - Verify the CTA to create a program", async () => {
     await basePage.clickElement(viewProgramsPage.addProgramButton);
     //Verify add action
     await expect(viewProgramsPage.addProgramHeader).toBeVisible();
