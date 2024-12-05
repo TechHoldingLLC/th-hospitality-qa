@@ -2,22 +2,22 @@ import { Page, Locator } from "@playwright/test";
 
 export class adminHomePage {
   private page: Page;
-  private usersButton: Locator;
-  private inviteUserButton: Locator;
-  private emailInput: Locator;
-  private roleSelect: Locator;
-  private roleDropdown: Locator;
-  private departmentSelect: Locator;
-  private departmentDropdown: Locator;
-  private groupsSelect: Locator;
-  private groupsDropdown: Locator;
-  private inviteButton: Locator;
-  private inviteSuccessMessage: Locator;
-  private inviteRoleErrorMessage: Locator;
-  private inviteDepartmentErrorMessage: Locator;
-  private inviteGroupsErrorMessage: Locator;
+  public usersButton: Locator;
+  public inviteUserButton: Locator;
+  public emailInput: Locator;
+  public roleSelect: Locator;
+  public roleDropdown: Locator;
+  public departmentSelect: Locator;
+  public departmentDropdown: Locator;
+  public groupsSelect: Locator;
+  public groupsDropdown: Locator;
+  public inviteButton: Locator;
+  public inviteSuccessMessage: Locator;
+  public inviteRoleErrorMessage: Locator;
+  public inviteDepartmentErrorMessage: Locator;
+  public inviteGroupsErrorMessage: Locator;
   public emailListItems: Locator;
-  private nextButton: Locator;
+  public firstEmailElement: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -36,51 +36,7 @@ export class adminHomePage {
     this.inviteDepartmentErrorMessage = page.locator("//span[normalize-space()='Department is required']");
     this.inviteGroupsErrorMessage = page.locator("//span[normalize-space()='At least one group must be selected']");
     this.emailListItems = page.locator("//tbody[@class='border-ui-border-base border-b-0']//td[2]");
-    this.nextButton = page.locator("//button[normalize-space()='Next']");
-  }
-  async clickUserButton(): Promise<void> {
-    await this.usersButton.click();
-  }
-  async clickInviteUserButton(): Promise<void> {
-    await this.inviteUserButton.click();
-  }
-  async fillInviteUserEmail(inviteEmail: string): Promise<void> {
-    await this.emailInput.fill(inviteEmail);
-  }
-  async fillInviteUserForm(inviteEmail: string): Promise<void> {
-    await this.emailInput.fill(inviteEmail);
-    await this.roleSelect.click();
-    await this.roleDropdown.click();
-    await this.departmentSelect.click();
-    await this.departmentDropdown.click();
-    await this.groupsSelect.click();
-    await this.groupsDropdown.click();
-  }
-  async submitInviteButton(): Promise<void> {
-    await this.inviteButton.click();
-  }
-  async getSuccessMessage(): Promise<string | null> {
-    return await this.inviteSuccessMessage.textContent();
-  }
-  async getErrorRoleMessage(): Promise<string | null> {
-    return await this.inviteRoleErrorMessage.textContent();
-  }
-  async getErrorDepartmentMessage(): Promise<string | null> {
-    return await this.inviteDepartmentErrorMessage.textContent();
-  }
-  async getErrorGroupsMessage(): Promise<string | null> {
-    return await this.inviteGroupsErrorMessage.textContent();
-  }
-  async generateRandomDigits(): Promise<string> {
-    return Math.floor(10000 + Math.random() * 90000).toString();
-  }
-  async clickNextUntilDisabled(): Promise<void> {
-    while (await this.nextButton.isEnabled()) {
-      await this.nextButton.click();
-    }
-  }
-  async isNextButtonDisabled(): Promise<boolean> {
-    return await this.nextButton.isDisabled();
+    this.firstEmailElement = page.locator("//tbody[@class='border-ui-border-base border-b-0']//tr[1]//td[2]//div[@class='flex size-full items-center pr-6']");
   }
 }
 

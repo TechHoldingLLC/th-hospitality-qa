@@ -2,10 +2,11 @@ import { Page, Locator } from "@playwright/test";
 
 export class adminLoginPage {
   private page: Page;
-  private emailInput: Locator;
-  private passwordInput: Locator;
-  private loginButton: Locator;
-  private readonly cokeLogo: Locator;
+  public emailInput: Locator;
+  public passwordInput: Locator;
+  public loginButton: Locator;
+  public readonly cokeLogo: Locator;
+  public errorMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,42 +14,7 @@ export class adminLoginPage {
     this.passwordInput = page.locator("//input[@id=':r1:-form-item']");
     this.loginButton = page.locator('//button[@type="submit"]');
     this.cokeLogo = page.locator("//button[@id='radix-:r5:']");
-  }
-
-  async navigate(url: string): Promise<void> {
-    await this.page.goto(url);
-  }
-  async enterEmail(email: string): Promise<void> {
-    await this.emailInput.fill(email);
-  }
-  async enterPassword(password: string): Promise<void> {
-    await this.passwordInput.fill(password);
-  }
-  async clickLoginButton(): Promise<void> {
-    await this.loginButton.click();
-  }
-  async login(email: string, password: string): Promise<void> {
-    await this.emailInput.fill(email);
-    await this.passwordInput.fill(password);
-    await this.loginButton.click();
-  }
-  async loginInvalid(email: string, incorrectPassword: string): Promise<void> {
-    await this.enterEmail(email);
-    await this.enterPassword(incorrectPassword);
-    await this.clickLoginButton();
-  }
-  async getErrorMessage(): Promise<string | null> {
-    return await this.page
-      .locator(
-        "span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']"
-      )
-      .textContent();
-  }
-  async isCokeLogoVisible(): Promise<boolean> {
-    return await this.cokeLogo.isVisible();
-  }
-  async isLoginPageVisible(): Promise<boolean> {
-    return await this.emailInput.isVisible() && await this.passwordInput.isVisible() && await this.loginButton.isVisible();
+    this.errorMessage = page.locator("span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']");
   }
   // Verify that the email and password inputs contain the correct values 
   async getEnteredEmail(): Promise<string> {
