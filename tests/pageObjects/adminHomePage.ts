@@ -16,7 +16,6 @@ export class adminHomePage {
   public inviteRoleErrorMessage: Locator;
   public inviteDepartmentErrorMessage: Locator;
   public inviteGroupsErrorMessage: Locator;
-  public emailListItems: Locator;
   public firstEmailElement: Locator;
 
   constructor(page: Page) {
@@ -35,7 +34,6 @@ export class adminHomePage {
     this.inviteRoleErrorMessage = page.locator("//span[normalize-space()='Role is required']");
     this.inviteDepartmentErrorMessage = page.locator("//span[normalize-space()='Department is required']");
     this.inviteGroupsErrorMessage = page.locator("//span[normalize-space()='At least one group must be selected']");
-    this.emailListItems = page.locator("//tbody[@class='border-ui-border-base border-b-0']//td[2]");
     this.firstEmailElement = page.locator("//tbody[@class='border-ui-border-base border-b-0']//tr[1]//td[2]//div[@class='flex size-full items-center pr-6']");
   }
 }

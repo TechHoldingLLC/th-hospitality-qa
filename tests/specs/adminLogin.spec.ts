@@ -15,6 +15,7 @@ test.beforeEach(async () => {
   await page.setViewportSize({ width: 1920, height: 1080 });
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
+  await basePage.navigateTo(config.adminPortalUrl);
 });
 
 test.afterEach(async () => {
@@ -23,12 +24,9 @@ test.afterEach(async () => {
 
 test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
-    // Navigate to the Admin Portal
-    await basePage.navigateTo(config.adminPortalUrl);
-    // Verify that email input, password input, and login button are visible
-    await page.waitForTimeout(3000);
+    // Verify that Login Form Inputs are visible
     await basePage.isElementVisible(loginPage.emailInput);
-    await basePage.isElementVisible(loginPage.passwordInput);
+    await basePage.isElementVisible(loginPage.passwardInput);
     await basePage.isElementVisible(loginPage.loginButton);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -37,18 +35,14 @@ test("TC0001 - Verify that users are presented with a login page", async () => {
 });
 test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
-    // Navigate to the Admin Portal
-    await basePage.navigateTo(config.adminPortalUrl);
-    // Enter email and password
+    // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
-    // Click the login button
-    await basePage.clickElement(loginPage.loginButton);
+    await basePage.enterValuesInElement(loginPage.passwardInput, config.passward);
     // Retrieve entered values and verify them
     const enteredEmail = await loginPage.getEnteredEmail();
-    const enteredPassword = await loginPage.getEnteredPassword();
+    const enteredPassward = await loginPage.getEnteredPassward();
     expect(enteredEmail).toBe(config.email);
-    expect(enteredPassword).toBe(config.password);
+    expect(enteredPassward).toBe(config.passward);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -56,13 +50,7 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
 });
 test("TC0003 - Verify that admins who have appropriate access can access the system", async () => {
   try {
-    await basePage.navigateTo(config.adminPortalUrl);
-    // Enter valid email and password
-    await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
-    // Click the login button
-    await basePage.clickElement(loginPage.loginButton);
-    await page.waitForTimeout(5000);
+    await loginPage.login(config.email, config.passward);
     // Verify that the admin portal's cokeLogo is visible
     await basePage.isElementVisible(loginPage.cokeLogo);
   } catch (error: any) {
@@ -72,14 +60,14 @@ test("TC0003 - Verify that admins who have appropriate access can access the sys
 });
 test("TC0004 - Verify that non-admins - those without appropriate access - cannot access the system.", async () => {
   try {
-    await basePage.navigateTo(config.adminPortalUrl);
-    // Enter Valid Email and Invalid Password
+    // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwordInput, config.incorrectPassword);
+    await basePage.enterValuesInElement(loginPage.passwardInput, config.incorrectPassward);
     // Click the login button
     await basePage.clickElement(loginPage.loginButton);
     // Verify that an error message is displayed
-    await basePage.getElementText(loginPage.errorMessage);
+    const errorMessageText: string | null = await basePage.getElementText(loginPage.errorMessage);
+    expect(errorMessageText).toEqual(config.errorMessage);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
