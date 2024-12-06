@@ -3,7 +3,7 @@ import { Page, Locator } from "@playwright/test";
 export class adminLoginPage {
   private page: Page;
   public emailInput: Locator;
-  public passwordInput: Locator;
+  public passwardInput: Locator;
   public loginButton: Locator;
   public readonly cokeLogo: Locator;
   public errorMessage: Locator;
@@ -11,7 +11,7 @@ export class adminLoginPage {
   constructor(page: Page) {
     this.page = page;
     this.emailInput = page.locator("//input[@id=':r0:-form-item']");
-    this.passwordInput = page.locator("//input[@id=':r1:-form-item']");
+    this.passwardInput = page.locator("//input[@id=':r1:-form-item']");
     this.loginButton = page.locator('//button[@type="submit"]');
     this.cokeLogo = page.locator("//button[@id='radix-:r5:']");
     this.errorMessage = page.locator("span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']");
@@ -25,8 +25,8 @@ export class adminLoginPage {
   async getEnteredEmail(): Promise<string> {
     return await this.emailInput.inputValue();
   }
-  async getEnteredPassword(): Promise<string> {
-    return await this.passwordInput.inputValue();
+  async getEnteredPassward(): Promise<string> {
+    return await this.passwardInput.inputValue();
   }
 }
 

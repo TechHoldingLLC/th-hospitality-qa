@@ -26,7 +26,7 @@ test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
     // Verify that Login Form Inputs are visible
     await basePage.isElementVisible(loginPage.emailInput);
-    await basePage.isElementVisible(loginPage.passwordInput);
+    await basePage.isElementVisible(loginPage.passwardInput);
     await basePage.isElementVisible(loginPage.loginButton);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -40,9 +40,9 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
     await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
     // Retrieve entered values and verify them
     const enteredEmail = await loginPage.getEnteredEmail();
-    const enteredPassword = await loginPage.getEnteredPassword();
+    const enteredPassward = await loginPage.getEnteredPassward();
     expect(enteredEmail).toBe(config.email);
-    expect(enteredPassword).toBe(config.password);
+    expect(enteredPassward).toBe(config.passward);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
