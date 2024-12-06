@@ -62,7 +62,18 @@ export default class BasePage {
   }
 
   async isElementVisible(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
     return await element.isVisible();
+  }
+
+  async isElementDisabled(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
+    return await element.isDisabled();
+  }
+
+  async isElementEnabled(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
+    return await element.isEnabled();
   }
 
   async getAllTextContents(element: Locator): Promise<string[]> {
