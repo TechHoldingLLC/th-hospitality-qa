@@ -1,25 +1,21 @@
 import { expect, test, Browser, Page } from "@playwright/test";
 import { chromium } from "@playwright/test";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
-
-const config = {
-  adminUrl: "https://admin.qa.hospitality.thinfra.net/login",
-  email: "prabhav.joshi@techholding.co",
-  password: "Test@123",
-  incorrectPassword: "Test@@123",
-  expectedTitle: "TBD",
-  errorMessage: "Incorrect email or password. Please try again."
-};
+import { config } from "../config/config.qa";
+import BasePage from "../pageObjects/basePage";
 
 let browser: Browser;
 let page: Page;
 let loginPage: adminLoginPage;
+let basePage: BasePage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
   await page.setViewportSize({ width: 1920, height: 1080 });
   loginPage = new adminLoginPage(page);
+  basePage = new BasePage(page);
+  await basePage.navigateTo(config.adminPortalUrl);
 });
 
 test.afterEach(async () => {
@@ -28,62 +24,54 @@ test.afterEach(async () => {
 
 test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
-    // Navigate to the Admin Portal
-    await loginPage.navigate(config.adminUrl);
-    // Verify that the login Page is visible
-    await page.waitForTimeout(3000);
-    const isVisible = await loginPage.isLoginPageVisible();
-    expect(isVisible).toBe(true);
+    // Verify that Login Form Inputs are visible
+    await basePage.isElementVisible(loginPage.emailInput);
+    await basePage.isElementVisible(loginPage.passwardInput);
+    await basePage.isElementVisible(loginPage.loginButton);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
 });
-
 test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
-
-    await loginPage.navigate(config.adminUrl);
-    // Enter email and password into the LoginPage
-    await loginPage.enterEmail(config.email);
-    await loginPage.enterPassword(config.password);
-    // Validate  entered values are correct
+    // Fill up Login Form
+    await basePage.enterValuesInElement(loginPage.emailInput, config.email);
+    await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
+    // Retrieve entered values and verify them
     const enteredEmail = await loginPage.getEnteredEmail();
-    const enteredPassword = await loginPage.getEnteredPassword();
+    const enteredPassward = await loginPage.getEnteredPassward();
     expect(enteredEmail).toBe(config.email);
-    expect(enteredPassword).toBe(config.password);
+    expect(enteredPassward).toBe(config.passward);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
 });
-
 test("TC0003 - Verify that admins who have appropriate access can access the system", async () => {
   try {
-
-    await loginPage.navigate(config.adminUrl);
-    // Enter Valid Email and Valid Password
     await loginPage.login(config.email, config.password);
-    // Validate Successful Login
-    await page.waitForTimeout(5000);
-    expect(await loginPage.isCokeLogoVisible()).toBe(true);
+    // Verify that the admin portal's cokeLogo is visible
+    await basePage.isElementVisible(loginPage.cokeLogo);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
   }
 });
-
 test("TC0004 - Verify that non-admins - those without appropriate access - cannot access the system.", async () => {
   try {
-    // Navigate to the Admin Portal
-    await loginPage.navigate(config.adminUrl);
-    // Enter Valid Email and Invalid Password
-    await loginPage.loginInvalid(config.email, config.incorrectPassword);
-    // Validate the Error message
-    const message: string | null = await loginPage.getErrorMessage();
-    expect(message).toEqual(config.errorMessage);
+    const incorrectPassword = "Test@@123";
+    const errorMessage = "Incorrect email or password. Please try again.";
+    // Fill up Login Form
+    await basePage.enterValuesInElement(loginPage.emailInput, config.email);
+    await basePage.enterValuesInElement(loginPage.passwordInput, incorrectPassword);
+    await basePage.clickElement(loginPage.loginButton);
+    // Verify that an error message is displayed
+    const errorMessageText: string | null = await basePage.getElementText(loginPage.errorMessage);
+    expect(errorMessageText).toEqual(errorMessage);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
   }
 });
+

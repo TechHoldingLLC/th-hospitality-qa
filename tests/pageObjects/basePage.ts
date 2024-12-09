@@ -23,7 +23,7 @@ export default class BasePage {
     await element.fill(valuesToEnter);
   }
 
-  // Common method to retrieve text from an element
+  //Common method to retrieve text from an element
   async getElementText(element: Locator): Promise<string> {
     return element.innerText();
   }
