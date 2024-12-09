@@ -32,6 +32,7 @@ test("TC00014- Verify that admins can initiate user invitations from the Users s
     // Create a dynamic email
     const inviteGmail: string = `test123${randomDigits}@gmail.com`;
     try {
+        const expectedSuccessMessage = "Invitation sent successfully!";
         // Fill up 'Invite User Form'
         await basePage.enterValuesInElement(homePage.emailInput, inviteGmail);
         await basePage.clickElement(homePage.roleSelect);
@@ -43,7 +44,7 @@ test("TC00014- Verify that admins can initiate user invitations from the Users s
         await basePage.clickElement(homePage.inviteButton);
         // Validate success message after invitation
         const succesMessageText: string | null = await basePage.getElementText(homePage.inviteSuccessMessage);
-        expect(succesMessageText).toEqual(config.expectedSuccessMessage);
+        expect(succesMessageText).toEqual(expectedSuccessMessage);
     } catch (error: any) {
         console.log(`Test failed: ${error.message}`);
         throw error;
@@ -51,16 +52,20 @@ test("TC00014- Verify that admins can initiate user invitations from the Users s
 });
 test("TC0015 - Verify that admins are required to choose a role and region for new users", async () => {
     try {
+        const inviteEmail = 'test@gmail.com';
+        const expectedroleErrorMessage = 'Role is required';
+        const expecteddepartmentErrorMessage = 'Department is required';
+        const expectedgroupsErrorMessage = 'At least one group must be selected';
         // Enter email for invitation
-        await basePage.enterValuesInElement(homePage.emailInput, config.inviteEmail);
+        await basePage.enterValuesInElement(homePage.emailInput, inviteEmail);
         await basePage.clickElement(homePage.inviteButton);
         // Validate error messages when required fields are not filled
         const roleErrorMessage: string | null = await basePage.getElementText(homePage.inviteRoleErrorMessage);
-        expect(roleErrorMessage).toEqual(config.expectedroleErrorMessage);
+        expect(roleErrorMessage).toEqual(expectedroleErrorMessage);
         const departmentErrorMessage: string | null = await basePage.getElementText(homePage.inviteDepartmentErrorMessage);
-        expect(departmentErrorMessage).toEqual(config.expecteddepartmentErrorMessage);
+        expect(departmentErrorMessage).toEqual(expecteddepartmentErrorMessage);
         const groupsErrorMessage: string | null = await basePage.getElementText(homePage.inviteGroupsErrorMessage);
-        expect(groupsErrorMessage).toEqual(config.expectedgroupsErrorMessage);
+        expect(groupsErrorMessage).toEqual(expectedgroupsErrorMessage);
     } catch (error: any) {
         console.log(`Test failed: ${error.message}`);
         throw error;
