@@ -26,7 +26,7 @@ test("TC0001 - Verify that users are presented with a login page", async () => {
   try {
     // Verify that Login Form Inputs are visible
     await basePage.isElementVisible(loginPage.emailInput);
-    await basePage.isElementVisible(loginPage.passwardInput);
+    await basePage.isElementVisible(loginPage.passwordInput);
     await basePage.isElementVisible(loginPage.loginButton);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -37,12 +37,12 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
     // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwardInput, config.passward);
+    await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
     // Retrieve entered values and verify them
     const enteredEmail = await loginPage.getEnteredEmail();
-    const enteredPassward = await loginPage.getEnteredPassward();
+    const enteredPassword = await loginPage.getEnteredPassword();
     expect(enteredEmail).toBe(config.email);
-    expect(enteredPassward).toBe(config.passward);
+    expect(enteredPassword).toBe(config.password);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -50,7 +50,7 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
 });
 test("TC0003 - Verify that admins who have appropriate access can access the system", async () => {
   try {
-    await loginPage.login(config.email, config.passward);
+    await loginPage.login(config.email, config.password);
     // Verify that the admin portal's cokeLogo is visible
     await basePage.isElementVisible(loginPage.cokeLogo);
   } catch (error: any) {
@@ -62,8 +62,7 @@ test("TC0004 - Verify that non-admins - those without appropriate access - canno
   try {
     // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwardInput, config.incorrectPassward);
-    // Click the login button
+    await basePage.enterValuesInElement(loginPage.passwordInput, config.incorrectPassword);
     await basePage.clickElement(loginPage.loginButton);
     // Verify that an error message is displayed
     const errorMessageText: string | null = await basePage.getElementText(loginPage.errorMessage);
