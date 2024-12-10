@@ -24,6 +24,10 @@ export class adminViewEventsPage {
     public addEventHeader: Locator;
     public editEventHeader: Locator;
     public confirmDeleteButton: Locator;
+    public paginationFooter: Locator;
+    public eventList: Locator;
+    public nextButton: Locator;
+    public prevButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -49,5 +53,9 @@ export class adminViewEventsPage {
         this.addEventHeader = page.locator("//h1[text()='Event Information']");
         this.editEventHeader = page.locator("//h1[text()='Edit Event']");
         this.confirmDeleteButton = page.locator("//button[text()='Delete']");
+        this.paginationFooter = page.locator("//div[@class='text-ui-fg-subtle txt-compact-small-plus flex w-full items-center justify-between px-3 py-4 flex-shrink-0']");
+        this.eventList = page.locator("//tbody//tr");
+        this.nextButton = page.locator("//button[text()='Next']");
+        this.prevButton = page.locator("//button[text()='Prev']");
     }
 }
