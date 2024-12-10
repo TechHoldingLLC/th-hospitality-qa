@@ -1,15 +1,14 @@
 import { Locator, Page } from "@playwright/test";
+import BasePage from "./basePage";
 
-export class adminCreateEditProgramPage {
-    private page: Page;
+export class adminCreateEditProgramPage extends BasePage {
     public programNameLabel: Locator;
     public departmentLabel: Locator;
     public groupsLabel: Locator;
     public programNameInput: Locator;
     public departmentDropdown: Locator;
     public groupsDropdown: Locator;
-    public groupNameFranceOlympics: Locator;
-    public groupNameMusic: Locator;
+    public groupsDropdownList: Locator;
     public cancelButton: Locator;
     public saveButton: Locator;
     public createSuccessMessage: Locator;
@@ -21,15 +20,14 @@ export class adminCreateEditProgramPage {
     public confirmCloseAddProgram: Locator;
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.programNameLabel = page.locator("//label[text()='Program Name']");
         this.departmentLabel = page.locator("//label[text()='Department']");
         this.groupsLabel = page.locator("//label[text()='Groups']");
         this.programNameInput = page.locator("//input[@name='name']");
         this.departmentDropdown = page.locator("//select[@name='department']");
-        this.groupsDropdown = page.locator("//button[@class='bg-ui-bg-field shadow-buttons-neutral transition-fg flex w-full h-fit select-none items-center justify-between rounded-md outline-none data-[placeholder]:text-ui-fg-muted text-ui-fg-base hover:bg-ui-bg-field-hover focus-visible:shadow-borders-interactive-with-active data-[state=open]:!shadow-borders-interactive-with-active aria-[invalid=true]:border-ui-border-error aria-[invalid=true]:shadow-borders-error invalid:border-ui-border-error invalid:shadow-borders-error disabled:!bg-ui-bg-disabled disabled:!text-ui-fg-disabled group/trigger h-8 px-2 py-1.5 txt-compact-small']");
-        this.groupNameFranceOlympics = page.locator("//div[@class='flex items-center p-2 cursor-pointer hover:bg-backgrounds/bg-subtle multiSelectLabel']//span[text()='France Olympics']");
-        this.groupNameMusic = page.locator("//div[@class='flex items-center p-2 cursor-pointer hover:bg-backgrounds/bg-subtle multiSelectLabel']//span[text()='Music']");
+        this.groupsDropdown = page.locator("//div[@class='relative']//button");
+        this.groupsDropdownList = page.locator("//div[@class='absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto']//div");
         this.cancelButton = page.locator("//button[text()='Cancel']");
         this.saveButton = page.locator("//button[text()='Save']");
         this.createSuccessMessage = page.locator("//span[text()='Program have been created successfully']");
@@ -39,5 +37,15 @@ export class adminCreateEditProgramPage {
         this.departmentValue = page.locator("//p[text()='Department']/following-sibling::p");
         this.closeIconOnAddProgram = page.locator("//div[@role='dialog']//div[@class='flex items-center gap-x-2']//button");
         this.confirmCloseAddProgram = page.locator("//button[text()='Continue']");
+    }
+
+    async createProgram(programName: string): Promise<void> {
+        await this.programNameInput.fill(programName);
+        // Select the random option by its value
+        await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
+        await this.groupsDropdown.click();
+        //Select random item from list
+        await this.selectRandomItemFromMultiSelectList(this.groupsDropdownList);
+        await this.saveButton.click();
     }
 }

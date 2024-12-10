@@ -34,8 +34,6 @@ test.afterEach(async () => {
 
 test("TC0097 - Verify that the user is able to create a program", async () => {
     try {
-        const randomDig = await basePage.generateRandomDigits();
-        const programInputText = `Coachella QA ${randomDig}`;
         await basePage.clickElement(viewProgramsPage.addProgramButton);
 
         //Verify expected components are visible on screen
@@ -43,13 +41,11 @@ test("TC0097 - Verify that the user is able to create a program", async () => {
         expect(await basePage.isElementVisible(createEditProgram.departmentLabel)).toBe(true);
         expect(await basePage.isElementVisible(createEditProgram.groupsLabel)).toBe(true);
 
-        //Fill up add program form
-        await basePage.enterValuesInElement(createEditProgram.programNameInput, programInputText);
-        await createEditProgram.departmentDropdown.selectOption({ value: 'Global' });
-        await basePage.clickElement(createEditProgram.groupsDropdown);
-        await basePage.clickElement(createEditProgram.groupNameFranceOlympics);
-        await basePage.clickElement(createEditProgram.groupNameMusic);
-        await basePage.clickElement(createEditProgram.saveButton);
+        //Generate Nomenclature name for program
+        const programInputText = await basePage.generateNomenclatureName('Program');
+
+        //Fill up add program form and create a program
+        await createEditProgram.createProgram(programInputText);
 
         //Verify program created successfully
         expect(await basePage.isElementVisible(createEditProgram.createSuccessMessage)).toBe(true);
@@ -78,17 +74,13 @@ test("TC0040 - Verify that the application validates program name is unique in t
 
 test("TC0043 - Verify that users can successfully create and edit programs.", async () => {
     try {
-        const randomDig = await basePage.generateRandomDigits();
-        const programInputText = `Coachella QA ${randomDig}`;
         await basePage.clickElement(viewProgramsPage.addProgramButton);
 
-        //Fill up add program form
-        await basePage.enterValuesInElement(createEditProgram.programNameInput, programInputText);
-        await createEditProgram.departmentDropdown.selectOption({ value: 'Global' });
-        await basePage.clickElement(createEditProgram.groupsDropdown);
-        await basePage.clickElement(createEditProgram.groupNameFranceOlympics);
-        await basePage.clickElement(createEditProgram.groupNameMusic);
-        await basePage.clickElement(createEditProgram.saveButton);
+        //Generate Nomenclature name for program
+        const programInputText = await basePage.generateNomenclatureName('Program');
+
+        //Fill up add program form and create program
+        await createEditProgram.createProgram(programInputText);
 
         //Verify program created successfully
         expect(await basePage.isElementVisible(createEditProgram.createSuccessMessage)).toBe(true);
@@ -96,11 +88,13 @@ test("TC0043 - Verify that users can successfully create and edit programs.", as
         //Edit an existing program
         await basePage.clickElement(viewProgramsPage.kebabMenuIcon);
         await basePage.clickElement(viewProgramsPage.editButton);
-        await createEditProgram.departmentDropdown.selectOption({ value: 'Europe' });
+        await basePage.waitForElementVisible(createEditProgram.departmentLabel);
+        await basePage.clickOnRandomOptionFromDropdown(createEditProgram.departmentDropdown);
+        const selectedValue = await createEditProgram.departmentDropdown.inputValue();
         await basePage.clickElement(createEditProgram.saveButton);
         expect(await basePage.isElementVisible(createEditProgram.editProgramSuccessMesaage)).toBe(true);
         //Verify changes made to the program are reflected and saved successfully
-        expect(await basePage.getElementText(createEditProgram.departmentValue)).toEqual('Europe');
+        expect(await basePage.getElementText(createEditProgram.departmentValue)).toEqual(selectedValue);
     } catch (error: any) {
         console.error(`Test failed: ${error.message}`);
         throw error;
@@ -112,8 +106,11 @@ test("TC0041 - Verify that edited programs appear updated in the products list",
         //Edit an existing program
         await basePage.clickElement(viewProgramsPage.kebabMenuIcon);
         await basePage.clickElement(viewProgramsPage.editButton);
-        const existingName = await createEditProgram.programNameInput.getAttribute('value');
-        const editedName = existingName + ' - Edited';
+        // const existingName = await createEditProgram.programNameInput.getAttribute('value');
+        
+        //Generate Nomenclature edited name for program
+        const editedName = await basePage.generateNomenclatureName('Program');
+    
         await basePage.enterValuesInElement(createEditProgram.programNameInput, editedName);
         await basePage.clickElement(createEditProgram.saveButton);
         await basePage.clickElement(viewProgramsPage.programsButton);
@@ -132,8 +129,11 @@ test("TC0042 - Verify required and optional fields while creation of new Program
         //Verify Save button is disabled when mandatory fields are empty 
         await basePage.clickElement(viewProgramsPage.addProgramButton);
         expect(await basePage.isElementDisabled(createEditProgram.saveButton)).toBe(true);
+
+        //Generate Nomenclature name for program
+        const programInputText = await basePage.generateNomenclatureName('Program');
         //Verify Save button is enabled when mandatory fields are filled
-        await basePage.enterValuesInElement(createEditProgram.programNameInput, 'Coachella');
+        await basePage.enterValuesInElement(createEditProgram.programNameInput, programInputText);
         expect(await basePage.isElementEnabled(createEditProgram.saveButton)).toBe(true);
         await basePage.clickElement(createEditProgram.closeIconOnAddProgram);
         await basePage.clickElement(createEditProgram.confirmCloseAddProgram);
@@ -145,7 +145,7 @@ test("TC0042 - Verify required and optional fields while creation of new Program
         await createEditProgram.programNameInput.clear();
         expect(await basePage.isElementDisabled(createEditProgram.saveButton)).toBe(true);
         //Verify Save button is enabled when mandatory fields are filled
-        await basePage.enterValuesInElement(createEditProgram.programNameInput, 'Coachella');
+        await basePage.enterValuesInElement(createEditProgram.programNameInput, programInputText);
         expect(await basePage.isElementEnabled(createEditProgram.saveButton)).toBe(true);
     } catch (error: any) {
         console.error(`Test failed: ${error.message}`);
