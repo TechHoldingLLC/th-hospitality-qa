@@ -62,7 +62,7 @@ export default class BasePage {
   }
 
   async isElementVisible(element: Locator): Promise<boolean> {
-    await this.page.waitForTimeout(3000);
+    await element.waitFor({ state: "visible" });
     return await element.isVisible();
   }
 
