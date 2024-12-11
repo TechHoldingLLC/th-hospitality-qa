@@ -113,7 +113,7 @@ test("TC0041 - Verify that edited programs appear updated in the products list",
     
         await basePage.enterValuesInElement(createEditProgram.programNameInput, editedName);
         await basePage.clickElement(createEditProgram.saveButton);
-        await basePage.clickElement(viewProgramsPage.programsButton);
+        await basePage.clickElement(viewProgramsPage.programsButton.first());
         await basePage.waitForPageToBeReady();
         const editedProgramLocator = page.locator(`text=${editedName}`).first();
         expect(await basePage.getElementText(editedProgramLocator)).toEqual(editedName);
