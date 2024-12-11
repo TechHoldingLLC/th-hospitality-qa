@@ -40,7 +40,7 @@ export class adminViewProgramsPage {
         this.eventDateRangeColumnData = page.locator("//table[@class='text-ui-fg-subtle txt-compact-small relative w-full']//td[4]");
         this.noOfEventsColumnData = page.locator("//table[@class='text-ui-fg-subtle txt-compact-small relative w-full']//td[5]");
         this.noOfPackagesColumnData = page.locator("//table[@class='text-ui-fg-subtle txt-compact-small relative w-full']//td[6]");
-        this.kebabMenuIcon = page.locator("//button[@id='radix-:ri:']");
+        this.kebabMenuIcon = page.locator("//tbody//tr[1]//button");
         this.deleteButton = page.locator("//span[text()='Delete']");
         this.editButton = page.locator("//span[text()='Edit']");
         this.editProgramHeader = page.locator("//h1[text()='Edit Program']");

@@ -62,7 +62,18 @@ export default class BasePage {
   }
 
   async isElementVisible(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
     return await element.isVisible();
+  }
+
+  async isElementDisabled(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
+    return await element.isDisabled();
+  }
+
+  async isElementEnabled(element: Locator): Promise<boolean> {
+    await this.page.waitForTimeout(3000);
+    return await element.isEnabled();
   }
 
   async getAllTextContents(element: Locator): Promise<string[]> {
@@ -82,5 +93,36 @@ export default class BasePage {
     const selector = 'text="Incorrect email or password. Please try again."';
     await this.page.waitForSelector(selector, { state: "visible" });
     await this.page.waitForSelector(selector, { state: "hidden" });
+  }
+
+  async generateNomenclatureName(modulename: string): Promise<string> {
+    const randomDigits = await this.generateRandomDigits();
+    return 'Automated_' + modulename + '_' + randomDigits;
+  }
+
+  async generateNomenclatureEditedName(modulename: string): Promise<string> {
+    const randomDigits = await this.generateRandomDigits();
+    return 'Automated_' + modulename + '_' + randomDigits + '_Edited';
+  }
+
+  async clickOnRandomOptionFromDropdown(dropdownElement: Locator): Promise<void> {
+    const options = await dropdownElement.locator('option').all();
+    // Generate a random index to select an option
+    const randomIndex = Math.floor(Math.random() * options.length);
+    // Get the value of the random option
+    const randomOptionValue = await options[randomIndex].getAttribute('value');
+    // Select the random option by its value
+    await dropdownElement.selectOption(randomOptionValue);
+  }
+
+  async selectRandomItemFromMultiSelectList(listElement: Locator): Promise<void> {
+    // Wait for the list to be visible
+    await listElement.first().waitFor({ state: 'visible' });
+    // Get all the list items
+    const items = await listElement.all();
+    // Generate a random index to select an item
+    const randomIndex = Math.floor(Math.random() * items.length);
+    // Click the random item
+    await items[randomIndex].click();
   }
 }
