@@ -1,8 +1,9 @@
-import test, { Browser, Page, chromium, expect } from "@playwright/test";
+import { test, Browser, Page, chromium, expect } from "@playwright/test";
 import BasePage from "../pageObjects/basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { adminViewEventsPage } from "../pageObjects/adminViewEvents";
+import exp from "constants";
 
 let browser: Browser;
 let page: Page;
@@ -133,10 +134,10 @@ test("TC0107 - Verify the list of events is paginated", async () => {
         let listItems = await viewEventsPage.eventList.all();
         expect(listItems.length).toBeLessThanOrEqual(eventsPerPage);
         // Verify Prev button on initial page
-        await expect(viewEventsPage.prevButton).toBeDisabled(); //Update after PR#4 merge
+        expect(await basePage.isElementDisabled(viewEventsPage.prevButton)).toBe(true);
 
         // Iterate through pages using the Next button
-        while (await viewEventsPage.nextButton.isEnabled()) { //Update after PR#4 merge
+        while (await basePage.isElementEnabled(viewEventsPage.nextButton)) {
             // Assert item count for intermediate pages
             expect(listItems.length).toBe(eventsPerPage);
             await basePage.clickElement(viewEventsPage.nextButton);
@@ -147,12 +148,12 @@ test("TC0107 - Verify the list of events is paginated", async () => {
         // Verify last page item count and Next button behavior
         expect(listItems.length).toBeLessThanOrEqual(eventsPerPage);
         // Verify Next button on last page
-        await expect(viewEventsPage.nextButton).toBeDisabled(); //Update after PR#4 merge
+        expect(await basePage.isElementDisabled(viewEventsPage.nextButton)).toBe(true);
 
         // Verify Prev button behavior by navigating back one page
         await basePage.clickElement(viewEventsPage.prevButton);
         // Verify Next button is re-enabled
-        await expect(viewEventsPage.nextButton).toBeEnabled(); //Update after PR#4 merge
+        expect(await basePage.isElementEnabled(viewEventsPage.nextButton)).toBe(true);
 
     } catch (error: any) {
         console.error(`Test failed: ${error.message}`);

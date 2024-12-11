@@ -67,12 +67,12 @@ export default class BasePage {
   }
 
   async isElementDisabled(element: Locator): Promise<boolean> {
-    await this.page.waitForTimeout(3000);
+    await element.waitFor({ state: 'visible' });
     return await element.isDisabled();
   }
 
   async isElementEnabled(element: Locator): Promise<boolean> {
-    await this.page.waitForTimeout(3000);
+    await element.waitFor({ state: 'visible' });
     return await element.isEnabled();
   }
 
