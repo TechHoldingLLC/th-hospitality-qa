@@ -1,4 +1,5 @@
 import { Page, Locator } from "@playwright/test";
+import { config } from "../config/config.qa";
 
 export default class BasePage {
   readonly page: Page;
@@ -124,5 +125,12 @@ export default class BasePage {
     const randomIndex = Math.floor(Math.random() * items.length);
     // Click the random item
     await items[randomIndex].click();
+  }
+
+  async mailinatorLogin(): Promise<void> {
+    await this.navigateTo("https://www.mailinator.com/v4/login.jsp");
+    await this.page.locator("#many_login_email").fill(config.email);
+    await this.page.locator("#many_login_password").fill("QAteam@2024");
+    await this.page.locator("//a[@class='btn btn-default submit']").click();
   }
 }

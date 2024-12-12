@@ -37,7 +37,10 @@ test("TC0002 - Verify that users can enter their credentials", async () => {
   try {
     // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwordInput, config.password);
+    await basePage.enterValuesInElement(
+      loginPage.passwordInput,
+      config.password
+    );
     // Retrieve entered values and verify them
     const enteredEmail = await loginPage.getEnteredEmail();
     const enteredPassword = await loginPage.getEnteredPassword();
@@ -53,6 +56,7 @@ test("TC0003 - Verify that admins who have appropriate access can access the sys
     await loginPage.login(config.email, config.password);
     // Verify that the admin portal's cokeLogo is visible
     await basePage.isElementVisible(loginPage.cokeLogo);
+    expect(await basePage.isElementVisible(loginPage.cokeLogo)).toBe(true);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
@@ -64,14 +68,18 @@ test("TC0004 - Verify that non-admins - those without appropriate access - canno
     const errorMessage = "Incorrect email or password. Please try again.";
     // Fill up Login Form
     await basePage.enterValuesInElement(loginPage.emailInput, config.email);
-    await basePage.enterValuesInElement(loginPage.passwordInput, incorrectPassword);
+    await basePage.enterValuesInElement(
+      loginPage.passwordInput,
+      incorrectPassword
+    );
     await basePage.clickElement(loginPage.loginButton);
     // Verify that an error message is displayed
-    const errorMessageText: string | null = await basePage.getElementText(loginPage.errorMessage);
+    const errorMessageText: string | null = await basePage.getElementText(
+      loginPage.errorMessage
+    );
     expect(errorMessageText).toEqual(errorMessage);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
   }
 });
-
