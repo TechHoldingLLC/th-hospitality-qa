@@ -68,12 +68,12 @@ export default class BasePage {
   }
 
   async isElementDisabled(element: Locator): Promise<boolean> {
-    await element.waitFor({ state: 'visible' });
+    await element.waitFor({ state: "visible" });
     return await element.isDisabled();
   }
 
   async isElementEnabled(element: Locator): Promise<boolean> {
-    await element.waitFor({ state: 'visible' });
+    await element.waitFor({ state: "visible" });
     return await element.isEnabled();
   }
 
@@ -98,27 +98,31 @@ export default class BasePage {
 
   async generateNomenclatureName(modulename: string): Promise<string> {
     const randomDigits = await this.generateRandomDigits();
-    return 'Automated_' + modulename + '_' + randomDigits;
+    return "Automated_" + modulename + "_" + randomDigits;
   }
 
   async generateNomenclatureEditedName(modulename: string): Promise<string> {
     const randomDigits = await this.generateRandomDigits();
-    return 'Automated_' + modulename + '_' + randomDigits + '_Edited';
+    return "Automated_" + modulename + "_" + randomDigits + "_Edited";
   }
 
-  async clickOnRandomOptionFromDropdown(dropdownElement: Locator): Promise<void> {
-    const options = await dropdownElement.locator('option').all();
+  async clickOnRandomOptionFromDropdown(
+    dropdownElement: Locator
+  ): Promise<void> {
+    const options = await dropdownElement.locator("option").all();
     // Generate a random index to select an option
     const randomIndex = Math.floor(Math.random() * options.length);
     // Get the value of the random option
-    const randomOptionValue = await options[randomIndex].getAttribute('value');
+    const randomOptionValue = await options[randomIndex].getAttribute("value");
     // Select the random option by its value
     await dropdownElement.selectOption(randomOptionValue);
   }
 
-  async selectRandomItemFromMultiSelectList(listElement: Locator): Promise<void> {
+  async selectRandomItemFromMultiSelectList(
+    listElement: Locator
+  ): Promise<void> {
     // Wait for the list to be visible
-    await listElement.first().waitFor({ state: 'visible' });
+    await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
     const items = await listElement.all();
     // Generate a random index to select an item
