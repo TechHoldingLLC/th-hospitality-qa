@@ -14,14 +14,16 @@ export class adminLoginPage {
     this.passwordInput = page.locator("//input[@id=':r1:-form-item']");
     this.loginButton = page.locator('//button[@type="submit"]');
     this.cokeLogo = page.locator("//button[@id='radix-:r5:']");
-    this.errorMessage = page.locator("span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']");
+    this.errorMessage = page.locator(
+      "span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']"
+    );
   }
   async login(email: string, password: string): Promise<void> {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.loginButton.click();
   }
-  // Verify that the email and password inputs contain the correct values 
+  // Verify that the email and password inputs contain the correct values
   async getEnteredEmail(): Promise<string> {
     return await this.emailInput.inputValue();
   }
@@ -29,8 +31,3 @@ export class adminLoginPage {
     return await this.passwordInput.inputValue();
   }
 }
-
-
-
-
-
