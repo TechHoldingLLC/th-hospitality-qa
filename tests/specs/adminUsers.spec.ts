@@ -1,6 +1,6 @@
 import { expect, test, Browser, Page } from "@playwright/test";
 import { chromium } from "@playwright/test";
-import { adminHomePage } from "../pageObjects/adminHomePage";
+import { adminHomePage } from "../pageObjects/adminUsersPage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import BasePage from "../pageObjects/basePage";

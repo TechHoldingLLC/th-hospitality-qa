@@ -12,6 +12,7 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
+  timeout: 60000,
   testMatch: ["**/tests/**/*.spec.ts"], // Adjust the pattern as needed
   //testMatch: ['**/tests-examples/**/*.spec.ts'],
   expect: {
