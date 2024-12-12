@@ -7,7 +7,7 @@ let browser: Browser;
 let page: Page;
 let basePage: BasePage;
 let forgotPasswordPage: adminForgotPasswordPage;
-const resetUserEmail = 'resetUser@team507472.testinator.com'
+const resetUserEmail = 'resetUser@team507472.testinator.com';
 
 test.beforeEach(async () => {
     browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -33,10 +33,16 @@ test("TC0005 - Verify that the user can access a screen to enter their email add
 test.only("TC0007 - Verify that the user should receive an email with a one-time link to access the password reset page", async () => {
     await basePage.waitForElementVisible(forgotPasswordPage.resetpasswordLink);
     await basePage.clickElement(forgotPasswordPage.resetpasswordLink);
+    expect(await basePage.isElementVisible(forgotPasswordPage.resetPasswordButton)).toBe(true);
+    await basePage.waitForElementVisible(forgotPasswordPage.emailInput);
     await basePage.enterValuesInElement(forgotPasswordPage.emailInput, resetUserEmail);
+    console.log('value entered:',await forgotPasswordPage.emailInput.getAttribute('value'));
     await basePage.clickElement(forgotPasswordPage.resetPasswordButton);
+    expect(await basePage.isElementVisible(forgotPasswordPage.resetLinkSentSuccessmessage)).toBe(true);
     await forgotPasswordPage.mailinatorLogin();
     const newTab = await forgotPasswordPage.navigateToResetPaswordPageFromMailinatorInbox();
     //expect(await basePage.isElementVisible(forgotPasswordPage.changePasswordButton)).toBe(true);
-    //await expect(newTab.locator(forgotPasswordPage.changePasswordButton)).toBeVisible();
+    await newTab.waitForSelector('//button[@type="submit"]', { state: 'visible' });
+
+    await page.waitForTimeout(3000);
 });

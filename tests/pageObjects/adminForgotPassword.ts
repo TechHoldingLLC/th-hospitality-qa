@@ -44,6 +44,7 @@ export class adminForgotPasswordPage extends BasePage {
 
     async navigateToResetPaswordPageFromMailinatorInbox(): Promise<Page> {
         await this.enterValuesInElement(this.mailinatorInboxField, 'resetUser');
+        console.log("Value entered in mailinator", await this.mailinatorInboxField.getAttribute('value'));
         await this.clickElement(this.mailinatorGoBTN);
         await this.clickElement(this.mailinatorFirstEmailRow);
         await this.clickElement(this.mailinatorLinksTab);
