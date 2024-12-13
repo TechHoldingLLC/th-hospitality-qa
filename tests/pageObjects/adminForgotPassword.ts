@@ -114,7 +114,7 @@ export class adminForgotPasswordPage extends BasePage {
   async openResetPasswordLinkFromExpiredEmail(): Promise<void> {
     await this.enterValuesInElement(this.mailinatorInboxField, "resetUser");
     await this.clickElement(this.mailinatorGoBTN);
-
+    await this.page.waitForTimeout(3000);
     await this.page
       .locator("//table[@class='table-striped jambo_table']//tr[4]")
       .click();
