@@ -10,10 +10,12 @@ export class adminLoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.emailInput = page.locator("//input[@id=':r0:-form-item']");
-    this.passwordInput = page.locator("//input[@id=':r1:-form-item']");
+    this.emailInput = page.locator("//input[@name='email']");
+    this.passwordInput = page.locator("//input[@name='password']");
     this.loginButton = page.locator('//button[@type="submit"]');
-    this.cokeLogo = page.locator("//button[@id='radix-:r5:']");
+    this.cokeLogo = page.locator(
+      "//button[@class='place-items-center	items-center w-full flex-col flex outline-0']"
+    );
     this.errorMessage = page.locator(
       "span[class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']"
     );
@@ -23,6 +25,7 @@ export class adminLoginPage {
     await this.passwordInput.fill(password);
     await this.loginButton.click();
   }
+  // Verify that the email and password inputs contain the correct values
   // Verify that the email and password inputs contain the correct values
   async getEnteredEmail(): Promise<string> {
     return await this.emailInput.inputValue();

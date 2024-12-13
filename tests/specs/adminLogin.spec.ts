@@ -56,6 +56,7 @@ test("TC0003 - Verify that admins who have appropriate access can access the sys
     await loginPage.login(config.email, config.password);
     // Verify that the admin portal's cokeLogo is visible
     await basePage.isElementVisible(loginPage.cokeLogo);
+    expect(await basePage.isElementVisible(loginPage.cokeLogo)).toBe(true);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
