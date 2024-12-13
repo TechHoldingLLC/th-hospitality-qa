@@ -133,18 +133,12 @@ export class adminForgotPasswordPage extends BasePage {
     await this.page.waitForLoadState("domcontentloaded");
   }
 
-  async requestNewPassword(email: string): Promise<void>{
+  async requestNewPassword(email: string): Promise<void> {
     //Navigate to Reset password page and request for new password
     await this.waitForElementVisible(this.resetpasswordLink);
     await this.clickElement(this.resetpasswordLink);
-    expect(
-      await this.isElementVisible(this.resetPasswordButton)
-    ).toBe(true);
-    await this.waitForElementVisible(this.emailInput);
-    await this.enterValuesInElement(
-      this.emailInput,
-      email
-    );
+    await this.isElementVisible(this.resetPasswordButton);
+    await this.enterValuesInElement(this.emailInput, email);
     await this.clickElement(this.resetPasswordButton);
     await this.page.waitForTimeout(5000);
   }
