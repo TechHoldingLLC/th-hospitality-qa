@@ -29,21 +29,7 @@ test.afterEach(async () => {
 test("TC0005 - Verify that the user can access a screen to enter their email address to initiate a reset", async () => {
   try {
     //Navigate to Reset password page and request for new password
-    await basePage.waitForElementVisible(forgotPasswordPage.resetpasswordLink);
-    await basePage.clickElement(forgotPasswordPage.resetpasswordLink);
-    expect(
-      await basePage.isElementVisible(forgotPasswordPage.resetPasswordButton)
-    ).toBe(true);
-    await basePage.waitForElementVisible(forgotPasswordPage.emailInput);
-    await basePage.enterValuesInElement(
-      forgotPasswordPage.emailInput,
-      resetUserEmail
-    );
-    const enteredEmail = await forgotPasswordPage.emailInput.getAttribute(
-      "value"
-    );
-    expect(enteredEmail).toEqual(resetUserEmail);
-    await basePage.clickElement(forgotPasswordPage.resetPasswordButton);
+    await forgotPasswordPage.requestNewPassword(resetUserEmail);
     expect(
       await basePage.isElementVisible(
         forgotPasswordPage.resetLinkSentSuccessmessage
