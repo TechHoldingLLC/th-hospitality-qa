@@ -20,17 +20,17 @@ export class adminHomePage {
 
   constructor(page: Page) {
     this.page = page;
-    this.usersButton = page.locator("//p[text()='Users']");
+    this.usersButton = page.locator("//a[@href='/users']");
     this.inviteUserButton = page.locator(
-      '//*[@id="root"]/div/div[2]/main/div/div/div/div[1]/button/button'
+      "//a[@href='/users/invite']"
     );
     this.emailInput = page.locator("//input[@type='email']");
     this.roleSelect = page.locator(
-      "//div[@class='flex-1 p-4']//div[2]//button"
+      "//span[text()='Select a role']"
     );
     this.roleDropdown = page.locator("//span[text()='Admin']");
     this.departmentSelect = page.locator(
-      "//div[@class='flex-1 p-4']//div[3]//button"
+      "//label[text()='Department']/following-sibling::div[1]"
     );
     this.departmentDropdown = page.locator("//span[text()='AOU']");
     this.groupsSelect = page.locator(

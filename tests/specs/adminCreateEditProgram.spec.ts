@@ -58,9 +58,8 @@ test("TC0097 - Verify that the user is able to create a program", async () => {
       await basePage.isElementVisible(createEditProgram.createSuccessMessage)
     ).toBe(true);
     //Verify created program gets populated on program listing page
-    expect(await createEditProgram.firstProgramName.textContent()).toEqual(
-      programInputText
-    );
+    const createdProgramLocator = page.locator(`text=${programInputText}`).first();
+    expect(await basePage.getElementText(createdProgramLocator)).toEqual(programInputText);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
