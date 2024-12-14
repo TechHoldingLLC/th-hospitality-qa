@@ -59,7 +59,7 @@ export class adminViewProgramsPage {
     this.confirmDeleteButton = page.locator("//button[text()='Delete']");
     this.addProgramHeader = page.locator("//h1[text()='Add Program']");
     this.deleteProgramConfirmation = page.locator(
-      "//div[@class='shadow-elevation-flyout bg-ui-bg-component flex w-fit min-w-[360px] max-w-[440px] gap-x-3 overflow-hidden rounded-lg p-3']"
+      "//button[text()='Delete']"
     );
   }
 }

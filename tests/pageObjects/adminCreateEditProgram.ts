@@ -33,7 +33,7 @@ export class adminCreateEditProgramPage extends BasePage {
     this.cancelButton = page.locator("//button[text()='Cancel']");
     this.saveButton = page.locator("//button[text()='Save']");
     this.createSuccessMessage = page.locator(
-      "//span[text()='Program have been created successfully']"
+      "//span[text()='Program has been created successfully']"
     );
     this.firstProgramName = page.locator(
       "//tbody[@class='border-ui-border-base border-b-0']//tr[1]//td[1]//span"
