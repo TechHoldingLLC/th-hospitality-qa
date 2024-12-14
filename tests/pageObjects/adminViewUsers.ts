@@ -16,6 +16,14 @@ export class adminViewUsersPage {
   public userDetailRole: Locator;
   public userDetailDepartment: Locator;
   public userDetailGroups: Locator;
+  public nameColumnData: Locator;
+  public emailColumnData: Locator;
+  public roleColumnData: Locator;
+  public departmentColumnData: Locator;
+  public groupsColumnData: Locator;
+  public statusColumnData: Locator;
+  public lastLoginColumnData: Locator;
+  public coordinatorAccessDeniedMessage: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -52,6 +60,30 @@ export class adminViewUsersPage {
     );
     this.userDetailGroups = page.locator(
       "//span[@class='px-2 py-1 bg-gray-100 text-gray-800 text-sm rounded-full']"
+    );
+    this.nameColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[1]"
+    );
+    this.emailColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[2]"
+    );
+    this.roleColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[3]"
+    );
+    this.departmentColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[4]"
+    );
+    this.groupsColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[5]"
+    );
+    this.statusColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[6]"
+    );
+    this.lastLoginColumnData = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//td[7]"
+    );
+    this.coordinatorAccessDeniedMessage = page.locator(
+      "//span[@class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']"
     );
   }
 }

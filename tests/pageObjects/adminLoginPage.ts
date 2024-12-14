@@ -26,7 +26,6 @@ export class adminLoginPage {
     await this.loginButton.click();
   }
   // Verify that the email and password inputs contain the correct values
-  // Verify that the email and password inputs contain the correct values
   async getEnteredEmail(): Promise<string> {
     return await this.emailInput.inputValue();
   }

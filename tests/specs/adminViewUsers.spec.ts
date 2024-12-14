@@ -1,0 +1,117 @@
+import test, { Browser, Page, chromium, expect } from "@playwright/test";
+import BasePage from "../pageObjects/basePage";
+import { adminLoginPage } from "../pageObjects/adminLoginPage";
+import { config } from "../config/config.qa";
+import { adminViewUsersPage } from "../pageObjects/adminViewUsers";
+
+let browser: Browser;
+let page: Page;
+let basePage: BasePage;
+let loginPage: adminLoginPage;
+let viewUsersPage: adminViewUsersPage;
+const coordinatorAccessDeniedText = "Access denied for user";
+
+test.beforeEach(async () => {
+  browser = await chromium.launch({ headless: false, channel: "chrome" });
+  page = await browser.newPage();
+  basePage = new BasePage(page);
+  loginPage = new adminLoginPage(page);
+  viewUsersPage = new adminViewUsersPage(page);
+  await basePage.navigateTo(config.adminPortalUrl);
+});
+
+test.afterEach(async () => {
+  await browser.close();
+});
+
+test("TC0011 - Verify that admins can view a list of users", async () => {
+  //Login as admin
+  await loginPage.login(config.email, config.password);
+  await basePage.clickElement(viewUsersPage.usersButton);
+  //Verify that admins can view a list of users
+  expect(await basePage.isElementVisible(viewUsersPage.inviteUserButton)).toBe(
+    true
+  );
+  expect(await basePage.isElementVisible(viewUsersPage.nameHeader)).toBe(true);
+});
+
+test("TC0013 - Verify that user list and detail shows specified fields like name, email, role, department, group, status and last login", async () => {
+  //Login as admin
+  await loginPage.login(config.email, config.password);
+  await basePage.clickElement(viewUsersPage.usersButton);
+
+  //Verifying all expected columns are visible on page
+  expect(await basePage.isElementVisible(viewUsersPage.nameHeader)).toBe(true);
+  expect(await basePage.isElementVisible(viewUsersPage.emailHeader)).toBe(true);
+  expect(await basePage.isElementVisible(viewUsersPage.roleHeader)).toBe(true);
+  expect(await basePage.isElementVisible(viewUsersPage.departmentHeader)).toBe(
+    true
+  );
+  expect(await basePage.isElementVisible(viewUsersPage.groupsHeader)).toBe(
+    true
+  );
+  expect(await basePage.isElementVisible(viewUsersPage.statusHeader)).toBe(
+    true
+  );
+  expect(await basePage.isElementVisible(viewUsersPage.lastLoginHeader)).toBe(
+    true
+  );
+
+  //Verifying Name column content text
+  const nameElements = await viewUsersPage.nameColumnData.all();
+  for (const element of nameElements) {
+    const textContent = await element.textContent();
+    expect(textContent).toBeTruthy();
+  }
+
+  //Verifying Email column content text
+  const emailElements = await viewUsersPage.emailColumnData.all();
+  for (const element of emailElements) {
+    const textContent = await element.textContent();
+    expect(textContent).toBeTruthy();
+  }
+
+  //Verify Role column data
+  const roleElements = await viewUsersPage.roleColumnData.all();
+  for (const element of roleElements) {
+    const textContent = await element.textContent();
+    expect(textContent === "Admin" || textContent === "Coordinator").toBe(true);
+  }
+
+  //Verifying Department column content text
+  const departmentElements = await viewUsersPage.departmentColumnData.all();
+  for (const element of departmentElements) {
+    const textContent = await element.textContent();
+    expect(textContent).toBeTruthy();
+  }
+
+  //Verifying Groups column content text
+  const groupsElements = await viewUsersPage.groupsColumnData.all();
+  for (const element of groupsElements) {
+    const textContent = await element.textContent();
+    expect(textContent).toBeTruthy();
+  }
+
+  //Verify Status column data
+  const statusElements = await viewUsersPage.statusColumnData.all();
+  for (const element of statusElements) {
+    const textContent = await element.textContent();
+    expect(textContent === "Active" || textContent === "Invited").toBe(true);
+  }
+
+  //Verify Last Login column data
+  const lastLoginElements = await viewUsersPage.lastLoginColumnData.all();
+  for (const element of lastLoginElements) {
+    const textContent = await element.textContent();
+    expect(textContent).toBeTruthy();
+  }
+});
+
+test("TC0012 - Verify that coordinators cannot view a list of users", async () => {
+  //Login as coordinator
+  await loginPage.login(config.coordinator_email, config.coordinator_password);
+  //Verify coordinator doesn't have access to Admin portal, hence can't view Users list
+  expect(
+    await basePage.getElementText(viewUsersPage.coordinatorAccessDeniedMessage)
+  ).toContain(coordinatorAccessDeniedText);
+});
