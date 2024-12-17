@@ -8,14 +8,12 @@ export class adminForgotPasswordPage extends BasePage {
   public resetLinkSentSuccessmessage: Locator;
   public mailinatorInboxField: Locator;
   public mailinatorGoBTN: Locator;
-  public mailinatorFirstEmailRow: Locator;
   public mailinatorLinksTab: Locator;
   public mailinatorResetPasswordButtonLink: Locator;
   public changePasswordButton: Locator;
   public newPasswordInput: Locator;
   public confirmPasswordInput: Locator;
   public passwordResetSuccessMessage: Locator;
-  public mailinatorFirstEmailTimeStamp: Locator;
   public mailinatorTimeList: Locator;
   public resetLinkInvalidText: Locator;
   public passwordFormatValidationMessage: Locator;
@@ -35,9 +33,6 @@ export class adminForgotPasswordPage extends BasePage {
 
     this.mailinatorInboxField = page.locator("#inbox_field");
     this.mailinatorGoBTN = page.locator("//button[@class='primary-btn']");
-    this.mailinatorFirstEmailRow = page.locator(
-      "//table[@class='table-striped jambo_table']//tr[1]"
-    );
     this.mailinatorLinksTab = page.locator("#pills-links-tab");
     this.mailinatorResetPasswordButtonLink = page.locator(
       "//td[text()='Reset Password']/following-sibling::td//a"
@@ -49,9 +44,6 @@ export class adminForgotPasswordPage extends BasePage {
     );
     this.passwordResetSuccessMessage = page.locator(
       "//span[text()='Password reset successful']"
-    );
-    this.mailinatorFirstEmailTimeStamp = page.locator(
-      "//table[@class='table-striped jambo_table']//tr[1]//td[5]"
     );
     this.mailinatorTimeList = page.locator(
       "//div[@class='block-received w-25 ng-binding']"
@@ -71,10 +63,7 @@ export class adminForgotPasswordPage extends BasePage {
   }
 
   async navigateToResetPaswordPageFromMailinatorInbox(): Promise<void> {
-    await this.enterValuesInElement(this.mailinatorInboxField, "resetUser");
-    await this.clickElement(this.mailinatorGoBTN);
-    await this.page.waitForTimeout(3000);
-    await this.confirmNewEmailAndGoToBody();
+    await this.confirmNewEmailAndGoToBody("resetUser");
     await this.clickElement(this.mailinatorLinksTab);
 
     // Navigate to the link's URL directly in the same tab
@@ -88,27 +77,6 @@ export class adminForgotPasswordPage extends BasePage {
       throw new Error("Reset password link not found");
     }
     await this.page.waitForLoadState("domcontentloaded");
-  }
-
-  async confirmNewEmailAndGoToBody(): Promise<void> {
-    const emailTimestamp =
-      await this.mailinatorFirstEmailTimeStamp.textContent();
-    if (emailTimestamp?.trim() === "just now") {
-      await this.clickElement(this.mailinatorFirstEmailRow);
-    } else {
-      console.log("Email not received yet. Reloading the page...");
-      await this.page.waitForTimeout(3000);
-      await this.page.reload();
-      await this.page.waitForLoadState("domcontentloaded");
-      const updatedEmailTimestamp =
-        await this.mailinatorFirstEmailTimeStamp.textContent();
-      if (updatedEmailTimestamp?.trim() === "just now") {
-        await this.clickElement(this.mailinatorFirstEmailRow);
-      } else {
-        console.log("No new email received after reload.");
-        throw new Error("No new email received after reload.");
-      }
-    }
   }
 
   async openResetPasswordLinkFromExpiredEmail(): Promise<void> {
