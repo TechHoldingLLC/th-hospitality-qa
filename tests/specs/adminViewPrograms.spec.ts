@@ -46,18 +46,11 @@ test("TC0037 - Verify the program list displays the expected data", async () => 
     await expect(viewProgramsPage.noOfOrdersHeader).toBeVisible();
 
     //Verifying groups column content text
-    const groupElements = await viewProgramsPage.groupsColumnData.all();
-    for (const element of groupElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProgramsPage.groupsColumnData);
+
     //Verifying department column content text
-    const departmentElements =
-      await viewProgramsPage.departmentColumnData.all();
-    for (const element of departmentElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProgramsPage.departmentColumnData);
+
     //Verifying event date/range column content text
     const eventDateRangeElements =
       await viewProgramsPage.eventDateRangeColumnData.all();
@@ -65,20 +58,12 @@ test("TC0037 - Verify the program list displays the expected data", async () => 
       const textContent: string | null = await element.textContent();
       expect(textContent).not.toBeNull();
     }
+
     //Verifying department column content text
-    const noOfEventsElements =
-      await viewProgramsPage.noOfEventsColumnData.all();
-    for (const element of noOfEventsElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
-    //Verifying event date/range column content text
-    const noOfPackagesElemets =
-      await viewProgramsPage.noOfPackagesColumnData.all();
-    for (const element of noOfPackagesElemets) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProgramsPage.noOfEventsColumnData);
+
+    //Verifying event # of Packages column content text
+    await basePage.validateColumnData(viewProgramsPage.noOfPackagesColumnData);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

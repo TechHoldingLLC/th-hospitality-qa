@@ -56,58 +56,25 @@ test("TC0022 - Verify that users can view a list of products", async () => {
     ).toBe(true);
 
     //Verify Product Name column data
-    const productNameElements =
-      await viewProductsPage.productNameColumnData.all();
-    for (const element of productNameElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.productNameColumnData);
 
     //Verify Product Type column data
-    const productTypeElements =
-      await viewProductsPage.productTypeColumnData.all();
-    for (const element of productTypeElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.productTypeColumnData);
 
     //Verify Program Name column data
-    const programNameElements =
-      await viewProductsPage.programNameColumnData.all();
-    for (const element of programNameElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.programNameColumnData);
 
     //Verify Event Name column data
-    const eventNameElements = await viewProductsPage.eventNameColumnData.all();
-    for (const element of eventNameElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.eventNameColumnData);
 
     //Verify Date range column data
-    const dateRangeElements = await viewProductsPage.dateRangeColumnData.all();
-    for (const element of dateRangeElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.dateRangeColumnData);
 
     //Verify # of Packages column data
-    const noOfPackagesElements =
-      await viewProductsPage.noOfPackagesColumnData.all();
-    for (const element of noOfPackagesElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.noOfPackagesColumnData);
 
     //Verify Total Quantity column data
-    const totalQuantityElements =
-      await viewProductsPage.totalQuantityColumnData.all();
-    for (const element of totalQuantityElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewProductsPage.totalQuantityColumnData);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

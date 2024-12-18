@@ -33,60 +33,50 @@ test.afterEach(async () => {
 test("TC0075 - Verify that users can view a list of events", async () => {
   try {
     //Verify navigation to Events Listing page
-    expect(await basePage.isElementVisible(viewEventsPage.eventCreateButton));
+    expect(
+      await basePage.isElementVisible(viewEventsPage.eventCreateButton)
+    ).toBe(true);
 
     //Verify that the event list displays expected columns
-    expect(await basePage.isElementVisible(viewEventsPage.eventNameLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.programNameLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.eventDateLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.departmentLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.groupsLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.noOfPackagesLabel));
-    expect(await basePage.isElementVisible(viewEventsPage.statusLabel));
+    expect(await basePage.isElementVisible(viewEventsPage.eventNameLabel)).toBe(
+      true
+    );
+    expect(
+      await basePage.isElementVisible(viewEventsPage.programNameLabel)
+    ).toBe(true);
+    expect(await basePage.isElementVisible(viewEventsPage.eventDateLabel)).toBe(
+      true
+    );
+    expect(
+      await basePage.isElementVisible(viewEventsPage.departmentLabel)
+    ).toBe(true);
+    expect(await basePage.isElementVisible(viewEventsPage.groupsLabel)).toBe(
+      true
+    );
+    expect(
+      await basePage.isElementVisible(viewEventsPage.noOfPackagesLabel)
+    ).toBe(true);
+    expect(await basePage.isElementVisible(viewEventsPage.statusLabel)).toBe(
+      true
+    );
 
     //Verify Event Name column data
-    const eventNameElements = await viewEventsPage.eventNameColumnData.all();
-    for (const element of eventNameElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.eventNameColumnData);
 
     //Verify Program Name column data
-    const programNameElements =
-      await viewEventsPage.programNameColumnData.all();
-    for (const element of programNameElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.programNameColumnData);
 
     //Verify Event Date column data
-    const eventDateElements = await viewEventsPage.eventDateColumnData.all();
-    for (const element of eventDateElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.eventDateColumnData);
 
     //Verify Department column data
-    const departmentElements = await viewEventsPage.departmentColumnData.all();
-    for (const element of departmentElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.departmentColumnData);
 
     //Verify Groups column data
-    const groupsElements = await viewEventsPage.groupsColumnData.all();
-    for (const element of groupsElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.groupsColumnData);
 
     //Verify No of packages column data
-    const noOfPackagesElements =
-      await viewEventsPage.noOfPackagesColumnData.all();
-    for (const element of noOfPackagesElements) {
-      const textContent = await element.textContent();
-      expect(textContent).toBeTruthy();
-    }
+    await basePage.validateColumnData(viewEventsPage.noOfPackagesColumnData);
 
     //Verify Status column data
     const statusElements = await viewEventsPage.statusColumnData.all();
