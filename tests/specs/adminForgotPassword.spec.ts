@@ -85,7 +85,7 @@ test("TC0005 - Verify that the user can access a screen to enter their email add
     await basePage.clickElement(forgotPasswordPage.changePasswordButton);
     expect(
       await basePage.isElementVisible(
-        forgotPasswordPage.passwordResetSuccessMessage
+        forgotPasswordPage.passwordResetSuccessMessage.first()
       )
     ).toBe(true);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);

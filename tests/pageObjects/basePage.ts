@@ -1,4 +1,4 @@
-import { Page, Locator } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
 import { config } from "../config/config.qa";
 
 export default class BasePage {
@@ -136,5 +136,13 @@ export default class BasePage {
     await this.page.locator("#many_login_email").fill(config.email);
     await this.page.locator("#many_login_password").fill("QAteam@2024");
     await this.page.locator("//a[@class='btn btn-default submit']").click();
+  }
+
+  async validateColumnData(elementList: Locator): Promise<void> {
+    const elements = await elementList.all();
+    for (const element of elements) {
+      const textContent = await element.textContent();
+      expect(textContent).toBeTruthy();
+    }
   }
 }

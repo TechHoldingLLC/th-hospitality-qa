@@ -58,18 +58,10 @@ test("TC0013 - Verify that user list and detail shows specified fields like name
   );
 
   //Verifying Name column content text
-  const nameElements = await viewUsersPage.nameColumnData.all();
-  for (const element of nameElements) {
-    const textContent = await element.textContent();
-    expect(textContent).toBeTruthy();
-  }
+  await basePage.validateColumnData(viewUsersPage.nameColumnData);
 
   //Verifying Email column content text
-  const emailElements = await viewUsersPage.emailColumnData.all();
-  for (const element of emailElements) {
-    const textContent = await element.textContent();
-    expect(textContent).toBeTruthy();
-  }
+  await basePage.validateColumnData(viewUsersPage.emailColumnData);
 
   //Verify Role column data
   const roleElements = await viewUsersPage.roleColumnData.all();
@@ -79,18 +71,10 @@ test("TC0013 - Verify that user list and detail shows specified fields like name
   }
 
   //Verifying Department column content text
-  const departmentElements = await viewUsersPage.departmentColumnData.all();
-  for (const element of departmentElements) {
-    const textContent = await element.textContent();
-    expect(textContent).toBeTruthy();
-  }
+  await basePage.validateColumnData(viewUsersPage.departmentColumnData);
 
   //Verifying Groups column content text
-  const groupsElements = await viewUsersPage.groupsColumnData.all();
-  for (const element of groupsElements) {
-    const textContent = await element.textContent();
-    expect(textContent).toBeTruthy();
-  }
+  await basePage.validateColumnData(viewUsersPage.groupsColumnData);
 
   //Verify Status column data
   const statusElements = await viewUsersPage.statusColumnData.all();
@@ -100,11 +84,7 @@ test("TC0013 - Verify that user list and detail shows specified fields like name
   }
 
   //Verify Last Login column data
-  const lastLoginElements = await viewUsersPage.lastLoginColumnData.all();
-  for (const element of lastLoginElements) {
-    const textContent = await element.textContent();
-    expect(textContent).toBeTruthy();
-  }
+  await basePage.validateColumnData(viewUsersPage.lastLoginColumnData);
 });
 
 test("TC0012 - Verify that coordinators cannot view a list of users", async () => {
