@@ -3,6 +3,8 @@ import { config } from "../config/config.qa";
 
 export default class BasePage {
   readonly page: Page;
+  createAccountLink: any;
+  createAccountLink: any;
 
   constructor(page: Page) {
     this.page = page;
@@ -136,6 +138,75 @@ export default class BasePage {
     await this.page.locator("#many_login_email").fill(config.email);
     await this.page.locator("#many_login_password").fill("QAteam@2024");
     await this.page.locator("//a[@class='btn btn-default submit']").click();
+  }
+
+  async generateNomenclatureEmail(role: string) {
+    const randomDigits = await this.generateRandomDigits();
+    return (
+      // "Automated_" + role + "_" + randomDigits + "@team507472.testinator.com"
+      "Automated_" + role + "_" + randomDigits + "@yopmail.com"
+    );
+  }
+
+  //This method is for mailinator
+  async confirmNewEmailAndGoToBody(email: string): Promise<void> {
+    await this.page.waitForTimeout(5000);
+    await this.enterValuesInElement(this.page.locator("#inbox_field"), email);
+    await this.clickElement(
+      this.page.locator("//button[@class='primary-btn']")
+    );
+    const emailTimestamp = await this.page
+      .locator("//table[@class='table-striped jambo_table']//tr[1]//td[5]")
+      .textContent();
+    if (emailTimestamp?.trim() === "just now") {
+      await this.clickElement(
+        this.page.locator("//table[@class='table-striped jambo_table']//tr[1]")
+      );
+    } else {
+      console.log("Email not received yet. Reloading the page...");
+      await this.page.waitForTimeout(3000);
+      await this.page.reload();
+      await this.page.waitForLoadState("domcontentloaded");
+      const updatedEmailTimestamp = await this.page
+        .locator("//table[@class='table-striped jambo_table']//tr[1]//td[5]")
+        .textContent();
+      if (updatedEmailTimestamp?.trim() === "just now") {
+        await this.clickElement(
+          this.page.locator(
+            "//table[@class='table-striped jambo_table']//tr[1]"
+          )
+        );
+      } else {
+        console.log("No new email received after reload.");
+        throw new Error("No new email received after reload.");
+      }
+    }
+  }
+
+  //This method is for YopMail
+  async openCreateAccountLinkFromEmail(email: string) {
+    await this.navigateTo("https://yopmail.com/en/");
+    await this.enterValuesInElement(
+      this.page.locator("//input[@id='login']"),
+      email
+    );
+    await this.page.keyboard.press("Enter");
+    // Locate the iframe by its name attribute
+    const iframeElement = this.page.frameLocator('iframe[name="ifmail"]');
+    // Wait for the "Create Account" link to be visible and click it
+    const createAccountLink = iframeElement.locator("a", {
+      hasText: "Create Account",
+    });
+
+    // Navigate to the link's URL directly in the same tab
+    const link = await createAccountLink.getAttribute("href");
+
+    if (link) {
+      await this.page.goto(link); // Directly navigate to the link's URL
+    } else {
+      throw new Error("Reset password link not found");
+    }
+    await this.page.waitForLoadState("domcontentloaded");
   }
 
   async validateColumnData(elementList: Locator): Promise<void> {
