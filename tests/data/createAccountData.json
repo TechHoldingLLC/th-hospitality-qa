@@ -1,18 +1,18 @@
 {
-  "adminInviteEmail": "Automated_Admin_22632@yopmail.com",
-  "coordinatorInviteEmail": "Automated_Coordinator_64017@yopmail.com",
+  "adminInviteEmail": "Automated_Admin_34441@yopmail.com",
+  "coordinatorInviteEmail": "Automated_Coordinator_10316@yopmail.com",
   "password": "Test@123",
-  "United States":{
+  "United States": {
     "cityName": "Atlanta",
     "stateName": "Georgia"
   },
-  "India":{
+  "India": {
     "cityName": "Ahmedabad",
     "stateName": "Gujarat"
   },
-  "United Kingdom":{
+  "United Kingdom": {
     "cityName": "London",
     "stateName": "England"
   },
-  "loginURLParam": "us/auth/login"
+  "expectedLoginBaseURL": "https://shop.qa.hospitality.thinfra.net/us/auth/login"
 }

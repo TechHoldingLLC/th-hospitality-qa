@@ -1,6 +1,6 @@
 {
     "emailValidationText": "Invalid email address",
-    "invitationSuccessMessage": "Invitation sent successfully!",
+    "invitationSuccessMessage": "The invitation has been successfully sent.",
     "roleValidationText": "Role is required",
     "departmentValidationText": "Department is required",
     "groupsValidationText": "At least one group must be selected",

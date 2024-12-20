@@ -189,6 +189,7 @@ export default class BasePage {
       this.page.locator("//input[@id='login']"),
       email
     );
+    await this.page.waitForTimeout(3000);
     await this.page.keyboard.press("Enter");
     // Locate the iframe by its name attribute
     const iframeElement = this.page.frameLocator('iframe[name="ifmail"]');

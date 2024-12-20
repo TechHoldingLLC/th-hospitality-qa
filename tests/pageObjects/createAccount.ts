@@ -20,6 +20,7 @@ export class createAccountPage extends BasePage {
   public stateValidationMessage: Locator;
   public countryValidationMessage: Locator;
   public locationValidationMessage: Locator;
+  public shopUILogo: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -60,11 +61,12 @@ export class createAccountPage extends BasePage {
     this.locationValidationMessage = page.locator(
       "//span[text()='City, state, and country must all be provided if any one is provided.']"
     );
+    this.shopUILogo = page.locator("//a[@class='flex items-center gap-4 md:gap-6']");
   }
 
   async createAccount(email: string): Promise<void> {
-    const firstname = "Automated";
     const username = email.split("@")[0];
+    const firstname = username.split("_")[0];
     const lastname = username.split("_").slice(1).join("_");
     await this.enterValuesInElement(this.firstNameInput, firstname);
     await this.enterValuesInElement(this.lastNameInput, lastname);
@@ -82,11 +84,15 @@ export class createAccountPage extends BasePage {
     const selectedCountry = (await this.countryDropdown
       .locator("option:checked")
       .textContent()) as CountryKeys;
+      console.log("selected country:",selectedCountry);
     const countryData = createAccountData[selectedCountry];
     await this.cityInput.waitFor();
     if (typeof countryData === "object" && countryData !== null) {
       await this.enterValuesInElement(this.cityInput, countryData.cityName);
+      console.log("city",countryData.cityName);
       await this.enterValuesInElement(this.stateInput, countryData.stateName);
+      console.log("state",countryData.stateName);
+
     } else {
       throw new Error(`Invalid data for country: ${selectedCountry}`);
     }

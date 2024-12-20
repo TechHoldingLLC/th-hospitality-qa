@@ -49,8 +49,8 @@ test("TC0014 - Verify that admins can initiate invitations for (admin) from the 
 
     //Update Admin email in createAccountData.json file
     const jsonData: any = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    if (jsonData.hasOwnProperty("AdminInviteEmail")) {
-      jsonData.AdminInviteEmail = email;
+    if (jsonData.hasOwnProperty("adminInviteEmail")) {
+      jsonData.adminInviteEmail = email;
     }
     fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), "utf-8");
   } catch (error: any) {
@@ -76,8 +76,8 @@ test("TC0108 - Verify that admins can initiate invitations for (coordinator) fro
     );
     //Update Coordinator email in createAccountData.json file
     const jsonData: any = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    if (jsonData.hasOwnProperty("CoordinatorInviteEmail")) {
-      jsonData.CoordinatorInviteEmail = email;
+    if (jsonData.hasOwnProperty("coordinatorInviteEmail")) {
+      jsonData.coordinatorInviteEmail = email;
     }
     fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), "utf-8");
   } catch (error: any) {

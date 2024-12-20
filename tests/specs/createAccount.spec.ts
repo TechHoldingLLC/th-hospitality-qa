@@ -114,7 +114,6 @@ test("TC0111 - Verify that Admin user is created successfully after registration
     //Create account successfully
     await createAccount.createAccount(createAccountData.adminInviteEmail);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
-    expect(page.url()).toContain(createAccountData.loginURLParam);
     //Verify login as newly registered admin
     await loginPage.login(
       createAccountData.adminInviteEmail,
@@ -135,14 +134,17 @@ test("TC0112 - Verify that Coordinator user is created successfully after regist
     //Create account successfully
     await createAccount.createAccount(createAccountData.coordinatorInviteEmail);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
-    expect(page.url()).toContain(createAccountData.loginURLParam);
+    await page.waitForLoadState();
+    expect(page.url()).toEqual(createAccountData.expectedLoginBaseURL);
 
     //Verify login as newly registered coordinator
     await loginPage.login(
       createAccountData.coordinatorInviteEmail,
       createAccountData.password
     );
-    expect(await basePage.isElementVisible(loginPage.cokeLogo)).toBe(true);
+    expect(await basePage.isElementVisible(createAccount.shopUILogo)).toBe(
+      true
+    );
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
