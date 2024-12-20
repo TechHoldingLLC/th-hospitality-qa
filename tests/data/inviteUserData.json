@@ -1,0 +1,11 @@
+{
+    "emailValidationText": "Invalid email address",
+    "invitationSuccessMessage": "Invitation sent successfully!",
+    "roleValidationText": "Role is required",
+    "departmentValidationText": "Department is required",
+    "groupsValidationText": "At least one group must be selected",
+    "urls": {
+        "expectedBaseURLAdminPortal": "https://admin.qa.hospitality.thinfra.net/create-account",
+        "expectedBaseURLCoordinator": "https://shop.qa.hospitality.thinfra.net/us/auth/create-account"
+    }
+}

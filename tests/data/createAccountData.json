@@ -1,0 +1,18 @@
+{
+  "adminInviteEmail": "Automated_Admin_22632@yopmail.com",
+  "coordinatorInviteEmail": "Automated_Coordinator_64017@yopmail.com",
+  "password": "Test@123",
+  "United States":{
+    "cityName": "Atlanta",
+    "stateName": "Georgia"
+  },
+  "India":{
+    "cityName": "Ahmedabad",
+    "stateName": "Gujarat"
+  },
+  "United Kingdom":{
+    "cityName": "London",
+    "stateName": "England"
+  },
+  "loginURLParam": "us/auth/login"
+}

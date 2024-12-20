@@ -25,6 +25,7 @@ test.afterEach(async () => {
 });
 
 test("TC0011 - Verify that admins can view a list of users", async () => {
+  try{
   //Login as admin
   await loginPage.login(config.email, config.password);
   await basePage.clickElement(viewUsersPage.usersButton);
@@ -33,9 +34,14 @@ test("TC0011 - Verify that admins can view a list of users", async () => {
     true
   );
   expect(await basePage.isElementVisible(viewUsersPage.nameHeader)).toBe(true);
+}catch (error: any) {
+  console.error(`Test failed: ${error.message}`);
+  throw error;
+}
 });
 
 test("TC0013 - Verify that user list and detail shows specified fields like name, email, role, department, group, status and last login", async () => {
+  try{
   //Login as admin
   await loginPage.login(config.email, config.password);
   await basePage.clickElement(viewUsersPage.usersButton);
@@ -85,13 +91,23 @@ test("TC0013 - Verify that user list and detail shows specified fields like name
 
   //Verify Last Login column data
   await basePage.validateColumnData(viewUsersPage.lastLoginColumnData);
+}
+catch (error: any) {
+  console.error(`Test failed: ${error.message}`);
+  throw error;
+}
 });
 
 test("TC0012 - Verify that coordinators cannot view a list of users", async () => {
+  try{
   //Login as coordinator
   await loginPage.login(config.coordinator_email, config.coordinator_password);
   //Verify coordinator doesn't have access to Admin portal, hence can't view Users list
   expect(
     await basePage.getElementText(viewUsersPage.coordinatorAccessDeniedMessage)
   ).toContain(coordinatorAccessDeniedText);
+}catch (error: any) {
+  console.error(`Test failed: ${error.message}`);
+  throw error;
+}
 });
