@@ -133,8 +133,12 @@ test("TC0112 - Verify that Coordinator user is created successfully after regist
     );
     //Create account successfully
     await createAccount.createAccount(createAccountData.coordinatorInviteEmail);
+    expect(
+      await basePage.isElementVisible(createAccount.createAccountSuccessMessage)
+    ).toBe(true);
+
+    await page.waitForURL(createAccountData.expectedLoginBaseURL);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
-    await page.waitForLoadState();
     expect(page.url()).toEqual(createAccountData.expectedLoginBaseURL);
 
     //Verify login as newly registered coordinator

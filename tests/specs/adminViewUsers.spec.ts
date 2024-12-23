@@ -3,13 +3,13 @@ import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { adminViewUsersPage } from "../pageObjects/adminViewUsers";
+import viewUserData from "../data/viewUserData.json";
 
 let browser: Browser;
 let page: Page;
 let basePage: BasePage;
 let loginPage: adminLoginPage;
 let viewUsersPage: adminViewUsersPage;
-const coordinatorAccessDeniedText = "Access denied for user";
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -105,7 +105,7 @@ test("TC0012 - Verify that coordinators cannot view a list of users", async () =
   //Verify coordinator doesn't have access to Admin portal, hence can't view Users list
   expect(
     await basePage.getElementText(viewUsersPage.coordinatorAccessDeniedMessage)
-  ).toContain(coordinatorAccessDeniedText);
+  ).toContain(viewUserData.coordinatorAccessDeniedText);
 }catch (error: any) {
   console.error(`Test failed: ${error.message}`);
   throw error;

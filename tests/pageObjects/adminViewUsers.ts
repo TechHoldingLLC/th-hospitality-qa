@@ -83,7 +83,7 @@ export class adminViewUsersPage {
       "//tbody[@class='border-ui-border-base border-b-0']//td[7]"
     );
     this.coordinatorAccessDeniedMessage = page.locator(
-      "//span[@class='txt-small text-ui-fg-error grid grid-cols-[20px_1fr] gap-1 items-start']"
+      "//span[text()='Incorrect email or password. Please try again.']"
     );
   }
 }
