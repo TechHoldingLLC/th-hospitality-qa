@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "description": "This repo is managed by QA team for Coke-Playwright Automation",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test", "allure:serve": "allure generate ./allure-results --clean && allure open"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.49.0",
-    "@types/node": "^22.9.0"
+    "@types/node": "^22.9.0",
+    "allure-commandline": "^2.32.0",
+    "allure-playwright": "^3.0.7"
   }
 }
