@@ -36,7 +36,7 @@ test.afterEach(async () => {
   await browser.close();
 });
 
-test.only("TC0086 - verify that the user can access a CTA to delete", async () => {
+test("TC0086 - verify that the user can access a CTA to delete", async () => {
   try {
     // Click on Add Program button
     await basePage.clickElement(viewProgramsPage.addProgramButton);
@@ -65,3 +65,19 @@ test.only("TC0086 - verify that the user can access a CTA to delete", async () =
     throw error;
   }
 });
+
+test('TC0087 - Verify that if the programs is not associated with packages, products and orders a confirmation prompt appears', async ()=>{
+  try {
+
+    // Verify cancel button
+    await deleteProgramPage.cancelDeleteProgram(deleteProgramPage.cancelProgramButton);
+
+    // Verify 'X' button
+    await deleteProgramPage.cancelDeleteProgram(deleteProgramPage.closePopupButton);
+
+  } catch (error:any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
