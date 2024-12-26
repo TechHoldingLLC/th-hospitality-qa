@@ -108,3 +108,33 @@ test("TC0024 - Verify the CTAs to create edit and delete products are available"
     throw error;
   }
 });
+
+test.only("TC0023 - Verify that users can filter on type and program", async() => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewProductsPage.addFilterButton);
+
+    // click on Type menu item 
+    await basePage.clickElement(viewProductsPage.typeMenuItem);
+
+    // select random product from list
+    const selectedProduct: null| string = await basePage.selectRandomItemFromMultiSelectList(viewProductsPage.productListFromTypeMenuItem);
+    
+    console.log(selectedProduct);
+
+   await basePage.waitForStaticTimeout(5000);
+
+    if (selectedProduct === null) {
+      console.error(`Test failed: Null value found while retrieving the text of the selected product.`);
+      expect( selectedProduct,'Null value found while retrieving the text of the selected product.').not.toBeNull();
+    }  else{
+      // verify filtered data
+      await basePage.verifyColumnData("Product Type",selectedProduct.toString());
+    }
+
+  } catch (error:any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+
+});

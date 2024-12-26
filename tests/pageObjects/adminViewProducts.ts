@@ -25,6 +25,9 @@ export class adminViewProductsPage {
   public addProductForm: Locator;
   public cancelButton: Locator;
   public editProductHeader: Locator;
+  public addFilterButton: Locator;
+  public typeMenuItem :Locator;
+  public productListFromTypeMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -85,5 +88,9 @@ export class adminViewProductsPage {
     this.editProductHeader = page.locator(
       "//h1[@class='font-sans font-medium h1-core']"
     );
+    this.addFilterButton = page.locator("button#filters_menu_trigger");
+    this.typeMenuItem = page.locator("//div[@role='menuitem' and text()='Type']");
+    this.productListFromTypeMenuItem = page.locator("//div[@role='option']");
   }
+
 }

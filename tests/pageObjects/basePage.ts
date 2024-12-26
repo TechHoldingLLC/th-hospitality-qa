@@ -4,7 +4,7 @@ import { config } from "../config/config.qa";
 export default class BasePage {
   readonly page: Page;
   createAccountLink: any;
-  createAccountLink: any;
+ // createAccountLink: any;
 
   constructor(page: Page) {
     this.page = page;
@@ -13,6 +13,11 @@ export default class BasePage {
   // Common method to navigate to a URL
   async navigateTo(url: string) {
     await this.page.goto(url);
+  }
+
+  // Wait for static time
+  async waitForStaticTimeout(miliSecond:number) {
+    await this.page.waitForTimeout(miliSecond); // Wait for 
   }
 
   // Common method to click an element
@@ -120,17 +125,21 @@ export default class BasePage {
     await dropdownElement.selectOption(randomOptionValue);
   }
 
-  async selectRandomItemFromMultiSelectList(
-    listElement: Locator
-  ): Promise<void> {
+  async selectRandomItemFromMultiSelectList(listElement: Locator):Promise<null | string> {
     // Wait for the list to be visible
     await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
     const items = await listElement.all();
     // Generate a random index to select an item
     const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select itom
+    const selectedItem = items[randomIndex].textContent();
+
     // Click the random item
     await items[randomIndex].click();
+
+    return selectedItem;
   }
 
   async mailinatorLogin(): Promise<void> {
@@ -214,6 +223,44 @@ export default class BasePage {
     for (const element of elements) {
       const textContent = await element.textContent();
       expect(textContent).toBeTruthy();
+    }
+  }
+
+  // Verify column Data
+  async verifyColumnData(columnName:string,expectedResult:string): Promise<void>{
+    // Find column Locators 
+    const columnLocators = await this.page.locator("//table//th").all();
+
+    let columnNo:number = -1; // Initialize with -1 to indicate "not found"
+
+    // Iterate through the column locators to find the column index
+    for (let i = 0; i < columnLocators.length;i++ ) {
+      
+      const data = await columnLocators[i].textContent();
+      
+      // If textContent is null, skip to the next iteration
+      if (data && data === columnName) {
+        console.log(`Found column: ${data}`);
+        columnNo = i+1;
+        break; // Exit the loop once the column is found
+      }
+    }
+    
+    // Column should not be -1
+    expect(columnNo).not.toBe(-1);
+    
+    console.log(columnNo);
+
+    // Get all data from the specified column
+    const rowData = await this.page.locator("//table//tr/td["+columnNo+"]").all();
+    
+    // Iterate through rowData to validate each cell's content
+    for (const rowLocator of rowData) {
+      const cellText = await rowLocator.textContent();
+      console.log(cellText);
+      
+      // Validate each row's textContent
+      expect(cellText).toBe(expectedResult);
     }
   }
 }
