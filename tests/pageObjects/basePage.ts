@@ -216,4 +216,8 @@ export default class BasePage {
       expect(textContent).toBeTruthy();
     }
   }
+  async generateNomenclatureDescription(modulename: string): Promise<string> {
+    const randomString = await this.generateRandomString();
+    return "Automated_" + modulename + "_Description_" + randomString;
+  }
 }
