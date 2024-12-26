@@ -14,32 +14,46 @@ const productDescriptionValidationMessage = "Description cannot be empty";
 const programValidationMessage = "Please select program";
 const totalQuantityValidationMessage = "Please fill total quantity";
 
-test.beforeEach(async()=>{
-    browser = await chromium.launch({headless: false, channel: "chrome"});
-    page = await browser.newPage();
-    basePage = new BasePage(page);
-    loginPage = new adminLoginPage(page);
-    createEditProductPage = new adminCreateEditProductPage(page);
-    // await basePage.navigateTo(config.adminPortalUrl);
-    // await loginPage.login(config.email, config.password);
-    await basePage.navigateTo("https://admin.dev.hospitality.thinfra.net/login");
-    await loginPage.login("superuser@dev.hospitality.thinfra.net", "TestSuperUser%123");
-    await basePage.clickElement(createEditProductPage.productsButton);
-    await basePage.clickElement(createEditProductPage.addProductButton);
+test.beforeEach(async () => {
+  browser = await chromium.launch({ headless: false, channel: "chrome" });
+  page = await browser.newPage();
+  basePage = new BasePage(page);
+  loginPage = new adminLoginPage(page);
+  createEditProductPage = new adminCreateEditProductPage(page);
+  await basePage.navigateTo(config.adminPortalUrl);
+  await loginPage.login(config.email, config.password);
+  await basePage.clickElement(createEditProductPage.productsButton);
+  await basePage.clickElement(createEditProductPage.addProductButton);
 });
 
-test.afterEach(async()=>{
-    await browser.close();
+test.afterEach(async () => {
+  await browser.close();
 });
 
-test("TC0028 - Verify that the user is able to create a product",async()=>{
-    console.log(await createEditProductPage.productNameInput.count());
-    await createEditProductPage.productNameInput.focus();
-    await basePage.waitForElementVisible(createEditProductPage.productNameInput);
-    await basePage.enterValuesInElement(createEditProductPage.productNameInput, "Automated product");
-    //await basePage.enterValuesInElement(createEditProductPage.productDescriptionInput, "Automated description");
-    console.log("entered name: ",await createEditProductPage.productNameInput.inputValue());
-    //console.log(await createEditProductPage.productDescriptionInput.inputValue());
-
+test("TC0028 - Verify that the user is able to create a product", async () => {
+  try {
+    await basePage.waitForElementVisible(
+      createEditProductPage.productNameInput
+    );
+    await basePage.enterValuesInElement(
+      createEditProductPage.productNameInput,
+      "Automated product"
+    );
+    await basePage.enterValuesInElement(
+      createEditProductPage.productDescriptionInput,
+      "Automated description"
+    );
+    await basePage.clickElement(createEditProductPage.giftIcon);
+    await basePage.clickElement(createEditProductPage.associatedProgramButton);
+    await basePage.selectRandomItemFromMultiSelectList(createEditProductPage.associateProgramList);
+    await basePage.enterValuesInElement(
+      createEditProductPage.totalQuantityAvailable,
+      "10"
+    );
+    await basePage.clickElement(createEditProductPage.saveButton);
     await page.waitForTimeout(3000);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
