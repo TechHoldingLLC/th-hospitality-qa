@@ -3,7 +3,6 @@ import BasePage from "../pageObjects/basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { adminViewEventsPage } from "../pageObjects/adminViewEvents";
-import exp from "constants";
 
 let browser: Browser;
 let page: Page;

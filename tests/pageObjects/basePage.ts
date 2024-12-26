@@ -4,7 +4,10 @@ import { config } from "../config/config.qa";
 export default class BasePage {
   readonly page: Page;
   createAccountLink: any;
+<<<<<<< HEAD
  // createAccountLink: any;
+=======
+>>>>>>> main
 
   constructor(page: Page) {
     this.page = page;
@@ -199,6 +202,7 @@ export default class BasePage {
       this.page.locator("//input[@id='login']"),
       email
     );
+    await this.page.waitForTimeout(3000);
     await this.page.keyboard.press("Enter");
     // Locate the iframe by its name attribute
     const iframeElement = this.page.frameLocator('iframe[name="ifmail"]');

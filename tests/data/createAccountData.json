@@ -1,0 +1,18 @@
+{
+  "adminInviteEmail": "Automated_Admin_10994@yopmail.com",
+  "coordinatorInviteEmail": "Automated_Coordinator_46265@yopmail.com",
+  "password": "Test@123",
+  "United States": {
+    "cityName": "Atlanta",
+    "stateName": "Georgia"
+  },
+  "India": {
+    "cityName": "Ahmedabad",
+    "stateName": "Gujarat"
+  },
+  "United Kingdom": {
+    "cityName": "London",
+    "stateName": "England"
+  },
+  "expectedLoginBaseURL": "https://shop.qa.hospitality.thinfra.net/us/auth/login"
+}

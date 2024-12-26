@@ -4,21 +4,16 @@ import { adminInviteUserPage } from "../pageObjects/adminInviteUserPage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import BasePage from "../pageObjects/basePage";
+import inviteUserData from "../data/inviteUserData.json";
+import fs from "fs";
+import path from "path";
 
 let browser: Browser;
 let page: Page;
 let loginPage: adminLoginPage;
 let inviteUserPage: adminInviteUserPage;
 let basePage: BasePage;
-const emailValidationText = "Invalid email address";
-const invitationSuccessMessage = "Invitation sent successfully!";
-const roleValidationText = "Role is required";
-const departmentValidationText = "Department is required";
-const groupsValidationText = "At least one group must be selected";
-const expectedBaseURLAdminPortal =
-  "https://admin.qa.hospitality.thinfra.net/create-account";
-const expectedBaseURLCoordinator =
-  "https://shop.qa.hospitality.thinfra.net/us/auth/create-account";
+const filePath = path.resolve(__dirname, "../data/createAccountData.json");
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -44,11 +39,20 @@ test("TC0014 - Verify that admins can initiate invitations for (admin) from the 
     // Validate success message after invitation
     expect(
       await basePage.getElementText(inviteUserPage.inviteSuccessMessage)
-    ).toEqual(invitationSuccessMessage);
+    ).toEqual(inviteUserData.invitationSuccessMessage);
 
     //Click on 'Create Account' button from email body and verify navigation URL
     await basePage.openCreateAccountLinkFromEmail(email);
-    expect(page.url()).toContain(expectedBaseURLAdminPortal);
+    expect(page.url()).toContain(
+      inviteUserData.urls.expectedBaseURLAdminPortal
+    );
+
+    //Update Admin email in createAccountData.json file
+    const jsonData: any = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    if (jsonData.hasOwnProperty("adminInviteEmail")) {
+      jsonData.adminInviteEmail = email;
+    }
+    fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), "utf-8");
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
@@ -63,11 +67,19 @@ test("TC0108 - Verify that admins can initiate invitations for (coordinator) fro
     // Validate success message after invitation
     expect(
       await basePage.getElementText(inviteUserPage.inviteSuccessMessage)
-    ).toEqual(invitationSuccessMessage);
+    ).toEqual(inviteUserData.invitationSuccessMessage);
 
     //Click on 'Create Account' button from email body and verify navigation URL
     await basePage.openCreateAccountLinkFromEmail(email);
-    expect(page.url()).toContain(expectedBaseURLCoordinator);
+    expect(page.url()).toContain(
+      inviteUserData.urls.expectedBaseURLCoordinator
+    );
+    //Update Coordinator email in createAccountData.json file
+    const jsonData: any = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    if (jsonData.hasOwnProperty("coordinatorInviteEmail")) {
+      jsonData.coordinatorInviteEmail = email;
+    }
+    fs.writeFileSync(filePath, JSON.stringify(jsonData, null, 2), "utf-8");
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;
@@ -80,16 +92,16 @@ test("TC0015 - Verify that admins are required to choose an email, role, departm
     //Validate error messages when required fields are submitted empty
     expect(
       await basePage.getElementText(inviteUserPage.inviteEmailErrorMessage)
-    ).toEqual(emailValidationText);
+    ).toEqual(inviteUserData.emailValidationText);
     expect(
       await basePage.getElementText(inviteUserPage.inviteRoleErrorMessage)
-    ).toEqual(roleValidationText);
+    ).toEqual(inviteUserData.roleValidationText);
     expect(
       await basePage.getElementText(inviteUserPage.inviteDepartmentErrorMessage)
-    ).toEqual(departmentValidationText);
+    ).toEqual(inviteUserData.departmentValidationText);
     expect(
       await basePage.getElementText(inviteUserPage.inviteGroupsErrorMessage)
-    ).toEqual(groupsValidationText);
+    ).toEqual(inviteUserData.groupsValidationText);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
     throw error;

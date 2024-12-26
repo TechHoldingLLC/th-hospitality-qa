@@ -3,13 +3,13 @@ import BasePage from "../pageObjects/basePage";
 import { config } from "../config/config.qa";
 import { adminForgotPasswordPage } from "../pageObjects/adminForgotPassword";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
+import forgotPasswordData from "../data/forgotPasswordData.json";
 
 let browser: Browser;
 let page: Page;
 let basePage: BasePage;
 let forgotPasswordPage: adminForgotPasswordPage;
 let loginPage: adminLoginPage;
-const resetUserEmail = "resetUser@team507472.testinator.com";
 let newPassword: any;
 
 test.beforeEach(async () => {
@@ -29,7 +29,9 @@ test.afterEach(async () => {
 test("TC0005 - Verify that the user can access a screen to enter their email address to initiate a reset", async () => {
   try {
     //Navigate to Reset password page and request for new password
-    await forgotPasswordPage.requestNewPassword(resetUserEmail);
+    await forgotPasswordPage.requestNewPassword(
+      forgotPasswordData.resetUserEmail
+    );
     expect(
       await basePage.isElementVisible(
         forgotPasswordPage.resetLinkSentSuccessmessage
@@ -91,7 +93,7 @@ test("TC0005 - Verify that the user can access a screen to enter their email add
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
 
     //Verify login with newly created password
-    await loginPage.login(resetUserEmail, newPassword);
+    await loginPage.login(forgotPasswordData.resetUserEmail, newPassword);
     await basePage.isElementVisible(loginPage.cokeLogo);
     expect(await basePage.isElementVisible(loginPage.cokeLogo)).toBe(true);
   } catch (error: any) {
