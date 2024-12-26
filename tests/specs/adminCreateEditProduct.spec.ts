@@ -20,8 +20,10 @@ test.beforeEach(async()=>{
     basePage = new BasePage(page);
     loginPage = new adminLoginPage(page);
     createEditProductPage = new adminCreateEditProductPage(page);
-    await basePage.navigateTo(config.adminPortalUrl);
-    await loginPage.login(config.email, config.password);
+    // await basePage.navigateTo(config.adminPortalUrl);
+    // await loginPage.login(config.email, config.password);
+    await basePage.navigateTo("https://admin.dev.hospitality.thinfra.net/login");
+    await loginPage.login("superuser@dev.hospitality.thinfra.net", "TestSuperUser%123");
     await basePage.clickElement(createEditProductPage.productsButton);
     await basePage.clickElement(createEditProductPage.addProductButton);
 });
