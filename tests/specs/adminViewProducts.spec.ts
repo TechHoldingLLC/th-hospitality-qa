@@ -109,7 +109,7 @@ test("TC0024 - Verify the CTAs to create edit and delete products are available"
   }
 });
 
-test.only("TC0023 - Verify that users can filter on type and program", async() => {
+test("TC0023 - Verify that users can filter on type and program", async() => {
   try {
     // click on Add filter button
     await basePage.clickElement(viewProductsPage.addFilterButton);
