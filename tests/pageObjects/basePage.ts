@@ -4,10 +4,6 @@ import { config } from "../config/config.qa";
 export default class BasePage {
   readonly page: Page;
   createAccountLink: any;
-<<<<<<< HEAD
- // createAccountLink: any;
-=======
->>>>>>> main
 
   constructor(page: Page) {
     this.page = page;
