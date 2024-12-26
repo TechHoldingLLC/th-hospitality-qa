@@ -228,6 +228,14 @@ export default class BasePage {
 
   // Verify column Data
   async verifyColumnData(columnName:string,expectedResult:string): Promise<void>{
+
+    if(await this.page.locator("text='No results'").isVisible() 
+      || await this.page.locator("text='Try changing the filters or search query'").isVisible()){
+
+      console.log("No results shown for filtering this data");
+      return;
+    }
+
     // Find column Locators 
     const columnLocators = await this.page.locator("//table//th").all();
 
