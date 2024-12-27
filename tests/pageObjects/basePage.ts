@@ -83,8 +83,16 @@ export default class BasePage {
   }
 
   // Function to generate a random 5-digit number
-  async generateRandomDigits(): Promise<string> {
+  async generate5RandomDigits(): Promise<string> {
     return Math.floor(10000 + Math.random() * 90000).toString(); // ensures 5 digits
+  }
+  // Function to generate a random 4-digit number
+  async generate4RandomDigits(): Promise<string> {
+    return Math.floor(1000 + Math.random() * 9000).toString(); // ensures 4 digits
+  }
+  // Function to generate a random 2-digit number
+  async generate2RandomDigits(): Promise<string> {
+    return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
   }
 
   // Function to generate a random 5-character alphanumeric string
@@ -98,25 +106,29 @@ export default class BasePage {
   }
 
   async generateNomenclatureName(modulename: string): Promise<string> {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generate5RandomDigits();
     return "Automated_" + modulename + "_" + randomDigits;
   }
 
   async generateNomenclatureEditedName(modulename: string): Promise<string> {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generate5RandomDigits();
     return "Automated_" + modulename + "_" + randomDigits + "_Edited";
   }
 
   async clickOnRandomOptionFromDropdown(
     dropdownElement: Locator
-  ): Promise<void> {
+  ): Promise<string> {
     const options = await dropdownElement.locator("option").all();
     // Generate a random index to select an option
     const randomIndex = Math.floor(Math.random() * options.length);
     // Get the value of the random option
     const randomOptionValue = await options[randomIndex].getAttribute("value");
+    if (!randomOptionValue) {
+      throw new Error("Selected option does not have a valid value attribute.");
+    }
     // Select the random option by its value
     await dropdownElement.selectOption(randomOptionValue);
+    return randomOptionValue;
   }
 
   async selectRandomItemFromMultiSelectList(
@@ -140,7 +152,7 @@ export default class BasePage {
   }
 
   async generateNomenclatureEmail(role: string) {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generate5RandomDigits();
     return (
       // "Automated_" + role + "_" + randomDigits + "@team507472.testinator.com"
       "Automated_" + role + "_" + randomDigits + "@yopmail.com"

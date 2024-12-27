@@ -25,6 +25,12 @@ export class adminCreateEditPackagePage extends BasePage {
   public maxQuantityPerOrderValidation: Locator;
   public thumbnailValidation: Locator;
   public mediaValidation: Locator;
+  public productSearchInput: Locator;
+  public selectProductButton: Locator;
+  public selectProductDropdown: Locator;
+  public submitButton: Locator;
+  public addNewProductButton: Locator;
+  public selectedProductText: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -80,16 +86,32 @@ export class adminCreateEditPackagePage extends BasePage {
     this.mediaValidation = page.locator(
       "//span[text()='At least one media is required.']"
     );
+    this.productSearchInput = page.locator("//input[@name='products']");
+    this.selectProductButton = page.locator("//div[@class='mt-2']//button");
+    this.selectProductDropdown = page.locator("//div[@class='mt-2']/select");
+    this.submitButton = page.locator("//button[text()='Submit']");
+    this.addNewProductButton = page.locator(
+      "//a[@href='/packages/create/product-create']"
+    );
+    this.selectedProductText = page.locator(
+      "//span[@class='flex items-center gap-3 stroke-foregrounds/fg-base']"
+    );
   }
 
   async addPackage(): Promise<void> {
+    const maxQuantity = await this.addPackageDetailsForm();
+    await this.addpackageProductForm(maxQuantity);
+    await this.clickElement(this.submitButton);
+  }
+
+  async addPackageDetailsForm(): Promise<string> {
     const packagename = await this.generateNomenclatureName("Package");
     const packageDescription = await this.generateNomenclatureDescription(
       "Package"
     );
     await this.waitForElementVisible(this.packageNameInput);
     await this.enterValuesInElement(this.packageNameInput, packagename);
-    await this.page.waitForTimeout(3000);
+    await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
     await this.enterValuesInElement(
       this.packageDescriptionInput,
@@ -99,9 +121,22 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
     await this.clickElement(this.groupRestrictionsButton);
     await this.selectRandomItemFromMultiSelectList(this.groupRestrictionsList);
-    await this.enterValuesInElement(this.totalQuantityAvailableInput, "10");
-    await this.enterValuesInElement(this.maxQuantityPerOrderInput, "2");
-    await this.enterValuesInElement(this.currencyAndPrice, "10");
+
+    const totalQuantity = await this.generate2RandomDigits();
+    await this.enterValuesInElement(
+      this.totalQuantityAvailableInput,
+      totalQuantity
+    );
+
+    const maxQuantity = Math.floor(
+      Math.random() * (parseInt(totalQuantity) - 10) + 10
+    ).toString();
+    await this.enterValuesInElement(this.maxQuantityPerOrderInput, maxQuantity);
+
+    await this.enterValuesInElement(
+      this.currencyAndPrice,
+      await this.generate4RandomDigits()
+    );
     await this.thumbnailUpload.setInputFiles(
       path.join(__dirname, "../coca-cola-images/packages/event-img1.webp")
     );
@@ -109,5 +144,31 @@ export class adminCreateEditPackagePage extends BasePage {
       path.join(__dirname, "../coca-cola-images/packages/event-img2.webp")
     );
     await this.clickElement(this.nextButton);
+    return maxQuantity;
+  }
+
+  async addpackageProductForm(maxQuantity: string) {
+    await this.enterValuesInElement(this.productSearchInput, "Automated");
+    await this.clickElement(this.selectProductButton);
+    const productname = await this.clickOnRandomOptionFromDropdown(
+      this.selectProductDropdown
+    );
+    await this.page.mouse.click(10, 10);
+    const inPackageQuantity = Math.floor(
+      Math.random() * (parseInt(maxQuantity) - 10) + 10
+    ).toString();
+    console.log(
+      await this.isElementVisible(
+        this.page.locator(await this.getProductQuantityLocator(productname))
+      )
+    );
+    await this.enterValuesInElement(
+      this.page.locator(await this.getProductQuantityLocator(productname)),
+      inPackageQuantity
+    );
+  }
+
+  async getProductQuantityLocator(productName: string) {
+    return `//td[text()='${productName}']/following-sibling::td[5]//input`;
   }
 }
