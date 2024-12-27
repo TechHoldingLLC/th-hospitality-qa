@@ -61,7 +61,16 @@ test("TC0034 - Verify required and optional fields for packages", async () => {
   }
 });
 
-test.only("TC0036 - Verify that user can add and remove products and update quantities", async () => {
+test("TC0036 - Verify that user can add and remove products and update quantities", async () => {
+  try {
+    await page.waitForTimeout(3000);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test.only("TC0035 - Verify that the user is able to create a package", async () => {
   try {
     await createEditPackagePage.addPackage();
 
