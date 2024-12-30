@@ -42,3 +42,26 @@ test.only('TC0089 - verify that the user can access a CTA to delete', async() =>
     }
 
 });
+
+test('TC0090 - Verify that if the package is not associated with orders a confirmation prompt appears', async() =>{
+    try {
+        
+        // Delete Package
+        deletePackagesPage.deletePackage("");
+        
+    } catch (error: any) {
+        console.log(`Test failed: ${error.message}`);
+        throw error;
+    }
+
+});
+
+test('TC0091 - Verify that if the package is associated with orders an error message appears', async() =>{
+    try {
+        
+    } catch (error: any) {
+        console.log(`Test failed: ${error.message}`);
+        throw error;
+    }
+
+});
