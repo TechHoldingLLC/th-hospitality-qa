@@ -28,7 +28,7 @@ test.afterEach(async () => {
   await browser.close();
 });
 
-test.only('TC0089 - verify that the user can access a CTA to delete', async() =>{
+test('TC0089 - verify that the user can access a CTA to delete', async() =>{
     try {
         // Click on three dot button
         await basePage.clickElement(deletePackagesPage.threeDotsButton);
