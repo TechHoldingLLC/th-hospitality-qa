@@ -164,3 +164,33 @@ test("TC0107 - Verify the list of events is paginated", async () => {
     throw error;
   }
 });
+
+test("TC0076 - Verify that users can filter by events", async() => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewEventsPage.addFilterButton);
+
+    // click on Status menu item 
+    await basePage.clickElement(viewEventsPage.statusMenuItem);
+
+    // select random status from list
+    const selectedProduct: null| string = await basePage.selectRandomItemFromMultiSelectList(viewEventsPage.statusListFromMenuItem);
+    
+    console.log(selectedProduct);
+
+   await basePage.waitForStaticTimeout(5000);
+
+    if (selectedProduct === null) {
+      console.error(`Test failed: Null value found while retrieving the text of the selected status.`);
+      expect( selectedProduct,'Null value found while retrieving the text of the selected status.').not.toBeNull();
+    }  else{
+      // verify filtered data
+      await basePage.verifyColumnData("Status",selectedProduct.toString());
+    }
+
+  } catch (error:any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+
+});
