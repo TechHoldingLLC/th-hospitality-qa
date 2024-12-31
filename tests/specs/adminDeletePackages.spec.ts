@@ -56,7 +56,7 @@ test('TC0090 - Verify that if the package is not associated with orders a confir
 
 });
 
-test.only('TC0091 - Verify that if the package is associated with orders an error message appears', async() =>{
+test('TC0091 - Verify that if the package is associated with orders an error message appears', async() =>{
     try {
         // Get Package name from Order Page
         const packageName : null|string= await deletePackagesPage.getPackageNameFromOrderPage();
