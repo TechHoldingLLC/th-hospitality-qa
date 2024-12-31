@@ -1,5 +1,6 @@
 import { expect,Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
+import deletePackagesData from "../data/deletePackagesData.json";
 
 export class adminDeletePackagesPage extends BasePage{
 
@@ -16,6 +17,8 @@ export class adminDeletePackagesPage extends BasePage{
     public orderListLink:Locator;
     public packagesButton:Locator;
     public packageNameFromTable:Locator;
+    public gotItButton:Locator;
+    public nextButton:Locator;
 
     constructor(page: Page) {
         super(page);
@@ -30,6 +33,8 @@ export class adminDeletePackagesPage extends BasePage{
         this.orderListLink = page.locator("//table//tr/td[1]//a");
         this.packagesButton = page.locator("//div[@role='tablist']/button[text()='Packages']");
         this.packageNameFromTable = page.locator("//div[contains(@id,'package')]//table//tr/td[1]");
+        this.gotItButton = page.locator("//button[text()='Got it']");
+        this.nextButton = page.locator("//button[text()='Next']");
 
     }
 
@@ -46,7 +51,7 @@ export class adminDeletePackagesPage extends BasePage{
         expect(await this.isElementVisible(this.alertDialog)).toBe(true);
         expect(await this.deleteMessageLabel.textContent()).toBe('This will permanently delete the package "'+packageName+'" and cannot be undone.');
 
-        // Click on delete program button
+        // Click on delete package button
         await this.clickElement(this.deletePackageButton);
 
         // Verify delete success message
@@ -67,14 +72,78 @@ export class adminDeletePackagesPage extends BasePage{
         await this.clickElement(this.orderButton);
 
         // Naviate to Order Details page
-        await this.clickElement(this.orderListLink.first());
+        await this.selectRandomItemFromMultiSelectList(this.orderListLink);
 
         // Click on Package button
         await this.clickElement(this.packagesButton);
 
+        await this.page.waitForTimeout(3000);
+
         // Get text from package list 
-        await this.waitForElementVisible(this.packageNameFromTable); 
-        return await this.packageNameFromTable.textContent();
+        await this.waitForElementVisible(this.packageNameFromTable.first()); 
+        return await this.packageNameFromTable.first().textContent();
+    }
+
+    // Find package and click on three dot button
+    async clickOnThreeButton(packageName:string){
+
+        const packageLocator: Locator = this.page.locator('//div[normalize-space()="'+packageName+'"]/ancestor::td/following-sibling::td//button');
+
+        // check package is display in page or not
+        await this.page.waitForTimeout(3000);
+        let productFound:boolean = (await packageLocator.isVisible()).valueOf();
+
+        if(!productFound){
+              let isnextButtonEnabled:boolean = (await this.nextButton.isEnabled()).valueOf();
+
+              if(isnextButtonEnabled){
+                // click on next button
+                await this.clickElement(this.nextButton); 
+
+                // wait for page load
+                 await this.page.waitForLoadState('domcontentloaded');
+
+                  await this.clickOnThreeButton(packageName);
+            } else{
+                console.log(packageName+" is not found in this page")
+                expect(false).toBeTruthy();
+            }
+        } else {
+
+            // click on product link
+            await this.clickElement(packageLocator);
+            await this.page.waitForLoadState('networkidle');
+
+            // verifty porperly navigate or not
+            expect(await this.deleteButton.isVisible()).toBe(true);
+        }
+
+    }
+
+    // Delete Assoicated Package and verify warning message
+    async deleteAssociatedPackage(packageName:string){
+
+         // Click on delete button
+         await this.clickElement(this.deleteButton);
+
+         // Verify alert dialog open or not and verify alert message also
+         expect(await this.isElementVisible(this.alertDialog)).toBe(true);
+         expect(await this.deleteMessageLabel.textContent()).toBe('This will permanently delete the package "'+packageName+'" and cannot be undone.');
+ 
+         // Click on delete package button
+         await this.clickElement(this.deletePackageButton); 
+         
+         await this.page.waitForTimeout(2000);
+
+         // Verify delete success message
+         await this.isElementVisible(this.gotItButton);
+         expect(await this.deleteMessageLabel.textContent()).toBe(deletePackagesData.AssociatedPackageNotDeleteMessage);
+        
+         // Click on conformation button
+         await this.clickElement(this.gotItButton);
+         
+         // Verify popup close or not
+         expect(await this.waitForElementHidden(this.gotItButton)).not.toBe(false);
     }
 
 }

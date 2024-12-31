@@ -71,6 +71,11 @@ test.only('TC0091 - Verify that if the package is associated with orders an erro
             // Navigate to Packages page
             await basePage.clickElement(viewPackagesPage.packagesButton);
 
+            // Click on Three dot button
+            await deletePackagesPage.clickOnThreeButton(packageName);
+
+            // Click on delete button and verify user can not delete package
+            await deletePackagesPage.deleteAssociatedPackage(packageName);
 
           }
       
