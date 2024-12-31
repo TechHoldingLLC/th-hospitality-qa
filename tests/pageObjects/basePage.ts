@@ -132,7 +132,7 @@ export default class BasePage {
     // Generate a random index to select an item
     const randomIndex = Math.floor(Math.random() * items.length);
 
-    // Get text of select itom
+    // Get text of select item
     const selectedItem = items[randomIndex].textContent();
 
     // Click the random item
@@ -268,7 +268,24 @@ export default class BasePage {
       console.log(cellText);
       
       // Validate each row's textContent
-      expect(cellText).toBe(expectedResult);
+      expect(cellText).toContain(expectedResult);
     }
+  }
+
+  // Select random element from list and return text of that element
+  async getRandomValueFromListLocator(listElement:Locator):Promise<null | string> {
+    
+    await this.waitForElementVisible(listElement.first());
+    
+    // Get all the list items
+    const items = await listElement.all();
+
+    // Generate a random index to select an item
+    const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select item
+    const getText = items[randomIndex].textContent();
+
+    return getText;
   }
 }

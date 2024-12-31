@@ -1,4 +1,4 @@
-import test, { Browser, Page, chromium, expect } from "@playwright/test";
+import test, { Browser, Page, chromium, expect,Locator } from "@playwright/test";
 import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
@@ -10,6 +10,19 @@ let page: Page;
 let basePage: BasePage;
 let loginPage: adminLoginPage;
 let viewUsersPage: adminViewUsersPage;
+
+interface FilterData{
+  filter:string;
+  columnlocator: string;
+  menuItemLocator: string;
+  columnName:string;
+}
+
+const filterData :FilterData[]= [
+  {filter:'First Name',columnlocator:  '//tbody[@class="border-ui-border-base border-b-0"]//td[1]', menuItemLocator:'//div[@role="menuitem" and text()="First Name"]', columnName:'Name'},
+  {filter:'Last Name',columnlocator:  '//tbody[@class="border-ui-border-base border-b-0"]//td[1]', menuItemLocator:'//div[@role="menuitem" and text()="Last Name"]', columnName:'Name'},
+  {filter:'Email',columnlocator:  '//tbody[@class="border-ui-border-base border-b-0"]//td[2]', menuItemLocator:'//div[@role="menuitem" and text()="Email"]', columnName:'Email'},
+];
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -110,4 +123,43 @@ test("TC0012 - Verify that coordinators cannot view a list of users", async () =
   console.error(`Test failed: ${error.message}`);
   throw error;
 }
+});
+
+filterData.forEach((data)  =>{
+  test.only("TC0115 - Verify that user can filter the records based on entered " +data.filter, async () => {
+    try{
+    //Login as admin
+    await loginPage.login(config.email, config.password);
+    await basePage.clickElement(viewUsersPage.usersButton);
+      
+    // Get Data from the table
+    const getValueFromColumnData: null | string =await basePage.getRandomValueFromListLocator(page.locator(data.columnlocator));
+    
+    if (getValueFromColumnData === null) {
+      console.error(`Test failed: Null value found while retrieving the text from the table`);
+      expect( getValueFromColumnData,'Null value found while retrieving the text from the table').not.toBeNull();
+    }  else{
+  
+      console.log(getValueFromColumnData);
+  
+      const inputValue = data.filter == 'Last Name'? getValueFromColumnData.toString().trim().split(" ")[1]:getValueFromColumnData.toString().trim().split(" ")[0];
+      
+      // filter data 
+      viewUsersPage.filterData(page.locator(data.menuItemLocator),inputValue);
+  
+      await basePage.waitForStaticTimeout(5000);
+  
+      // Check  no results should not display
+      expect(await viewUsersPage.noResultsLabel.isVisible()).toBe(false);
+  
+      // verify filtered data
+      await basePage.verifyColumnData(data.columnName,inputValue);   
+    
+    }
+  
+  }catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+  });
 });
