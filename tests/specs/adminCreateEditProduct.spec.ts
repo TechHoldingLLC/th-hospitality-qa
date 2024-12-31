@@ -9,10 +9,6 @@ let page: Page;
 let basePage: BasePage;
 let loginPage: adminLoginPage;
 let createEditProductPage: adminCreateEditProductPage;
-const productNameValidationMessage = "Product name cannot be empty";
-const productDescriptionValidationMessage = "Description cannot be empty";
-const programValidationMessage = "Please select program";
-const totalQuantityValidationMessage = "Please fill total quantity";
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -30,28 +26,180 @@ test.afterEach(async () => {
   await browser.close();
 });
 
-test("TC0028 - Verify that the user is able to create a product", async () => {
+test("TC0028 - Verify that the user is able to create a product - with Gift", async () => {
   try {
-    await basePage.waitForElementVisible(
-      createEditProductPage.productNameInput
+    const productname = await createEditProductPage.createProductWithGift();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0028 - Verify that the user is able to create a product - with Ticket", async () => {
+  try {
+    const productname = await createEditProductPage.createProductWithTicket();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0028 - Verify that the user is able to create a product - with Accommodation", async () => {
+  try {
+    const productname =
+      await createEditProductPage.createProductWithAccommodation();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0028 - Verify that the user is able to create a product - with Airport Transfer", async () => {
+  try {
+    const productname =
+      await createEditProductPage.createProductWithAirportTransfer();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0028 - Verify that the user is able to create a product - with Parking", async () => {
+  try {
+    const productname = await createEditProductPage.createProductWithParking();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0028 - Verify that the user is able to create a product - with Other", async () => {
+  try {
+    const productname = await createEditProductPage.createProductWithOther();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0029 - Verify that created/edit products appear updated in the products list", async () => {
+  try {
+    const productname = await createEditProductPage.createProductWithOther();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+    await basePage.waitForElementHidden(
+      page.locator(
+        await createEditProductPage.getProductCreatedLocator(productname)
+      )
     );
-    await basePage.enterValuesInElement(
-      createEditProductPage.productNameInput,
-      "Automated product"
+    const createdProductLocator = page.locator(`text=${productname}`).first();
+    expect(await basePage.getElementText(createdProductLocator)).toEqual(
+      productname
     );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0027 - Verify required and optional fields", async () => {
+  try {
+    await basePage.clickElement(createEditProductPage.saveButton);
+    expect(
+      await basePage.isElementVisible(
+        createEditProductPage.productNameValidation
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0026 - Verify that the user can create and edit products", async () => {
+  try {
+    const productname = await createEditProductPage.createProductWithGift();
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productname)
+        )
+      )
+    ).toBe(true);
+    await basePage.waitForElementHidden(
+      page.locator(
+        await createEditProductPage.getProductCreatedLocator(productname)
+      )
+    );
+    const createdProductLocator = page.locator(`text=${productname}`).first();
+    expect(await basePage.getElementText(createdProductLocator)).toEqual(
+      productname
+    );
+    await basePage.clickElement(
+      page.locator(
+        await createEditProductPage.getCreatedProductKebabIcon(productname)
+      )
+    );
+    await basePage.clickElement(createEditProductPage.editProduct);
     await basePage.enterValuesInElement(
       createEditProductPage.productDescriptionInput,
-      "Automated description"
-    );
-    await basePage.clickElement(createEditProductPage.giftIcon);
-    await basePage.clickElement(createEditProductPage.associatedProgramButton);
-    await basePage.selectRandomItemFromMultiSelectList(createEditProductPage.associateProgramList);
-    await basePage.enterValuesInElement(
-      createEditProductPage.totalQuantityAvailable,
-      "10"
+      await createEditProductPage.generateNomenclatureDescription("Product")
     );
     await basePage.clickElement(createEditProductPage.saveButton);
-    await page.waitForTimeout(3000);
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductEditedLocator(productname)
+        )
+      )
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

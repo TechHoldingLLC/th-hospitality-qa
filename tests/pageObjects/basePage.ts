@@ -216,4 +216,45 @@ export default class BasePage {
       expect(textContent).toBeTruthy();
     }
   }
+
+  async generateNomenclatureDescription(modulename: string): Promise<string> {
+    const randomString = await this.generateRandomString();
+    return "Automated_" + modulename + "_Description_" + randomString;
+  }
+
+  // Function to generate a random 2-digit number
+  async generate2RandomDigits(): Promise<string> {
+    return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
+  }
+
+  // Function to generate a random 4-digit number
+  async generate4RandomDigits(): Promise<string> {
+    return Math.floor(1000 + Math.random() * 9000).toString(); // ensures 4 digits
+  }
+
+  //Function to select random option from radio group
+  async selectRandomRadioOption(radiogroup: Locator) {
+    const options = await radiogroup.all();
+    const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1; // Ensure index is never 0
+    await options[randomIndex].click();
+  }
+
+  // Function to generate a random future date in MM-DD-YYYY format
+  async getRandomFutureDate(): Promise<string> {
+    const currentDate = new Date();
+
+    // Generate a random number of days in the future (up to 365 days)
+    const daysInFuture = Math.floor(Math.random() * 365) + 1; // Between 1 and 365 days
+
+    // Add the random number of days to the current date
+    currentDate.setDate(currentDate.getDate() + daysInFuture);
+
+    // Format the date as MM-DD-YYYY
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed, so add 1
+    const day = String(currentDate.getDate()).padStart(2, "0"); // Day of the month
+    const year = currentDate.getFullYear(); // Full year
+
+    // Return the date in MM-DD-YYYY format
+    return `${month}-${day}-${year}`;
+  }
 }
