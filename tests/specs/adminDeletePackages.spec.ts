@@ -56,8 +56,24 @@ test('TC0090 - Verify that if the package is not associated with orders a confir
 
 });
 
-test('TC0091 - Verify that if the package is associated with orders an error message appears', async() =>{
+test.only('TC0091 - Verify that if the package is associated with orders an error message appears', async() =>{
     try {
+        // Get Package name from Order Page
+        const packageName : null|string= await deletePackagesPage.getPackageNameFromOrderPage();
+
+        if (packageName === null) {
+            console.error(`Test failed: Null value found while retrieving the text of the package`);
+            expect( packageName,'Null value found while retrieving the text of the package.').not.toBeNull();
+          }  else{
+
+            console.log("Package Name: "+packageName);
+
+            // Navigate to Packages page
+            await basePage.clickElement(viewPackagesPage.packagesButton);
+
+
+          }
+      
         
     } catch (error: any) {
         console.log(`Test failed: ${error.message}`);

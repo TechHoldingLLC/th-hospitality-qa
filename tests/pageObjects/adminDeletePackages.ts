@@ -11,6 +11,12 @@ export class adminDeletePackagesPage extends BasePage{
     public conformationButton:Locator;
     public noResultsLabel:Locator;
 
+    // order page Locator
+    public orderButton:Locator;
+    public orderListLink:Locator;
+    public packagesButton:Locator;
+    public packageNameFromTable:Locator;
+
     constructor(page: Page) {
         super(page);
         this.threeDotsButton = page.locator("(//a//button[@type='button' and @data-state='closed'])[1]");
@@ -20,6 +26,10 @@ export class adminDeletePackagesPage extends BasePage{
         this.deletePackageButton = page.locator("//button[text()='Delete']"); 
         this.conformationButton  = page.locator("//button[text()='Yeah, Thanks!']"); 
         this.noResultsLabel = page.locator("text='No results'");
+        this.orderButton = page.locator("//a[@href='/orders']");
+        this.orderListLink = page.locator("//table//tr/td[1]//a");
+        this.packagesButton = page.locator("//div[@role='tablist']/button[text()='Packages']");
+        this.packageNameFromTable = page.locator("//div[contains(@id,'package')]//table//tr/td[1]");
 
     }
 
@@ -43,11 +53,28 @@ export class adminDeletePackagesPage extends BasePage{
         await this.isElementVisible(this.conformationButton);
         expect(await this.deleteMessageLabel.textContent()).toBe(packageName+' was successfully deleted.');
 
-        // click on conformation button
+        // Click on conformation button
         await this.clickElement(this.conformationButton);
 
-        // verify popup close or not
+        // Verify popup close or not
         expect(await this.alertDialog.isHidden()).toBe(false);
+    }
+
+    // Get Package name from Order page
+    async getPackageNameFromOrderPage():Promise<null | string>{
+
+        // Naviage to Orders page
+        await this.clickElement(this.orderButton);
+
+        // Naviate to Order Details page
+        await this.clickElement(this.orderListLink.first());
+
+        // Click on Package button
+        await this.clickElement(this.packagesButton);
+
+        // Get text from package list 
+        await this.waitForElementVisible(this.packageNameFromTable); 
+        return await this.packageNameFromTable.textContent();
     }
 
 }
