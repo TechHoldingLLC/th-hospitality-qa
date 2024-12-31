@@ -126,7 +126,7 @@ test("TC0012 - Verify that coordinators cannot view a list of users", async () =
 });
 
 filterData.forEach((data)  =>{
-  test.only("TC0115 - Verify that user can filter the records based on entered " +data.filter, async () => {
+  test("TC0115 - Verify that user can filter the records based on entered " +data.filter, async () => {
     try{
     //Login as admin
     await loginPage.login(config.email, config.password);
