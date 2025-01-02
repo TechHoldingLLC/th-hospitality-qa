@@ -14,11 +14,6 @@ export default class BasePage {
     await this.page.goto(url);
   }
 
-  // Wait for static time
-  async waitForStaticTimeout(miliSecond:number) {
-    await this.page.waitForTimeout(miliSecond); // Wait for 
-  }
-
   // Common method to click an element
   async clickElement(element: Locator) {
     await element.waitFor({ state: "visible" });
@@ -124,7 +119,9 @@ export default class BasePage {
     await dropdownElement.selectOption(randomOptionValue);
   }
 
-  async selectRandomItemFromMultiSelectList(listElement: Locator):Promise<null | string> {
+  async selectRandomItemFromMultiSelectList(
+    listElement: Locator
+  ): Promise<null | string> {
     // Wait for the list to be visible
     await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
@@ -137,6 +134,8 @@ export default class BasePage {
 
     // Click the random item
     await items[randomIndex].click();
+
+    await this.page.waitForTimeout(3000);
 
     return selectedItem;
   }
@@ -227,56 +226,57 @@ export default class BasePage {
   }
 
   // Verify column Data
-  async verifyColumnData(columnName:string,expectedResult:string): Promise<void>{
-
-    if(await this.page.locator("text='No results'").isVisible() 
-      || await this.page.locator("text='Try changing the filters or search query'").isVisible()){
-
+  async verifyColumnDataBasedOnColumnName(
+    columnName: string,
+    expectedResult: string
+  ): Promise<void> {
+    if (
+      (await this.page.locator("text='No results'").isVisible()) ||
+      (await this.page
+        .locator("text='Try changing the filters or search query'")
+        .isVisible())
+    ) {
       console.log("No results shown for filtering this data");
       return;
     }
 
-    // Find column Locators 
+    // Find column Locators
     const columnLocators = await this.page.locator("//table//th").all();
 
-    let columnNo:number = -1; // Initialize with -1 to indicate "not found"
+    let columnNo: number = -1; // Initialize with -1 to indicate "not found"
 
     // Iterate through the column locators to find the column index
-    for (let i = 0; i < columnLocators.length;i++ ) {
-      
+    for (let i = 0; i < columnLocators.length; i++) {
       const data = await columnLocators[i].textContent();
-      
+
       // If textContent is null, skip to the next iteration
       if (data && data === columnName) {
-        console.log(`Found column: ${data}`);
-        columnNo = i+1;
+        columnNo = i + 1;
         break; // Exit the loop once the column is found
       }
     }
-    
+
     // Column should not be -1
     expect(columnNo).not.toBe(-1);
-    
-    console.log(columnNo);
 
     // Get all data from the specified column
-    const rowData = await this.page.locator("//table//tr/td["+columnNo+"]").all();
-    
+    const rowData = await this.page
+      .locator("//table//tr/td[" + columnNo + "]")
+      .all();
+
     // Iterate through rowData to validate each cell's content
     for (const rowLocator of rowData) {
       const cellText = await rowLocator.textContent();
-      console.log(cellText);
-      
+
       // Validate each row's textContent
       expect(cellText).toContain(expectedResult);
     }
   }
 
   // Select random element from list and return text of that element
-  async getRandomValueFromListLocator(listElement:Locator):Promise<null | string> {
-    
+  async getRandomValueFromListLocator(listElement: Locator): Promise<string> {
     await this.waitForElementVisible(listElement.first());
-    
+
     // Get all the list items
     const items = await listElement.all();
 
@@ -284,7 +284,9 @@ export default class BasePage {
     const randomIndex = Math.floor(Math.random() * items.length);
 
     // Get text of select item
-    const getText = items[randomIndex].textContent();
+    let getText = await items[randomIndex].textContent();
+
+    getText = getText == null ? "" : getText;
 
     return getText;
   }

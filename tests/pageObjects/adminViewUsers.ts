@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 
-export class adminViewUsersPage extends BasePage{
+export class adminViewUsersPage extends BasePage {
   public usersButton: Locator;
   public inviteUserButton: Locator;
   public nameHeader: Locator;
@@ -26,8 +26,8 @@ export class adminViewUsersPage extends BasePage{
   public coordinatorAccessDeniedMessage: Locator;
   public addFilterButton: Locator;
   public firstNameMenuItem: Locator;
-  public filterInputField:Locator;
-  public noResultsLabel:Locator;
+  public filterInputField: Locator;
+  public noResultsLabel: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -90,14 +90,15 @@ export class adminViewUsersPage extends BasePage{
       "//span[text()='Incorrect email or password. Please try again.']"
     );
     this.addFilterButton = page.locator("button#filters_menu_trigger");
-    this.firstNameMenuItem = page.locator("//div[@role='menuitem' and text()='First Name']");
+    this.firstNameMenuItem = page.locator(
+      "//div[@role='menuitem' and text()='First Name']"
+    );
     this.filterInputField = page.locator("//div[@role='dialog']//input");
     this.noResultsLabel = page.locator("text='No results'");
- 
   }
 
   // Filter data
-  async filterData(menuItemElement:Locator,inputData:string){
+  async filterData(menuItemElement: Locator, inputData: string) {
     // Click on Add Filter button
     await this.clickElement(this.addFilterButton);
 
@@ -107,5 +108,6 @@ export class adminViewUsersPage extends BasePage{
     // Enter value in filter Input Field
     await this.enterValuesInElement(this.filterInputField, inputData);
 
+    await this.page.waitForTimeout(5000);
   }
 }

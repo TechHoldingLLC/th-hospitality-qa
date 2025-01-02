@@ -106,32 +106,34 @@ test("TC0039 - Verify the CTA to create a program", async () => {
   }
 });
 
-test("TC0038 - Verify that users can filter by Department", async() => {
+test("TC0038 - Verify that users can filter by Department", async () => {
   try {
     // click on Add filter button
     await basePage.clickElement(viewProgramsPage.addFilterButton);
 
-    // click on Department menu item 
+    // click on Department menu item
     await basePage.clickElement(viewProgramsPage.departmentMenuItem);
 
     // select random department d from list
-    const selectedProduct: null| string = await basePage.selectRandomItemFromMultiSelectList(viewProgramsPage.departmentListFromMenuItem);
-    
-    console.log(selectedProduct);
+    const selectedDepartment: null | string =
+      await basePage.selectRandomItemFromMultiSelectList(
+        viewProgramsPage.departmentListFromMenuItem
+      );
 
-   await basePage.waitForStaticTimeout(5000);
-
-    if (selectedProduct === null) {
-      console.error(`Test failed: Null value found while retrieving the text of the selected department.`);
-      expect( selectedProduct,'Null value found while retrieving the text of the selected department.').not.toBeNull();
-    }  else{
+    if (selectedDepartment === null) {
+      expect(
+        selectedDepartment,
+        "Null value found while retrieving the text of the selected department."
+      ).not.toBeNull();
+    } else {
       // verify filtered data
-      await basePage.verifyColumnData("Department",selectedProduct.toString());
+      await basePage.verifyColumnDataBasedOnColumnName(
+        "Department",
+        selectedDepartment.toString()
+      );
     }
-
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
-
 });
