@@ -47,7 +47,22 @@ test("TC0034 - Verify required and optional fields for packages", async () => {
     ).toBe(true);
     expect(
       await basePage.isElementVisible(
+        createEditPackagePage.noOfGuestsValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        createEditPackagePage.totalQuantityAvailableValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
         createEditPackagePage.maxQuantityPerOrderValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        createEditPackagePage.currencyAndPriceValidation
       )
     ).toBe(true);
     expect(
@@ -64,8 +79,9 @@ test("TC0034 - Verify required and optional fields for packages", async () => {
 
 test("TC0036 - Verify that user can add and remove products and update quantities", async () => {
   try {
-    const maxQuantity = await createEditPackagePage.addPackageDetailsForm();
-    await createEditPackagePage.addPackageProductForm(maxQuantity);
+    const packagename = await basePage.generateNomenclatureName("Package");
+    await createEditPackagePage.addPackageDetailsForm(packagename);
+    await createEditPackagePage.addPackageProductForm();
     expect(
       await createEditPackagePage.inPackageQuantityInput.inputValue()
     ).not.toEqual("0");
@@ -81,15 +97,25 @@ test("TC0036 - Verify that user can add and remove products and update quantitie
 
 test("TC0035 - Verify that the user is able to create a package", async () => {
   try {
-    await createEditPackagePage.addPackage();
+    const packagename = await basePage.generateNomenclatureName("Package");
+    await createEditPackagePage.addPackage(packagename);
     expect(
       await basePage.isElementVisible(
         createEditPackagePage.packageCreationSuccessMessage
       )
     ).toBe(true);
+    await basePage.clickElement(await createEditPackagePage.createdPackageKebabIconLocator(packagename));
+    await basePage.clickElement(createEditPackagePage.editButton);
+    await basePage.clickElement(createEditPackagePage.nextButton);
+    await basePage.clickElement(createEditPackagePage.addNewProductButton);
+
     await page.waitForTimeout(3000);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
+});
+
+test("TC0033 - Verify that the user is able to create and edit packages",async()=>{
+
 });
