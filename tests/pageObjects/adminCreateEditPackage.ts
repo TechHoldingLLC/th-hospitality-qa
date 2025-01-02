@@ -27,16 +27,22 @@ export class adminCreateEditPackagePage extends BasePage {
   public maxQuantityPerOrderValidation: Locator;
   public thumbnailValidation: Locator;
   public mediaValidation: Locator;
+  public noOfGuestsValidation: Locator;
+  public currencyAndPriceValidation: Locator;
+  public totalQuantityAvailableValidation: Locator;
   public productSearchInput: Locator;
   public selectProductButton: Locator;
   public selectProductDropdown: Locator;
   public submitButton: Locator;
-  public addNewProductButton: Locator;
   public selectedProductText: Locator;
   public firstProgramText: Locator;
   public packageCreationSuccessMessage: Locator;
   public inPackageQuantityInput: Locator;
   public deleteProductIcon: Locator;
+  public totalProductQuantity: Locator;
+  public editButton: Locator;
+  public addNewProductButton: Locator;
+  public continueButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -84,7 +90,7 @@ export class adminCreateEditPackagePage extends BasePage {
       "//span[text()='Package Description is required.']"
     );
     this.maxQuantityPerOrderValidation = page.locator(
-      "//span[text()='Required']"
+      "//div[@class='flex flex-col space-y-2 mt-1'][2]/descendant::span[text()='Required']"
     );
     this.thumbnailValidation = page.locator(
       "//span[text()='At least one thumbnail is required.']"
@@ -92,13 +98,13 @@ export class adminCreateEditPackagePage extends BasePage {
     this.mediaValidation = page.locator(
       "//span[text()='At least one media is required.']"
     );
+    this.noOfGuestsValidation = page.locator("//div[@class='flex flex-col space-y-2 mt-3']/descendant::span[text()='Required']");
+    this.currencyAndPriceValidation = page.locator("//div[@class='flex flex-col space-y-2 mb-5']/descendant::span[text()='Required']");
+    this.totalQuantityAvailableValidation = page.locator("//div[@class='flex flex-col space-y-2 mt-1'][1]/descendant::span[text()='Required']");
     this.productSearchInput = page.locator("//input[@name='products']");
     this.selectProductButton = page.locator("//div[@class='mt-2']//button");
     this.selectProductDropdown = page.locator("//div[@class='mt-2']/select");
     this.submitButton = page.locator("//button[text()='Submit']");
-    this.addNewProductButton = page.locator(
-      "//a[@href='/packages/create/product-create']"
-    );
     this.selectedProductText = page.locator(
       "//span[@class='flex items-center gap-3 stroke-foregrounds/fg-base']"
     );
@@ -115,21 +121,24 @@ export class adminCreateEditPackagePage extends BasePage {
     this.deleteProductIcon = page.locator(
       "//button[@data-test-id='no-of-packages']"
     );
+    this.totalProductQuantity = page.locator("//td[@class='h-12 pr-6'][5]");
+    this.editButton = page.locator("//span[text()='Edit']");
+    this.addNewProductButton = page.locator("//a/descendant::label[text()='Add New Product']");
+    this.continueButton = page.locator("//button[text()='Continue']");
   }
 
-  async addPackage(): Promise<void> {
-    const maxQuantity = await this.addPackageDetailsForm();
-    await this.addPackageProductForm(maxQuantity);
+  async addPackage(packagename: string): Promise<void> {
+    await this.addPackageDetailsForm(packagename);
+    await this.addPackageProductForm();
     await this.clickElement(this.submitButton);
   }
 
-  async addPackageDetailsForm(): Promise<string> {
+  async addPackageDetailsForm(packagename: string): Promise<void> {
     await this.clickElement(viewProgramsPage.programsButton);
     const programName = await this.getElementText(this.firstProgramText);
     await this.clickElement(this.packagesButton);
     await this.clickElement(this.addPackageButton);
 
-    const packagename = await this.generateNomenclatureName("Package");
     const packageDescription = await this.generateNomenclatureDescription(
       "Package"
     );
@@ -144,8 +153,6 @@ export class adminCreateEditPackagePage extends BasePage {
     );
     await this.clickOnRandomOptionFromDropdown(this.noOfGuestsDropdown);
     await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
-    await this.clickElement(this.groupRestrictionsButton);
-    await this.selectRandomItemFromMultiSelectList(this.groupRestrictionsList);
     await this.clickElement(this.currencyAndPriceInput);
     const totalQuantity = await this.generate2RandomDigits();
     await this.enterValuesInElement(
@@ -169,24 +176,30 @@ export class adminCreateEditPackagePage extends BasePage {
       path.join(__dirname, "../coca-cola-images/packages/event-img2.webp")
     );
     await this.clickElement(this.nextButton);
-    return maxQuantity;
   }
 
-  async addPackageProductForm(maxQuantity: string) {
+  async addPackageProductForm() {
     await this.enterValuesInElement(this.productSearchInput, "a");
     await this.page.waitForTimeout(2000);
     await this.clickElement(this.selectProductButton);
     await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.selectProductDropdown);
     await this.page.mouse.click(10, 10);
-
-    const inPackageQuantity = Math.floor(
-      Math.random() * (parseInt(maxQuantity) - 10) + 10
-    ).toString();
+    const totalProductQuantity = await this.getElementText(this.totalProductQuantity);
+    const inPackageQuantity = Math.floor(Math.random() * Math.min(9, parseInt(totalProductQuantity))) + 1;
 
     await this.enterValuesInElement(
       this.inPackageQuantityInput,
-      inPackageQuantity
+      inPackageQuantity.toString()
     );
+  }
+
+  async createdPackageKebabIconLocator(createdPackageName: string): Promise<Locator>{
+    return this.page.locator(`//span[text()="${createdPackageName}"]/ancestor::td/following-sibling::td[7]`);
+  }
+
+  async generateNomenclatureProductName(): Promise<string> {
+    const randomDigits = await this.generate5RandomDigits();
+    return "Automated_Product_Created_Under_Package_" + randomDigits;
   }
 }
