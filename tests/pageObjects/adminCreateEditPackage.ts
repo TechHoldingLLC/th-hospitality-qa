@@ -1,6 +1,8 @@
 import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import path from "path";
+import { adminViewProgramsPage } from "./adminViewPrograms";
+let viewProgramsPage: adminViewProgramsPage;
 
 export class adminCreateEditPackagePage extends BasePage {
   public packagesButton: Locator;
@@ -14,7 +16,7 @@ export class adminCreateEditPackagePage extends BasePage {
   public groupRestrictionsList: Locator;
   public totalQuantityAvailableInput: Locator;
   public maxQuantityPerOrderInput: Locator;
-  public currencyAndPrice: Locator;
+  public currencyAndPriceInput: Locator;
   public thumbnailUpload: Locator;
   public mediaUpload: Locator;
   public nextButton: Locator;
@@ -31,6 +33,10 @@ export class adminCreateEditPackagePage extends BasePage {
   public submitButton: Locator;
   public addNewProductButton: Locator;
   public selectedProductText: Locator;
+  public firstProgramText: Locator;
+  public packageCreationSuccessMessage: Locator;
+  public inPackageQuantityInput: Locator;
+  public deleteProductIcon: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -55,7 +61,7 @@ export class adminCreateEditPackagePage extends BasePage {
     this.maxQuantityPerOrderInput = page.locator(
       "//input[@name='max_quantity_per_person']"
     );
-    this.currencyAndPrice = page.locator("//input[@inputmode='decimal']");
+    this.currencyAndPriceInput = page.locator("//input[@inputmode='decimal']");
     this.thumbnailUpload = page.locator(
       "//h1[text()='Thumbnail ']/following-sibling::div[@id='media']/descendant::input"
     );
@@ -78,7 +84,7 @@ export class adminCreateEditPackagePage extends BasePage {
       "//span[text()='Package Description is required.']"
     );
     this.maxQuantityPerOrderValidation = page.locator(
-      "//span[text()='Max quantity per order must be less than total quantity.']"
+      "//span[text()='Required']"
     );
     this.thumbnailValidation = page.locator(
       "//span[text()='At least one thumbnail is required.']"
@@ -96,15 +102,33 @@ export class adminCreateEditPackagePage extends BasePage {
     this.selectedProductText = page.locator(
       "//span[@class='flex items-center gap-3 stroke-foregrounds/fg-base']"
     );
+    this.firstProgramText = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//tr[1]//td[1]"
+    );
+    viewProgramsPage = new adminViewProgramsPage(page);
+    this.packageCreationSuccessMessage = page.locator(
+      "//span[text()='Package created successfully']"
+    );
+    this.inPackageQuantityInput = page.locator(
+      "//input[@data-test-id='in-package-quantity']"
+    );
+    this.deleteProductIcon = page.locator(
+      "//button[@data-test-id='no-of-packages']"
+    );
   }
 
   async addPackage(): Promise<void> {
     const maxQuantity = await this.addPackageDetailsForm();
-    await this.addpackageProductForm(maxQuantity);
+    await this.addPackageProductForm(maxQuantity);
     await this.clickElement(this.submitButton);
   }
 
   async addPackageDetailsForm(): Promise<string> {
+    await this.clickElement(viewProgramsPage.programsButton);
+    const programName = await this.getElementText(this.firstProgramText);
+    await this.clickElement(this.packagesButton);
+    await this.clickElement(this.addPackageButton);
+
     const packagename = await this.generateNomenclatureName("Package");
     const packageDescription = await this.generateNomenclatureDescription(
       "Package"
@@ -113,6 +137,7 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.enterValuesInElement(this.packageNameInput, packagename);
     await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
+    await this.associatedProgramDropdown.selectOption(programName);
     await this.enterValuesInElement(
       this.packageDescriptionInput,
       packageDescription
@@ -121,7 +146,7 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
     await this.clickElement(this.groupRestrictionsButton);
     await this.selectRandomItemFromMultiSelectList(this.groupRestrictionsList);
-
+    await this.clickElement(this.currencyAndPriceInput);
     const totalQuantity = await this.generate2RandomDigits();
     await this.enterValuesInElement(
       this.totalQuantityAvailableInput,
@@ -134,7 +159,7 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.enterValuesInElement(this.maxQuantityPerOrderInput, maxQuantity);
 
     await this.enterValuesInElement(
-      this.currencyAndPrice,
+      this.currencyAndPriceInput,
       await this.generate4RandomDigits()
     );
     await this.thumbnailUpload.setInputFiles(
@@ -147,28 +172,21 @@ export class adminCreateEditPackagePage extends BasePage {
     return maxQuantity;
   }
 
-  async addpackageProductForm(maxQuantity: string) {
-    await this.enterValuesInElement(this.productSearchInput, "Automated");
+  async addPackageProductForm(maxQuantity: string) {
+    await this.enterValuesInElement(this.productSearchInput, "a");
+    await this.page.waitForTimeout(2000);
     await this.clickElement(this.selectProductButton);
-    const productname = await this.clickOnRandomOptionFromDropdown(
-      this.selectProductDropdown
-    );
+    await this.page.waitForTimeout(2000);
+    await this.clickOnRandomOptionFromDropdown(this.selectProductDropdown);
     await this.page.mouse.click(10, 10);
+
     const inPackageQuantity = Math.floor(
       Math.random() * (parseInt(maxQuantity) - 10) + 10
     ).toString();
-    console.log(
-      await this.isElementVisible(
-        this.page.locator(await this.getProductQuantityLocator(productname))
-      )
-    );
+
     await this.enterValuesInElement(
-      this.page.locator(await this.getProductQuantityLocator(productname)),
+      this.inPackageQuantityInput,
       inPackageQuantity
     );
-  }
-
-  async getProductQuantityLocator(productName: string) {
-    return `//td[text()='${productName}']/following-sibling::td[5]//input`;
   }
 }

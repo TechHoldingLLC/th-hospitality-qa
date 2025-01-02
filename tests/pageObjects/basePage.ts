@@ -117,7 +117,7 @@ export default class BasePage {
 
   async clickOnRandomOptionFromDropdown(
     dropdownElement: Locator
-  ): Promise<string> {
+  ): Promise<void> {
     const options = await dropdownElement.locator("option").all();
     // Generate a random index to select an option
     const randomIndex = Math.floor(Math.random() * options.length);
@@ -128,7 +128,6 @@ export default class BasePage {
     }
     // Select the random option by its value
     await dropdownElement.selectOption(randomOptionValue);
-    return randomOptionValue;
   }
 
   async selectRandomItemFromMultiSelectList(
