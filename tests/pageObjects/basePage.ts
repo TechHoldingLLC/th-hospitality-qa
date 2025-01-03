@@ -121,15 +121,23 @@ export default class BasePage {
 
   async selectRandomItemFromMultiSelectList(
     listElement: Locator
-  ): Promise<void> {
+  ): Promise<null | string> {
     // Wait for the list to be visible
     await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
     const items = await listElement.all();
     // Generate a random index to select an item
     const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select item
+    const selectedItem = items[randomIndex].textContent();
+
     // Click the random item
     await items[randomIndex].click();
+
+    await this.page.waitForTimeout(3000);
+
+    return selectedItem;
   }
 
   async mailinatorLogin(): Promise<void> {
@@ -217,44 +225,69 @@ export default class BasePage {
     }
   }
 
-  async generateNomenclatureDescription(modulename: string): Promise<string> {
-    const randomString = await this.generateRandomString();
-    return "Automated_" + modulename + "_Description_" + randomString;
+  // Verify column Data
+  async verifyColumnDataBasedOnColumnName(
+    columnName: string,
+    expectedResult: string
+  ): Promise<void> {
+    if (
+      (await this.page.locator("text='No results'").isVisible()) ||
+      (await this.page
+        .locator("text='Try changing the filters or search query'")
+        .isVisible())
+    ) {
+      console.log("No results shown for filtering this data");
+      return;
+    }
+
+    // Find column Locators
+    const columnLocators = await this.page.locator("//table//th").all();
+
+    let columnNo: number = -1; // Initialize with -1 to indicate "not found"
+
+    // Iterate through the column locators to find the column index
+    for (let i = 0; i < columnLocators.length; i++) {
+      const data = await columnLocators[i].textContent();
+
+      // If textContent is null, skip to the next iteration
+      if (data && data === columnName) {
+        columnNo = i + 1;
+        break; // Exit the loop once the column is found
+      }
+    }
+
+    // Column should not be -1
+    expect(columnNo).not.toBe(-1);
+
+    // Get all data from the specified column
+    const rowData = await this.page
+      .locator("//table//tr/td[" + columnNo + "]")
+      .all();
+
+    // Iterate through rowData to validate each cell's content
+    for (const rowLocator of rowData) {
+      const cellText = await rowLocator.textContent();
+
+      // Validate each row's textContent
+      expect(cellText).toContain(expectedResult);
+    }
   }
 
-  // Function to generate a random 2-digit number
-  async generate2RandomDigits(): Promise<string> {
-    return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
-  }
+  // Select random element from list and return text of that element
+  async getRandomValueFromListLocator(listElement: Locator): Promise<string> {
+    await this.waitForElementVisible(listElement.first());
 
-  // Function to generate a random 4-digit number
-  async generate4RandomDigits(): Promise<string> {
-    return Math.floor(1000 + Math.random() * 9000).toString(); // ensures 4 digits
-  }
+    // Get all the list items
+    const items = await listElement.all();
 
-  //Function to select random option from radio group
-  async selectRandomRadioOption(radiogroup: Locator) {
-    const options = await radiogroup.all();
-    const randomIndex = Math.floor(Math.random() * (options.length - 1)) + 1; // Ensure index is never 0
-    await options[randomIndex].click();
-  }
+    // Generate a random index to select an item
+    const randomIndex = Math.floor(Math.random() * items.length);
 
-  // Function to generate a random future date in MM-DD-YYYY format
-  async getRandomFutureDate(): Promise<string> {
-    const currentDate = new Date();
+    // Get text of select item
+    let getText = await items[randomIndex].textContent();
 
-    // Generate a random number of days in the future (up to 365 days)
-    const daysInFuture = Math.floor(Math.random() * 365) + 1; // Between 1 and 365 days
+    getText = getText == null ? "" : getText;
 
-    // Add the random number of days to the current date
-    currentDate.setDate(currentDate.getDate() + daysInFuture);
-
-    // Format the date as MM-DD-YYYY
-    const month = String(currentDate.getMonth() + 1).padStart(2, "0"); // Month is 0-indexed, so add 1
-    const day = String(currentDate.getDate()).padStart(2, "0"); // Day of the month
-    const year = currentDate.getFullYear(); // Full year
-
-    // Return the date in MM-DD-YYYY format
-    return `${month}-${day}-${year}`;
+    return getText;
   }
 }

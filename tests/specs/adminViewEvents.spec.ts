@@ -164,3 +164,35 @@ test("TC0107 - Verify the list of events is paginated", async () => {
     throw error;
   }
 });
+
+test("TC0076 - Verify that users can filter by events", async () => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewEventsPage.addFilterButton);
+
+    // click on Status menu item
+    await basePage.clickElement(viewEventsPage.statusMenuItem);
+
+    // select random status from list
+    const selectedStatus: null | string =
+      await basePage.selectRandomItemFromMultiSelectList(
+        viewEventsPage.statusListFromMenuItem
+      );
+
+    if (selectedStatus === null) {
+      expect(
+        selectedStatus,
+        "Null value found while retrieving the text of the selected status."
+      ).not.toBeNull();
+    } else {
+      // verify filtered data
+      await basePage.verifyColumnDataBasedOnColumnName(
+        "Status",
+        selectedStatus.toString()
+      );
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

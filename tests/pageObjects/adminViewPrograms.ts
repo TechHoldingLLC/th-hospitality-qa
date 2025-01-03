@@ -23,6 +23,9 @@ export class adminViewProgramsPage {
   public confirmDeleteButton: Locator;
   public addProgramHeader: Locator;
   public deleteProgramConfirmation: Locator;
+  public addFilterButton: Locator;
+  public departmentMenuItem: Locator;
+  public departmentListFromMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -58,8 +61,11 @@ export class adminViewProgramsPage {
     this.editProgramHeader = page.locator("//h1[text()='Edit Program']");
     this.confirmDeleteButton = page.locator("//button[text()='Delete']");
     this.addProgramHeader = page.locator("//h1[text()='Add Program']");
-    this.deleteProgramConfirmation = page.locator(
-      "//button[text()='Delete']"
+    this.deleteProgramConfirmation = page.locator("//button[text()='Delete']");
+    this.addFilterButton = page.locator("button#filters_menu_trigger");
+    this.departmentMenuItem = page.locator(
+      "//div[@role='menuitem' and text()='Department']"
     );
+    this.departmentListFromMenuItem = page.locator("//div[@role='option']");
   }
 }
