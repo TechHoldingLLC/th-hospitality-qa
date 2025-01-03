@@ -3,13 +3,14 @@ import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { adminCreateEditPackagePage } from "../pageObjects/adminCreateEditPackage";
 import { config } from "../config/config.qa";
-import { adminViewProgramsPage } from "../pageObjects/adminViewPrograms";
+import { adminCreateEditProductPage } from "../pageObjects/adminCreateEditProduct";
 
 let browser: Browser;
 let page: Page;
 let basePage: BasePage;
 let loginPage: adminLoginPage;
 let createEditPackagePage: adminCreateEditPackagePage;
+let createEditProductPage: adminCreateEditProductPage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -17,6 +18,7 @@ test.beforeEach(async () => {
   basePage = new BasePage(page);
   loginPage = new adminLoginPage(page);
   createEditPackagePage = new adminCreateEditPackagePage(page);
+  createEditProductPage = new adminCreateEditProductPage(page);
   await basePage.navigateTo(config.adminPortalUrl);
   await loginPage.login(config.email, config.password);
 });
@@ -29,6 +31,7 @@ test("TC0034 - Verify required and optional fields for packages", async () => {
   try {
     await basePage.clickElement(createEditPackagePage.packagesButton);
     await basePage.clickElement(createEditPackagePage.addPackageButton);
+    // Generate validations on screen
     await basePage.clickElement(createEditPackagePage.productsTab);
     expect(
       await basePage.isElementVisible(
@@ -82,9 +85,11 @@ test("TC0036 - Verify that user can add and remove products and update quantitie
     const packagename = await basePage.generateNomenclatureName("Package");
     await createEditPackagePage.addPackageDetailsForm(packagename);
     await createEditPackagePage.addPackageProductForm();
+    // Verify user is able to update quantity
     expect(
       await createEditPackagePage.inPackageQuantityInput.inputValue()
     ).not.toEqual("0");
+    // Verify user is able to remove product
     await basePage.clickElement(createEditPackagePage.deleteProductIcon);
     expect(
       await basePage.isElementDisabled(createEditPackagePage.submitButton)
@@ -99,17 +104,12 @@ test("TC0035 - Verify that the user is able to create a package", async () => {
   try {
     const packagename = await basePage.generateNomenclatureName("Package");
     await createEditPackagePage.addPackage(packagename);
+    // Verify package created successfully
     expect(
       await basePage.isElementVisible(
         createEditPackagePage.packageCreationSuccessMessage
       )
     ).toBe(true);
-    await basePage.clickElement(await createEditPackagePage.createdPackageKebabIconLocator(packagename));
-    await basePage.clickElement(createEditPackagePage.editButton);
-    await basePage.clickElement(createEditPackagePage.nextButton);
-    await basePage.clickElement(createEditPackagePage.addNewProductButton);
-
-    await page.waitForTimeout(3000);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -117,5 +117,44 @@ test("TC0035 - Verify that the user is able to create a package", async () => {
 });
 
 test("TC0033 - Verify that the user is able to create and edit packages",async()=>{
+  try {
+    // Create new package flow
+    const packagename = await basePage.generateNomenclatureName("Package");
+    await createEditPackagePage.addPackage(packagename);
+    expect(
+      await basePage.isElementVisible(
+        createEditPackagePage.packageCreationSuccessMessage
+      )
+    ).toBe(true);
 
+    // Edit package which just got created
+    await basePage.clickElement(await createEditPackagePage.createdPackageKebabIconLocator(packagename));
+    await basePage.clickElement(createEditPackagePage.editButton);
+    await basePage.clickElement(createEditPackagePage.nextButton);
+
+    // Create new product while editing package
+    await basePage.clickElement(createEditPackagePage.addNewProductButton);
+    await basePage.clickElement(createEditPackagePage.continueButton);
+    const productNameFromPackage = await createEditPackagePage.generateNomenclatureProductNameFromPackage();
+    await createEditPackagePage.createProductUnderPackage(productNameFromPackage);
+    expect(
+      await basePage.isElementVisible(
+        page.locator(
+          await createEditProductPage.getProductCreatedLocator(productNameFromPackage)
+        )
+      )
+    ).toBe(true);
+
+    // Add newly created product to package
+    await createEditPackagePage.addCreatedProductToPackage(productNameFromPackage);
+
+    // Save edited package
+    await basePage.clickElement(createEditPackagePage.submitButton);
+
+    // Verify package updated successfully
+    expect(await basePage.isElementVisible(createEditPackagePage.packageUpdateMessage)).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
