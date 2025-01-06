@@ -20,6 +20,7 @@ export class adminInviteUserPage extends BasePage {
   public inviteEmailErrorMessage: Locator;
   public cancelButton: Locator;
   public confirmCancelButton: Locator;
+  public allAccessGroup: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -39,7 +40,7 @@ export class adminInviteUserPage extends BasePage {
     );
     this.inviteButton = page.locator("//button[normalize-space()='Invite']");
     this.inviteSuccessMessage = page.locator(
-      "span[class='txt-compact-small-plus text-ui-fg-base']"
+      "//span[text()='The invitation has been successfully sent.']"
     );
     this.inviteRoleErrorMessage = page.locator(
       "//span[normalize-space()='Role is required']"
@@ -58,6 +59,7 @@ export class adminInviteUserPage extends BasePage {
     );
     this.cancelButton = page.locator("//button[text()='Cancel']");
     this.confirmCancelButton = page.locator("//button[text()='Continue']");
+    this.allAccessGroup = page.locator("//input[@id='checkbox-ALL_ACCESS']/following-sibling::span");
   }
 
   async inviteAdminUser(email: string): Promise<void> {
@@ -74,14 +76,14 @@ export class adminInviteUserPage extends BasePage {
     await this.enterValuesInElement(this.emailInput, email);
     await this.clickElement(this.roleSelect);
     await this.clickElement(this.roleCoordinator);
-    await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
+    await this.departmentDropdown.selectOption({value:'All'})
     await this.clickElement(this.groupsSelect);
-    await this.selectRandomItemFromMultiSelectList(this.groupsDropdown);
+    await this.clickElement(this.allAccessGroup);
     await this.clickElement(this.inviteButton);
   }
 
   async generateLocatorByEmail(email: string): Promise<Locator> {
-    const xpath = `//*[text()='${email}']/../../following-sibling::td[4]`;
+    const xpath = `//*[text()='${email}']/../../../following-sibling::td[4]`;
     return this.page.locator(xpath);
   }
 }
