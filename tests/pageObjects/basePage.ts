@@ -312,19 +312,24 @@ export default class BasePage {
       columnLocator
     );
 
+    // Remove all "-" values
+    const removeUnderScroreValue = columnDataValues.filter(
+      (str) => str !== "-"
+    );
+
     let columnDataValuesInLowerCase: string[];
 
     // Handle data based on menu item
     if (menuItem == "First Name") {
-      columnDataValuesInLowerCase = columnDataValues.map(
+      columnDataValuesInLowerCase = removeUnderScroreValue.map(
         (row) => row.toLowerCase().split(" ")[0]
       );
     } else if (menuItem == "Last Name") {
-      columnDataValuesInLowerCase = columnDataValues.map(
+      columnDataValuesInLowerCase = removeUnderScroreValue.map(
         (row) => row.toLowerCase().split(" ")[1]
       );
     } else {
-      columnDataValuesInLowerCase = columnDataValues.map((row) =>
+      columnDataValuesInLowerCase = removeUnderScroreValue.map((row) =>
         row.toLowerCase()
       );
     }
@@ -333,9 +338,9 @@ export default class BasePage {
     const sortedData: string[] =
       sortingOrder == "Ascending"
         ? [...columnDataValuesInLowerCase].sort()
-        : [...columnDataValuesInLowerCase].sort((a, b) => {
-            return b.localeCompare(a); // Descending order
-          });
+        : // : [...columnDataValuesInLowerCase].sort((a, b) => {
+          //     return b.localeCompare(a); // Descending order
+          [...columnDataValuesInLowerCase].sort().reverse();
 
     return [columnDataValuesInLowerCase, sortedData];
   }
