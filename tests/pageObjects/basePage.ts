@@ -83,8 +83,16 @@ export default class BasePage {
   }
 
   // Function to generate a random 5-digit number
-  async generateRandomDigits(): Promise<string> {
+  async generateFiveRandomDigits(): Promise<string> {
     return Math.floor(10000 + Math.random() * 90000).toString(); // ensures 5 digits
+  }
+  // Function to generate a random 4-digit number
+  async generateFourRandomDigits(): Promise<string> {
+    return Math.floor(1000 + Math.random() * 9000).toString(); // ensures 4 digits
+  }
+  // Function to generate a random 2-digit number
+  async generateTwoRandomDigits(): Promise<string> {
+    return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
   }
 
   // Function to generate a random 5-character alphanumeric string
@@ -98,12 +106,12 @@ export default class BasePage {
   }
 
   async generateNomenclatureName(modulename: string): Promise<string> {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generateFiveRandomDigits();
     return "Automated_" + modulename + "_" + randomDigits;
   }
 
   async generateNomenclatureEditedName(modulename: string): Promise<string> {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generateFiveRandomDigits();
     return "Automated_" + modulename + "_" + randomDigits + "_Edited";
   }
 
@@ -115,6 +123,9 @@ export default class BasePage {
     const randomIndex = Math.floor(Math.random() * options.length);
     // Get the value of the random option
     const randomOptionValue = await options[randomIndex].getAttribute("value");
+    if (!randomOptionValue) {
+      throw new Error("Selected option does not have a valid value attribute.");
+    }
     // Select the random option by its value
     await dropdownElement.selectOption(randomOptionValue);
   }
@@ -140,7 +151,7 @@ export default class BasePage {
   }
 
   async generateNomenclatureEmail(role: string) {
-    const randomDigits = await this.generateRandomDigits();
+    const randomDigits = await this.generateFiveRandomDigits();
     return (
       // "Automated_" + role + "_" + randomDigits + "@team507472.testinator.com"
       "Automated_" + role + "_" + randomDigits + "@yopmail.com"
@@ -220,16 +231,6 @@ export default class BasePage {
   async generateNomenclatureDescription(modulename: string): Promise<string> {
     const randomString = await this.generateRandomString();
     return "Automated_" + modulename + "_Description_" + randomString;
-  }
-
-  // Function to generate a random 2-digit number
-  async generate2RandomDigits(): Promise<string> {
-    return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
-  }
-
-  // Function to generate a random 4-digit number
-  async generate4RandomDigits(): Promise<string> {
-    return Math.floor(1000 + Math.random() * 9000).toString(); // ensures 4 digits
   }
 
   //Function to select random option from radio group
