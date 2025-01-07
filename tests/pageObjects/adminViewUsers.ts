@@ -28,6 +28,7 @@ export class adminViewUsersPage extends BasePage {
   public firstNameMenuItem: Locator;
   public filterInputField: Locator;
   public noResultsLabel: Locator;
+  public filterMenuButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -95,6 +96,9 @@ export class adminViewUsersPage extends BasePage {
     );
     this.filterInputField = page.locator("//div[@role='dialog']//input");
     this.noResultsLabel = page.locator("text='No results'");
+    this.filterMenuButton = page.locator(
+      "//div[contains(@class,'flex items-start')]//button[@aria-haspopup='menu']"
+    );
   }
 
   // Filter data

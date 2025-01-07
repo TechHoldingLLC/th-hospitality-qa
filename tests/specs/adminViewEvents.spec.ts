@@ -196,3 +196,36 @@ test("TC0076 - Verify that users can filter by events", async () => {
     throw error;
   }
 });
+
+test("TC0187 - Verify Filter functionality for Even name by sorting order", async () => {
+  try {
+    // click on filter menu button
+    await basePage.clickElement(viewEventsPage.filterMenuButton);
+
+    // click on Event Name menu item
+    await basePage.clickElement(viewEventsPage.eventNameMenuItem);
+
+    // Click on Ascending button and verify data
+    const [actualDataAsc, sortedDataAsc] =
+      await basePage.performAndGetSortingData(
+        "Ascending",
+        viewEventsPage.eventNameColumnData,
+        "Event Name"
+      );
+
+    expect(actualDataAsc).toEqual(sortedDataAsc);
+
+    // Click on Descending button and verify data
+    const [actualDataDes, sortedDataDes] =
+      await basePage.performAndGetSortingData(
+        "Descending",
+        viewEventsPage.eventNameColumnData,
+        "Event Name"
+      );
+
+    expect(actualDataDes).toEqual(sortedDataDes);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

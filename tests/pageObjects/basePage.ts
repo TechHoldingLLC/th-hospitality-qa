@@ -290,4 +290,53 @@ export default class BasePage {
 
     return getText;
   }
+
+  // Click on sorting option and verify data accordingly
+  async performAndGetSortingData(
+    sortingOrder: "Ascending" | "Descending",
+    columnLocator: Locator,
+    menuItem: string
+  ): Promise<[lowercaseDataRows: string[], sortedData: string[]]> {
+    // Click on Sorting order
+    await this.clickElement(
+      this.page.locator(
+        "//div[@role='menuitemradio' and text()='" + sortingOrder + "']"
+      )
+    );
+
+    await this.page.waitForLoadState("domcontentloaded");
+    await this.page.waitForTimeout(3000);
+
+    // Get data
+    const columnDataValues: string[] = await this.getAllTextContents(
+      columnLocator
+    );
+
+    let columnDataValuesInLowerCase: string[];
+
+    // Handle data based on menu item
+    if (menuItem == "First Name") {
+      columnDataValuesInLowerCase = columnDataValues.map(
+        (row) => row.toLowerCase().split(" ")[0]
+      );
+    } else if (menuItem == "Last Name") {
+      columnDataValuesInLowerCase = columnDataValues.map(
+        (row) => row.toLowerCase().split(" ")[1]
+      );
+    } else {
+      columnDataValuesInLowerCase = columnDataValues.map((row) =>
+        row.toLowerCase()
+      );
+    }
+
+    // Assuming dataValues are numbers or strings that can be compared
+    const sortedData: string[] =
+      sortingOrder == "Ascending"
+        ? [...columnDataValuesInLowerCase].sort()
+        : [...columnDataValuesInLowerCase].sort((a, b) => {
+            return b.localeCompare(a); // Descending order
+          });
+
+    return [columnDataValuesInLowerCase, sortedData];
+  }
 }

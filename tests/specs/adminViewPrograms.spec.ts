@@ -137,3 +137,36 @@ test("TC0038 - Verify that users can filter by Department", async () => {
     throw error;
   }
 });
+
+test("TC0186 - Verify Filter functionality for Program Name by sorting order", async () => {
+  try {
+    // click on filter menu button
+    await basePage.clickElement(viewProgramsPage.filterMenuButton);
+
+    // click on Department menu item
+    await basePage.clickElement(viewProgramsPage.programNameMenuItem);
+
+    // Click on Ascending button and verify data
+    const [actualDataAsc, sortedDataAsc] =
+      await basePage.performAndVerifySortingOrder(
+        "Ascending",
+        viewProgramsPage.programNameColumnData,
+        "Program Name"
+      );
+
+    expect(actualDataAsc).toEqual(sortedDataAsc);
+
+    // Click on Descending button and verify data
+    const [actualDataDes, sortedDataDes] =
+      await basePage.performAndVerifySortingOrder(
+        "Descending",
+        viewProgramsPage.programNameColumnData,
+        "Program Name"
+      );
+
+    expect(actualDataDes).toEqual(sortedDataDes);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

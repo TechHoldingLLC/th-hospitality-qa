@@ -21,6 +21,7 @@ interface FilterData {
   filter: string;
   columnlocator: string;
   menuItemLocator: string;
+  menuRadioItemLocator: string;
   columnName: string;
 }
 
@@ -29,18 +30,22 @@ const filterData: FilterData[] = [
     filter: "First Name",
     columnlocator: '//tbody[@class="border-ui-border-base border-b-0"]//td[1]',
     menuItemLocator: '//div[@role="menuitem" and text()="First Name"]',
+    menuRadioItemLocator:
+      '//div[@role="menuitemradio" and text()="First Name"]',
     columnName: "Name",
   },
   {
     filter: "Last Name",
     columnlocator: '//tbody[@class="border-ui-border-base border-b-0"]//td[1]',
     menuItemLocator: '//div[@role="menuitem" and text()="Last Name"]',
+    menuRadioItemLocator: '//div[@role="menuitemradio" and text()="Last Name"]',
     columnName: "Name",
   },
   {
     filter: "Email",
     columnlocator: '//tbody[@class="border-ui-border-base border-b-0"]//td[2]',
     menuItemLocator: '//div[@role="menuitem" and text()="Email"]',
+    menuRadioItemLocator: '//div[@role="menuitemradio" and text()="Email"]',
     columnName: "Email",
   },
 ];
@@ -202,6 +207,50 @@ filterData.forEach((data) => {
             inputValue
           );
         }
+      } catch (error: any) {
+        console.error(`Test failed: ${error.message}`);
+        throw error;
+      }
+    }
+  );
+});
+
+filterData.forEach((data) => {
+  test(
+    "TC0188 - Verify Filter functionality for " +
+      data.filter +
+      " by sorting order",
+    async () => {
+      try {
+        //Login as admin
+        await loginPage.login(config.email, config.password);
+        await basePage.clickElement(viewUsersPage.usersButton);
+
+        // click on filter menu button
+        await basePage.clickElement(viewUsersPage.filterMenuButton);
+
+        // click on menu item
+        await basePage.clickElement(page.locator(data.menuRadioItemLocator));
+
+        // Click on Ascending button and verify data
+        const [actualDataAsc, sortedDataAsc] =
+          await basePage.performAndGetSortingData(
+            "Ascending",
+            page.locator(data.columnlocator),
+            data.filter
+          );
+
+        expect(actualDataAsc).toEqual(sortedDataAsc);
+
+        // Click on Descending button and verify data
+        const [actualDataDes, sortedDataDes] =
+          await basePage.performAndGetSortingData(
+            "Descending",
+            page.locator(data.columnlocator),
+            data.filter
+          );
+
+        expect(actualDataDes).toEqual(sortedDataDes);
       } catch (error: any) {
         console.error(`Test failed: ${error.message}`);
         throw error;
