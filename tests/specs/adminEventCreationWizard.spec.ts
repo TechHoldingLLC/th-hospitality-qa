@@ -3,6 +3,7 @@ import BasePage from "../pageObjects/basePage";
 import { adminEventCreationWizardpage } from "../pageObjects/adminEventCreationWizard";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
+import createEventData from "../data/createEventData.json";
 
 let browser: Browser;
 let page: Page;
@@ -118,3 +119,45 @@ test("TC0079 - Verify that users can save as draft and publish", async () => {
 });
 
 test("TC0078 - Verify that users can create events in a wizard like experience", async () => {});
+
+test("TC0081 - Verify nested objects persist after abandoning event creation", async () => {
+  const eventName = await basePage.generateNomenclatureName("Event");
+  await eventCreationWizardPage.fillEventInformationForm(eventName);
+
+  // Verify abandon while creating new product
+  await basePage.clickElement(eventCreationWizardPage.addProductButton);
+  await basePage.enterValuesInElement(
+    eventCreationWizardPage.productNameInput,
+    eventName
+  );
+  await basePage.clickElement(eventCreationWizardPage.cancelButton);
+  expect(
+    await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
+  ).toBe(true);
+  expect(
+    await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
+  ).toEqual(createEventData.cancellationPopupText);
+
+  await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
+  await basePage.clickElement(eventCreationWizardPage.nextButton);
+
+  // Verify abandon while creating new package
+  await basePage.clickElement(eventCreationWizardPage.addPackageButton);
+  await basePage.enterValuesInElement(
+    eventCreationWizardPage.packageNameInput,
+    eventName
+  );
+  await basePage.clickElement(eventCreationWizardPage.cancelButton);
+  expect(
+    await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
+  ).toBe(true);
+  expect(
+    await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
+  ).toEqual(createEventData.cancellationPopupText);
+  await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
+
+  // Verify nested objects including Programs, Products and packages are still present and not lost
+  expect(
+    await basePage.isElementVisible(eventCreationWizardPage.saveDraftButton)
+  ).toBe(true);
+});

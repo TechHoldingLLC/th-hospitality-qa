@@ -33,6 +33,11 @@ export class adminEventCreationWizardpage extends BasePage {
   public eventPublishSuccessMessage: Locator;
   public addProductButton: Locator;
   public addPackageButton: Locator;
+  public productNameInput: Locator;
+  public packageNameInput: Locator;
+  public cancelButton: Locator;
+  public cancelPopUpText: Locator;
+  public confirmCancelButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -102,6 +107,13 @@ export class adminEventCreationWizardpage extends BasePage {
     this.addPackageButton = page.locator(
       "//a[@href='/events/create/package-create']"
     );
+    this.productNameInput = page.locator("//input[@name='title']");
+    this.packageNameInput = page.locator("//input[@name='name']");
+    this.cancelButton = page.locator("//button[text()='Cancel']");
+    this.cancelPopUpText = page.locator(
+      "//div[@class='flex flex-col gap-y-1 px-6 pt-6']"
+    );
+    this.confirmCancelButton = page.locator("//button[text()='Continue']");
   }
 
   async createEvent(eventname: string) {
@@ -191,5 +203,43 @@ export class adminEventCreationWizardpage extends BasePage {
     //
     //
     await this.clickElement(this.addPackageButton);
+  }
+
+  async createPackageUnderEvent(packagename: string) {
+    const packageDescription = await this.generateNomenclatureDescription(
+      "Package"
+    );
+    await this.waitForElementVisible(this.packageNameInput);
+    await this.enterValuesInElement(this.packageNameInput, packagename);
+    await this.page.waitForTimeout(2000);
+    await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
+    // await this.associatedProgramDropdown.selectOption(programName);
+    // await this.enterValuesInElement(
+    //   this.packageDescriptionInput,
+    //   packageDescription
+    // );
+    // await this.clickOnRandomOptionFromDropdown(this.noOfGuestsDropdown);
+    // await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
+    // await this.clickElement(this.currencyAndPriceInput);
+    // const totalQuantity = await this.generate2RandomDigits();
+    // await this.enterValuesInElement(
+    //   this.totalQuantityAvailableInput,
+    //   totalQuantity
+    // );
+
+    // const maxQuantity = Math.floor(Math.random() * 9 + 1).toString();
+    // await this.enterValuesInElement(this.maxQuantityPerOrderInput, maxQuantity);
+
+    // await this.enterValuesInElement(
+    //   this.currencyAndPriceInput,
+    //   await this.generate4RandomDigits()
+    // );
+    // await this.thumbnailUpload.setInputFiles(
+    //   path.join(__dirname, "../coca-cola-images/packages/event-img1.webp")
+    // );
+    // await this.mediaUpload.setInputFiles(
+    //   path.join(__dirname, "../coca-cola-images/packages/event-img2.webp")
+    // );
+    // await this.clickElement(this.nextButton);
   }
 }
