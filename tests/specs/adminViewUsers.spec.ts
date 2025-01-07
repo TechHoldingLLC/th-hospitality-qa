@@ -25,8 +25,6 @@ test.afterEach(async () => {
 });
 
 test("TC0011 - Verify that admins can view a list of users", async () => {
-  test.info().annotations.push({ type: 'allure', description: 'TC0011 - Verify that admins can view a list of users'});
-
   try{
   //Login as admin
   await loginPage.login(config.email, config.password);

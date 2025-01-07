@@ -1,4 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","4804","TC0012 - Verify that coordinators cannot view a list of users","Premium Hospitality","Thu Dec 26 11:53:22 IST 2024","failed","Thu Dec 26 11:53:27 IST 2024","","specs/adminViewUsers.spec.ts","",""
-"","7088","TC0011 - Verify that admins can view a list of users","Premium Hospitality","Thu Dec 26 11:53:08 IST 2024","passed","Thu Dec 26 11:53:15 IST 2024","","specs/adminViewUsers.spec.ts","",""
-"","7251","TC0013 - Verify that user list and detail shows specified fields like name, email, role, department, group, status and last login","Premium Hospitality","Thu Dec 26 11:53:15 IST 2024","passed","Thu Dec 26 11:53:22 IST 2024","","specs/adminViewUsers.spec.ts","",""
