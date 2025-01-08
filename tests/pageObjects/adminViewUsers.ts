@@ -102,12 +102,12 @@ export class adminViewUsersPage extends BasePage {
   }
 
   // Filter data
-  async filterData(menuItemElement: Locator, inputData: string) {
+  async filterData(menuItemElement: string, inputData: string) {
     // Click on Add Filter button
     await this.clickElement(this.addFilterButton);
 
     // Click on filter option
-    await this.clickElement(menuItemElement);
+    await this.clickElement(this.page.locator(menuItemElement));
 
     // Enter value in filter Input Field
     await this.enterValuesInElement(this.filterInputField, inputData);

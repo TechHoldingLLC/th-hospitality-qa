@@ -193,10 +193,7 @@ filterData.forEach((data) => {
               : getValueFromColumnData.toString().trim().split(" ")[0];
 
           // filter data
-          viewUsersPage.filterData(
-            page.locator(data.menuItemLocator),
-            inputValue
-          );
+          viewUsersPage.filterData(data.menuItemLocator, inputValue);
 
           // Check  no results should not display
           expect(await viewUsersPage.noResultsLabel.isVisible()).toBe(false);
