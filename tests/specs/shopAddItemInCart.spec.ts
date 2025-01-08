@@ -96,9 +96,6 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
         addedPackageName
       );
 
-    console.log(availableQty);
-    console.log(maxQtyPerOrder);
-
     await newTab.close();
 
     const maxNumber: number =
@@ -159,9 +156,6 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
       await addItemInCart.getNumberOfAvialableQtyAndMaxQtyPerOrder(
         addedPackageName
       );
-
-    console.log(availableQty);
-    console.log(maxQtyPerOrder);
 
     await newTab.close();
 

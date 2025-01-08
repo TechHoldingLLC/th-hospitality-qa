@@ -162,13 +162,11 @@ export class shopAddItemInCartPage extends BasePage {
     let totalPackage = (await this.viewPackageButton.all()).length;
 
     totalPackage = totalPackage > 5 ? 5 : totalPackage;
-    console.log(totalPackage);
 
     // Generate random number
     const randomNumber: number =
       Math.floor(Math.random() * (totalPackage - 1)) + 1;
 
-    console.log(randomNumber);
     for (let index: number = 0; index < randomNumber; index++) {
       // Click on View Package button
       await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
