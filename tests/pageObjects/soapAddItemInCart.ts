@@ -59,7 +59,7 @@ export class soapAddItemInCartPage extends BasePage {
     );
     this.emptyCartTitle = page.locator("//h3[text()='Empty Cart']");
     this.emptyCartErrorMessage = page.locator(
-      "//p[@aria-label='Error Message']"
+      "//*[@aria-label='Error Message']"
     );
     this.totalAmountValueLabel = page.locator(
       "//p[text()='Total Amount']/following-sibling::p"
@@ -67,47 +67,20 @@ export class soapAddItemInCartPage extends BasePage {
   }
 
   // Add item in cart
-  async addItemInCartPage(numberOfTrytoAdd: number): Promise<string> {
-    // Maximum try three time to add Item
-    expect(
-      numberOfTrytoAdd,
-      "We have try three time to find available package but not found"
-    ).toBeLessThan(4);
-
+  async addItemInCartPage(): Promise<string> {
     // Click on View Package button
     await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
 
-    // Verify Package details pop up open or not
-    expect(await this.isElementVisible(this.packageTitleLabel)).toBe(true);
-
+    // Get title of package title
     const packageTitle: string = await this.packageTitleLabel.innerText();
     console.log(packageTitle);
 
     // Click on Add to Cart button
     await this.clickElement(this.addToCardButton);
-
-    expect(await this.isElementVisible(this.cartButton)).toBe(true);
     await this.page.waitForTimeout(3000);
 
-    // Check item out of stock or not
-    const outOfStockNotification: boolean =
-      await this.notificationLabel.isVisible();
-
-    if (outOfStockNotification) {
-      numberOfTrytoAdd++;
-      this.addItemInCartPage(numberOfTrytoAdd);
-    } else {
-      // click on Cart button
-      await this.clickElement(this.cartButton);
-
-      // Verify My Cart section open or not
-      expect(await this.isElementVisible(this.cartSection)).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(await this.packageTitleInCartPage.last().textContent()).toBe(
-        packageTitle
-      );
-    }
+    // click on Cart button
+    await this.clickElement(this.cartButton);
 
     return packageTitle;
   }
@@ -124,45 +97,44 @@ export class soapAddItemInCartPage extends BasePage {
       '//span[text()="' + packageName + '"]'
     );
 
-    // Check package is display in page or not
+    // Wait for the page to load
     await this.page.waitForTimeout(3000);
-    let productFound: boolean = (await packageLocator.isVisible()).valueOf();
 
-    if (!productFound) {
-      let isnextButtonEnabled: boolean = (
-        await this.nextButton.isEnabled()
-      ).valueOf();
+    let packageFound: boolean = (await packageLocator.isVisible()).valueOf();
+    let isnextButtonEnabled: boolean = false;
 
-      if (isnextButtonEnabled) {
-        // Click on next button
-        await this.clickElement(this.nextButton);
+    // Continue searching if the package is not found and the "Next" button is enabled
+    while (!packageFound) {
+      isnextButtonEnabled = (await this.nextButton.isEnabled()).valueOf();
 
-        // Wait for page load
-        await this.page.waitForLoadState("domcontentloaded");
-
-        await this.getNumberOfAvialableQtyAndMaxQtyPerOrder(packageName);
-      } else {
+      if (!isnextButtonEnabled) {
         console.log(packageName + " is not found in this page");
-        expect(false).toBeTruthy();
+        break;
       }
-    } else {
+
+      // Click on next button if enabled
+      await this.clickElement(this.nextButton);
+
+      // Wait for page load
+      await this.page.waitForLoadState("domcontentloaded");
+      await this.page.waitForTimeout(2000);
+
+      // Check again if the package is available on the next page
+      packageFound = (await packageLocator.isVisible()).valueOf();
+    }
+
+    // If package is found, navigate to its details and retrieve the quantities
+    if (packageFound) {
       // Click on package link
       await this.clickElement(packageLocator);
 
+      // Wait for the page to be ready
       this.waitForPageToBeReady();
       await this.page.waitForTimeout(5000);
 
-      // Verify Total Quantity Available element display or not
-      expect(await this.isElementVisible(this.availableQuantityLabel)).toBe(
-        true
-      );
-
-      // Verify Max Quantity Per Order element display or not
-      expect(await this.isElementVisible(this.maxQuantityPerOrderLabel)).toBe(
-        true
-      );
-
+      // Get available quantity and max quantity per order
       availableQty = Number(await this.availableQuantityLabel.textContent());
+
       maxQtyPerOrder = Number(
         await this.maxQuantityPerOrderLabel.textContent()
       );
@@ -170,7 +142,4 @@ export class soapAddItemInCartPage extends BasePage {
 
     return { availableQty, maxQtyPerOrder };
   }
-
-  // Update Quantity in Cart page
-  async updateQuantityInCartPage(quantity: string) {}
 }

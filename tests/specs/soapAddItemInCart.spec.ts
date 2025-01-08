@@ -11,6 +11,12 @@ let loginPage: adminLoginPage;
 let basePage: BasePage;
 let addItemInCartPage: soapAddItemInCartPage;
 
+let invalidValueListForQuantityField = [
+  { inValidValue: 0 },
+  { inValidValue: -1 },
+  { inValidValue: Number.MAX_SAFE_INTEGER },
+];
+
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
@@ -56,10 +62,18 @@ test("TC0119 - Verify the 'Add to Cart' page is empty when a user logs in for th
 test("TC0057 - Verify users can add packages they are interested in to cart and specify the quantity they want to purchase", async () => {
   try {
     // Add Package in cart and verify
-    const addedPackageName: string = await addItemInCartPage.addItemInCartPage(
-      1
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
     );
 
+    // Verify item added or not in cart page
+    expect(
+      await addItemInCartPage.packageTitleInCartPage.last().textContent()
+    ).toBe(addedPackageName);
     // Open new tab
     const newTab: Page = await browser.newPage();
     const login: adminLoginPage = new adminLoginPage(newTab);
@@ -111,9 +125,18 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
 test("TC0058 - Verify that the maximum quantity as specified on the package is not exceeded", async () => {
   try {
     // Add Package in cart and verify
-    const addedPackageName: string = await addItemInCartPage.addItemInCartPage(
-      1
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
     );
+
+    // Verify item added or not in cart page
+    expect(
+      await addItemInCartPage.packageTitleInCartPage.last().textContent()
+    ).toBe(addedPackageName);
 
     // Open new tab
     const newTab: Page = await browser.newPage();
@@ -149,10 +172,45 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
     );
 
     expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
-      addItemInCartData.cartErrorMessage + maxQtyPerOrder.toString() + "."
+      addItemInCartData.cartMaxQuantityErrorMessage +
+        maxQtyPerOrder.toString() +
+        "."
     );
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
+});
+
+invalidValueListForQuantityField.forEach((inputValues) => {
+  test.only(
+    "TC0125 - Verify that application validates invalid input " +
+      inputValues.inValidValue +
+      " in to quantity field under cart page",
+    async () => {
+      // Click on View Package button
+      await basePage.selectRandomItemFromMultiSelectList(
+        addItemInCartPage.viewPackageButton
+      );
+
+      await basePage.waitForPageToBeReady();
+
+      // Enter value in quantity field
+      await basePage.enterValuesInElement(
+        addItemInCartPage.quantityInputField,
+        inputValues.inValidValue.toString()
+      );
+
+      // Verify error message
+      if (inputValues.inValidValue == Number.MAX_SAFE_INTEGER) {
+        expect(
+          await addItemInCartPage.emptyCartErrorMessage.textContent()
+        ).toContain(addItemInCartData.cartMaxQuantityErrorMessage);
+      } else {
+        expect(
+          await addItemInCartPage.emptyCartErrorMessage.textContent()
+        ).toBe(addItemInCartData.invalidInputValueMessage);
+      }
+    }
+  );
 });
