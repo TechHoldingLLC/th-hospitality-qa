@@ -217,7 +217,7 @@ invalidValueListForQuantityField.forEach((inputValues) => {
   );
 });
 
-test.only("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
+test("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
   // Add Package in cart and verify
   const addedPackageName: string = await addItemInCartPage.addItemInCartPage();
 
@@ -255,4 +255,17 @@ test.only("TC0126 - Verify that items in the cart are retained after the user lo
   expect(
     await addItemInCartPage.packageTitleInCartPage.last().textContent()
   ).toBe(addedPackageName);
+});
+
+test("TC0127 - Verify that 'Total Amount' displayed correct values when multiple packages been added to cart", async () => {
+  // Add multiple package
+  const totalPrice: number = await addItemInCartPage.addMultiplePackageInCart();
+
+  // Click on Cart button
+  await basePage.clickElement(addItemInCartPage.cartButton);
+
+  // Verify total amount
+  expect(
+    (await addItemInCartPage.totalAmountValueLabel.allInnerTexts()).toString()
+  ).toContain("$" + totalPrice.toString());
 });

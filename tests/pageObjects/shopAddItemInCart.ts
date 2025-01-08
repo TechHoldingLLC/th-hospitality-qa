@@ -18,6 +18,7 @@ export class shopAddItemInCartPage extends BasePage {
   public emptyCartErrorMessage: Locator;
   public totalAmountValueLabel: Locator;
   public closeCartDrawerButton: Locator;
+  public packagePriceLabel: Locator;
 
   // Packages pages locator
   public packagesButton: Locator;
@@ -35,7 +36,9 @@ export class shopAddItemInCartPage extends BasePage {
       "//section[@role='dialog']//h3[@aria-label='Package Title']"
     );
     this.quantityInputField = page.locator("//input[@aria-label='Quantity']");
-    this.addToCardButton = page.locator("//button[text()='Add to Cart']");
+    this.addToCardButton = page.locator(
+      "//button[@aria-label='Add/Update to Cart Button']"
+    );
     this.notificationLabel = page.locator(
       "(//section[contains(@aria-label,'Notifications')]//span)[2]"
     );
@@ -68,6 +71,9 @@ export class shopAddItemInCartPage extends BasePage {
     this.closeCartDrawerButton = page.locator(
       "//button[@aria-label='Close Cart Drawer']"
     );
+    this.packagePriceLabel = page.locator(
+      "//p[text()='Package Price']/following-sibling::p"
+    );
   }
 
   // Add item in cart
@@ -77,7 +83,6 @@ export class shopAddItemInCartPage extends BasePage {
 
     // Get title of package title
     const packageTitle: string = await this.packageTitleLabel.innerText();
-    console.log(packageTitle);
 
     // Click on Add to Cart button
     await this.clickElement(this.addToCardButton);
@@ -145,5 +150,47 @@ export class shopAddItemInCartPage extends BasePage {
     }
 
     return { availableQty, maxQtyPerOrder };
+  }
+
+  // Add multiple Package in cart
+  async addMultiplePackageInCart(): Promise<number> {
+    await this.waitForPageToBeReady();
+
+    await this.waitForElementVisible(this.viewPackageButton.first());
+
+    let totalOrderAmount: number = 0;
+    let totalPackage = (await this.viewPackageButton.all()).length;
+
+    totalPackage = totalPackage > 5 ? 5 : totalPackage;
+    console.log(totalPackage);
+
+    // Generate random number
+    const randomNumber: number =
+      Math.floor(Math.random() * (totalPackage - 1)) + 1;
+
+    console.log(randomNumber);
+    for (let index: number = 0; index < randomNumber; index++) {
+      // Click on View Package button
+      await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
+
+      // Get price of package
+      const packagePrice: number = parseFloat(
+        (await this.packagePriceLabel.allTextContents())
+          .toString()
+          .replace("$", "")
+      );
+
+      // Click on Add to Cart button
+      await this.clickElement(this.addToCardButton);
+      await this.page.waitForTimeout(3000);
+
+      const notificationVisible = await this.notificationLabel.isVisible();
+
+      if (!notificationVisible) {
+        totalOrderAmount += packagePrice;
+      }
+    }
+
+    return totalOrderAmount;
   }
 }
