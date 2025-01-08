@@ -185,11 +185,18 @@ test("TC0076 - Verify that users can filter by events", async () => {
         "Null value found while retrieving the text of the selected status."
       ).not.toBeNull();
     } else {
-      // verify filtered data
-      await basePage.verifyColumnDataBasedOnColumnName(
-        "Status",
-        selectedStatus.toString()
-      );
+      // Get Status column data locators
+      const satusColumnLocator = await basePage.getColumnDataLocators("Status");
+
+      expect(satusColumnLocator.length).toBeGreaterThan(0);
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of satusColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedStatus.toString());
+      }
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);

@@ -126,11 +126,20 @@ test("TC0038 - Verify that users can filter by Department", async () => {
         "Null value found while retrieving the text of the selected department."
       ).not.toBeNull();
     } else {
-      // verify filtered data
-      await basePage.verifyColumnDataBasedOnColumnName(
-        "Department",
-        selectedDepartment.toString()
+      // Get Department column data locators
+      const departmentColumnLocator = await basePage.getColumnDataLocators(
+        "Department"
       );
+
+      expect(departmentColumnLocator.length).toBeGreaterThan(0);
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of departmentColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedDepartment.toString());
+      }
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -148,7 +157,7 @@ test("TC0186 - Verify Filter functionality for Program Name by sorting order", a
 
     // Click on Ascending button and verify data
     const [actualDataAsc, sortedDataAsc] =
-      await basePage.performAndVerifySortingOrder(
+      await basePage.performAndGetSortingData(
         "Ascending",
         viewProgramsPage.programNameColumnData,
         "Program Name"
@@ -158,7 +167,7 @@ test("TC0186 - Verify Filter functionality for Program Name by sorting order", a
 
     // Click on Descending button and verify data
     const [actualDataDes, sortedDataDes] =
-      await basePage.performAndVerifySortingOrder(
+      await basePage.performAndGetSortingData(
         "Descending",
         viewProgramsPage.programNameColumnData,
         "Program Name"

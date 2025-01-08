@@ -30,6 +30,11 @@ export default class BasePage {
     return element.innerText();
   }
 
+  //Common method to retrieve text from an element
+  async getElementTextContent(element: Locator): Promise<null | string> {
+    return element.textContent();
+  }
+
   // Common method to wait for an element to be visible
   async waitForElementVisible(element: Locator | string) {
     if (typeof element === "string") {
@@ -226,10 +231,8 @@ export default class BasePage {
   }
 
   // Verify column Data
-  async verifyColumnDataBasedOnColumnName(
-    columnName: string,
-    expectedResult: string
-  ): Promise<void> {
+  async getColumnDataLocators(columnName: string): Promise<Array<Locator>> {
+    let rowData: Locator[] = [];
     if (
       (await this.page.locator("text='No results'").isVisible()) ||
       (await this.page
@@ -237,7 +240,7 @@ export default class BasePage {
         .isVisible())
     ) {
       console.log("No results shown for filtering this data");
-      return;
+      return rowData;
     }
 
     // Find column Locators
@@ -256,21 +259,14 @@ export default class BasePage {
       }
     }
 
-    // Column should not be -1
-    expect(columnNo).not.toBe(-1);
-
     // Get all data from the specified column
-    const rowData = await this.page
-      .locator("//table//tr/td[" + columnNo + "]")
-      .all();
-
-    // Iterate through rowData to validate each cell's content
-    for (const rowLocator of rowData) {
-      const cellText = await rowLocator.textContent();
-
-      // Validate each row's textContent
-      expect(cellText).toContain(expectedResult);
+    if (columnNo > 0) {
+      rowData = await this.page
+        .locator("//table//tr/td[" + columnNo + "]")
+        .all();
     }
+
+    return rowData;
   }
 
   // Select random element from list and return text of that element

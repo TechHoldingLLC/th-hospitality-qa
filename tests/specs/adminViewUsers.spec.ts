@@ -201,11 +201,20 @@ filterData.forEach((data) => {
           // Check  no results should not display
           expect(await viewUsersPage.noResultsLabel.isVisible()).toBe(false);
 
-          // verify filtered data
-          await basePage.verifyColumnDataBasedOnColumnName(
-            data.columnName,
-            inputValue
+          // Get column data locators
+          const columnDataLocator = await basePage.getColumnDataLocators(
+            data.columnName
           );
+
+          expect(columnDataLocator.length).toBeGreaterThan(0);
+
+          // Iterate through rowData to validate each cell's content
+          for (const rowLocator of columnDataLocator) {
+            const cellText = await basePage.getElementTextContent(rowLocator);
+
+            // Validate each row's textContent
+            expect(cellText).toContain(inputValue.toString());
+          }
         }
       } catch (error: any) {
         console.error(`Test failed: ${error.message}`);

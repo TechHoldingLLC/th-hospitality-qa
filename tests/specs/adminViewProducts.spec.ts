@@ -129,11 +129,20 @@ test("TC0023 - Verify that users can filter on type and program", async () => {
         "Null value found while retrieving the text of the selected product."
       ).not.toBeNull();
     } else {
-      // verify filtered data
-      await basePage.verifyColumnDataBasedOnColumnName(
-        "Product Type",
-        selectedProductType.toString()
+      // Get Product Type column data locators
+      const productTypeColumnLocator = await basePage.getColumnDataLocators(
+        "Product Type"
       );
+
+      expect(productTypeColumnLocator.length).toBeGreaterThan(0);
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of productTypeColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedProductType.toString());
+      }
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
