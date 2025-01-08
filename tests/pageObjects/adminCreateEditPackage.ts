@@ -183,10 +183,13 @@ export class adminCreateEditPackagePage extends BasePage {
       await this.generateFourRandomDigits()
     );
     await this.thumbnailUpload.setInputFiles(
-      path.join(__dirname, "../tests/data/coca-cola-images/packages/event-img1.webp")
+      path.join(__dirname, "../data/coca-cola-images/packages/event-img1.webp")
     );
     await this.mediaUpload.setInputFiles(
-      path.join(__dirname, "../tests/data/coca-cola-images/packages/coachella-2025-lineup-696x398.jpg")
+      path.join(
+        __dirname,
+        "../data/coca-cola-images/packages/coachella-2025-lineup-696x398.jpg"
+      )
     );
     await this.clickElement(this.nextButton);
   }

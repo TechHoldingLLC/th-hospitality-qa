@@ -1,6 +1,8 @@
 import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import path from "path";
+import { adminCreateEditPackagePage } from "./adminCreateEditPackage";
+let createEditPackagePage: adminCreateEditPackagePage;
 
 export class adminEventCreationWizardpage extends BasePage {
   public eventsButton: Locator;
@@ -41,6 +43,7 @@ export class adminEventCreationWizardpage extends BasePage {
 
   constructor(page: Page) {
     super(page);
+    createEditPackagePage = new adminCreateEditPackagePage(page);
     this.eventsButton = page.locator("//a[@href='/events']");
     this.addEventButton = page.locator("//a[@href='/events/create']");
     this.productsTab = page.locator("//button[text()='Products']");
@@ -134,6 +137,7 @@ export class adminEventCreationWizardpage extends BasePage {
   async fillEventInformationForm(eventname: string) {
     await this.enterValuesInElement(this.eventNameInput, eventname);
 
+    // Generate start date & end date
     const startDate = await this.getRandomFutureDate();
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 5); // Add 5 days to the start date
@@ -144,19 +148,22 @@ export class adminEventCreationWizardpage extends BasePage {
 
     await this.clickElement(this.eventStartDateInput);
     await this.page.keyboard.type(startDate);
-
     await this.clickElement(this.eventEndDateInput);
     await this.page.keyboard.type(endDateFormatted);
+
     await this.page.waitForTimeout(3000);
     await this.clickOnRandomOptionFromDropdown(this.eventVenueDropdown);
     await this.page.waitForTimeout(3000);
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
 
     await this.thumbnailUploadInput.setInputFiles(
-      path.join(__dirname, "../tests/data/coca-cola-images/event/Coachella-2020-1280x720-988x416.jpg")
+      path.join(
+        __dirname,
+        "../data/coca-cola-images/event/Coachella-2020-1280x720-988x416.jpg"
+      )
     );
     await this.mediaUploadInput.setInputFiles(
-      path.join(__dirname, "../tests/data/coca-cola-images/event/images.jpeg")
+      path.join(__dirname, "../data/coca-cola-images/event/images.jpeg")
     );
     await this.clickElement(this.nextButton);
   }
@@ -198,48 +205,60 @@ export class adminEventCreationWizardpage extends BasePage {
   async createEventWithNewObjects(eventname: string) {
     await this.fillEventInformationForm(eventname);
     await this.clickElement(this.addProductButton);
-    //use here method from package
-    //
-    //
-    //
+    await createEditPackagePage.createProductUnderPackage(
+      await this.generateNomenclatureName("Product_Under_Event")
+    );
+    await this.waitForElementHidden(this.productNameInput);
+    await this.clickElement(this.nextButton);
     await this.clickElement(this.addPackageButton);
+    await this.createPackageUnderEvent();
+    await this.clickElement(this.publishButton);
   }
 
-  async createPackageUnderEvent(packagename: string) {
-    const packageDescription = await this.generateNomenclatureDescription(
-      "Package"
-    );
+  async createPackageUnderEvent() {
     await this.waitForElementVisible(this.packageNameInput);
-    await this.enterValuesInElement(this.packageNameInput, packagename);
-    await this.page.waitForTimeout(2000);
-    await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
-    // await this.associatedProgramDropdown.selectOption(programName);
-    // await this.enterValuesInElement(
-    //   this.packageDescriptionInput,
-    //   packageDescription
-    // );
-    // await this.clickOnRandomOptionFromDropdown(this.noOfGuestsDropdown);
-    // await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
-    // await this.clickElement(this.currencyAndPriceInput);
-    // const totalQuantity = await this.generate2RandomDigits();
-    // await this.enterValuesInElement(
-    //   this.totalQuantityAvailableInput,
-    //   totalQuantity
-    // );
+    await this.enterValuesInElement(
+      this.packageNameInput,
+      await this.generateNomenclatureName("Package_Under_Event")
+    );
+    await this.enterValuesInElement(
+      createEditPackagePage.packageDescriptionInput,
+      await this.generateNomenclatureDescription("Package_Under_Event")
+    );
+    await this.clickOnRandomOptionFromDropdown(
+      createEditPackagePage.noOfGuestsDropdown
+    );
+    await this.clickOnRandomOptionFromDropdown(
+      createEditPackagePage.departmentDropdown
+    );
+    await this.clickElement(createEditPackagePage.currencyAndPriceInput);
+    const totalQuantity = await createEditPackagePage.generateTwoRandomDigits();
+    await this.enterValuesInElement(
+      createEditPackagePage.totalQuantityAvailableInput,
+      totalQuantity
+    );
 
-    // const maxQuantity = Math.floor(Math.random() * 9 + 1).toString();
-    // await this.enterValuesInElement(this.maxQuantityPerOrderInput, maxQuantity);
+    const maxQuantity = Math.floor(Math.random() * 9 + 1).toString();
+    await this.enterValuesInElement(
+      createEditPackagePage.maxQuantityPerOrderInput,
+      maxQuantity
+    );
 
-    // await this.enterValuesInElement(
-    //   this.currencyAndPriceInput,
-    //   await this.generate4RandomDigits()
-    // );
-    // await this.thumbnailUpload.setInputFiles(
-    //   path.join(__dirname, "../coca-cola-images/packages/event-img1.webp")
-    // );
-    // await this.mediaUpload.setInputFiles(
-    //   path.join(__dirname, "../coca-cola-images/packages/event-img2.webp")
-    // );
-    // await this.clickElement(this.nextButton);
+    await this.enterValuesInElement(
+      createEditPackagePage.currencyAndPriceInput,
+      await this.generateFourRandomDigits()
+    );
+    await createEditPackagePage.thumbnailUpload.setInputFiles(
+      path.join(__dirname, "../data/coca-cola-images/packages/event-img1.webp")
+    );
+    await createEditPackagePage.mediaUpload.setInputFiles(
+      path.join(
+        __dirname,
+        "../data/coca-cola-images/packages/coachella-2025-lineup-696x398.jpg"
+      )
+    );
+    await createEditPackagePage.clickElement(this.nextButton);
+    await createEditPackagePage.addPackageProductForm();
+    await this.clickElement(createEditPackagePage.submitButton);
   }
 }

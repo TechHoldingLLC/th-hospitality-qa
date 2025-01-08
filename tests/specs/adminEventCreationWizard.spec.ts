@@ -33,131 +33,171 @@ test.afterEach(async () => {
 });
 
 test("TC0080 - Verify that users can create nested objects and that nested object lists are filtered by objects associated with the same program as the event", async () => {
-  const eventName = await basePage.generateNomenclatureName("Event");
-  await eventCreationWizardPage.createEvent(eventName);
-  expect(
-    await basePage.isElementVisible(
-      eventCreationWizardPage.eventDraftSuccessMessage
-    )
-  ).toBe(true);
+  try {
+    const eventName = await basePage.generateNomenclatureName("Event");
+    await eventCreationWizardPage.createEvent(eventName);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventDraftSuccessMessage
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
 
 test("TC0165 - Verify that application validates the mandatory fields when left blank on Event Information screen", async () => {
-  await basePage.clickElement(eventCreationWizardPage.productsTab);
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.eventNameValidation)
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(
-      eventCreationWizardPage.eventStartDateValidation
-    )
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(
-      eventCreationWizardPage.eventEndDateValidation
-    )
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(
-      eventCreationWizardPage.eventVenueValidation
-    )
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(
-      eventCreationWizardPage.associatedProgramValidation
-    )
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.thumbnailValidation)
-  ).toBe(true);
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.mediaValidation)
-  ).toBe(true);
+  try {
+    await basePage.clickElement(eventCreationWizardPage.productsTab);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventNameValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventStartDateValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventEndDateValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventVenueValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.associatedProgramValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.thumbnailValidation
+      )
+    ).toBe(true);
+    expect(
+      await basePage.isElementVisible(eventCreationWizardPage.mediaValidation)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
 
 test("TC0079 - Verify that users can save as draft and publish", async () => {
-  const eventName = await basePage.generateNomenclatureName("Event");
-  await eventCreationWizardPage.createEvent(eventName);
-  expect(
-    await basePage.isElementVisible(
+  try {
+    const eventName = await basePage.generateNomenclatureName("Event");
+    await eventCreationWizardPage.createEvent(eventName);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventDraftSuccessMessage
+      )
+    ).toBe(true);
+    await basePage.waitForElementHidden(
       eventCreationWizardPage.eventDraftSuccessMessage
-    )
-  ).toBe(true);
-  const createdEventtLocator = page.locator(`text=${eventName}`).first();
-  expect(await basePage.getElementText(createdEventtLocator)).toEqual(
-    eventName
-  );
-  expect(
-    await basePage.getElementText(
-      await eventCreationWizardPage.getStatusByEventName(eventName)
-    )
-  ).toEqual("DRAFT");
-  await basePage.clickElement(
-    await eventCreationWizardPage.createdEventKebabIconLocator(eventName)
-  );
-  await basePage.clickElement(eventCreationWizardPage.editButton);
-  await basePage.enterValuesInElement(
-    eventCreationWizardPage.eventDescriptionInput,
-    await basePage.generateNomenclatureDescription("Event")
-  );
-  await basePage.clickElement(eventCreationWizardPage.nextButton);
-  await basePage.clickElement(eventCreationWizardPage.nextButton);
-  await basePage.clickElement(eventCreationWizardPage.publishButton);
-  expect(
-    await basePage.isElementVisible(
+    );
+    const createdEventtLocator = page.locator(`text=${eventName}`).first();
+    expect(await basePage.getElementText(createdEventtLocator)).toEqual(
+      eventName
+    );
+    expect(
+      await basePage.getElementText(
+        await eventCreationWizardPage.getStatusByEventName(eventName)
+      )
+    ).toEqual("DRAFT");
+    await basePage.clickElement(
+      await eventCreationWizardPage.createdEventKebabIconLocator(eventName)
+    );
+    await basePage.clickElement(eventCreationWizardPage.editButton);
+    await basePage.enterValuesInElement(
+      eventCreationWizardPage.eventDescriptionInput,
+      await basePage.generateNomenclatureDescription("Event")
+    );
+    await basePage.clickElement(eventCreationWizardPage.nextButton);
+    await basePage.clickElement(eventCreationWizardPage.nextButton);
+    await basePage.clickElement(eventCreationWizardPage.publishButton);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventPublishSuccessMessage
+      )
+    ).toBe(true);
+    await basePage.waitForElementHidden(
       eventCreationWizardPage.eventPublishSuccessMessage
-    )
-  ).toBe(true);
-  await basePage.waitForElementHidden(
-    eventCreationWizardPage.eventPublishSuccessMessage
-  );
-  expect(
-    await basePage.getElementText(
-      await eventCreationWizardPage.getStatusByEventName(eventName)
-    )
-  ).toEqual("PUBLISHED");
+    );
+    expect(
+      await basePage.getElementText(
+        await eventCreationWizardPage.getStatusByEventName(eventName)
+      )
+    ).toEqual("PUBLISHED");
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
 
-test("TC0078 - Verify that users can create events in a wizard like experience", async () => {});
+test("TC0078 - Verify that users can create events in a wizard like experience", async () => {
+  try {
+    const eventName = await basePage.generateNomenclatureName("Event");
+    await eventCreationWizardPage.createEventWithNewObjects(eventName);
+    expect(
+      await basePage.isElementVisible(
+        eventCreationWizardPage.eventPublishSuccessMessage
+      )
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
 
 test("TC0081 - Verify nested objects persist after abandoning event creation", async () => {
-  const eventName = await basePage.generateNomenclatureName("Event");
-  await eventCreationWizardPage.fillEventInformationForm(eventName);
+  try {
+    const eventName = await basePage.generateNomenclatureName("Event");
+    await eventCreationWizardPage.fillEventInformationForm(eventName);
 
-  // Verify abandon while creating new product
-  await basePage.clickElement(eventCreationWizardPage.addProductButton);
-  await basePage.enterValuesInElement(
-    eventCreationWizardPage.productNameInput,
-    eventName
-  );
-  await basePage.clickElement(eventCreationWizardPage.cancelButton);
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
-  ).toBe(true);
-  expect(
-    await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
-  ).toEqual(createEventData.cancellationPopupText);
+    // Verify abandon while creating new product
+    await basePage.clickElement(eventCreationWizardPage.addProductButton);
+    await basePage.enterValuesInElement(
+      eventCreationWizardPage.productNameInput,
+      eventName
+    );
+    await basePage.clickElement(eventCreationWizardPage.cancelButton);
+    expect(
+      await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
+    ).toBe(true);
+    expect(
+      await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
+    ).toEqual(createEventData.cancellationPopupText);
 
-  await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
-  await basePage.clickElement(eventCreationWizardPage.nextButton);
+    await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
+    await basePage.clickElement(eventCreationWizardPage.nextButton);
 
-  // Verify abandon while creating new package
-  await basePage.clickElement(eventCreationWizardPage.addPackageButton);
-  await basePage.enterValuesInElement(
-    eventCreationWizardPage.packageNameInput,
-    eventName
-  );
-  await basePage.clickElement(eventCreationWizardPage.cancelButton);
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
-  ).toBe(true);
-  expect(
-    await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
-  ).toEqual(createEventData.cancellationPopupText);
-  await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
+    // Verify abandon while creating new package
+    await basePage.clickElement(eventCreationWizardPage.addPackageButton);
+    await basePage.enterValuesInElement(
+      eventCreationWizardPage.packageNameInput,
+      eventName
+    );
+    await basePage.clickElement(eventCreationWizardPage.cancelButton);
+    expect(
+      await basePage.isElementVisible(eventCreationWizardPage.cancelPopUpText)
+    ).toBe(true);
+    expect(
+      await basePage.getElementText(eventCreationWizardPage.cancelPopUpText)
+    ).toEqual(createEventData.cancellationPopupText);
+    await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
 
-  // Verify nested objects including Programs, Products and packages are still present and not lost
-  expect(
-    await basePage.isElementVisible(eventCreationWizardPage.saveDraftButton)
-  ).toBe(true);
+    // Verify nested objects including Programs, Products and packages are still present and not lost
+    expect(
+      await basePage.isElementVisible(eventCreationWizardPage.saveDraftButton)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
