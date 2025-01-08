@@ -2,14 +2,14 @@ import { test, Browser, Page, chromium, expect } from "@playwright/test";
 import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
-import { soapAddItemInCartPage } from "../pageObjects/soapAddItemInCart";
+import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import addItemInCartData from "../data/addItemInCartData.json";
 
 let browser: Browser;
 let page: Page;
 let loginPage: adminLoginPage;
 let basePage: BasePage;
-let addItemInCartPage: soapAddItemInCartPage;
+let addItemInCartPage: shopAddItemInCartPage;
 
 let invalidValueListForQuantityField = [
   { inValidValue: 0 },
@@ -23,7 +23,7 @@ test.beforeEach(async () => {
   await page.setViewportSize({ width: 1780, height: 720 });
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
-  addItemInCartPage = new soapAddItemInCartPage(page);
+  addItemInCartPage = new shopAddItemInCartPage(page);
   //Navigation to admin portal
   await basePage.navigateTo(config.soapPortalUrl);
   //Login
@@ -77,7 +77,7 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
     // Open new tab
     const newTab: Page = await browser.newPage();
     const login: adminLoginPage = new adminLoginPage(newTab);
-    const addItemInCart: soapAddItemInCartPage = new soapAddItemInCartPage(
+    const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
       newTab
     );
 
@@ -141,7 +141,7 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
     // Open new tab
     const newTab: Page = await browser.newPage();
     const login: adminLoginPage = new adminLoginPage(newTab);
-    const addItemInCart: soapAddItemInCartPage = new soapAddItemInCartPage(
+    const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
       newTab
     );
 
@@ -183,7 +183,7 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
 });
 
 invalidValueListForQuantityField.forEach((inputValues) => {
-  test.only(
+  test(
     "TC0125 - Verify that application validates invalid input " +
       inputValues.inValidValue +
       " in to quantity field under cart page",
@@ -213,4 +213,19 @@ invalidValueListForQuantityField.forEach((inputValues) => {
       }
     }
   );
+});
+
+test("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
+  // Add Package in cart and verify
+  const addedPackageName: string = await addItemInCartPage.addItemInCartPage();
+
+  // Verify My Cart section open or not
+  expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+    true
+  );
+
+  // Verify item added or not in cart page
+  expect(
+    await addItemInCartPage.packageTitleInCartPage.last().textContent()
+  ).toBe(addedPackageName);
 });

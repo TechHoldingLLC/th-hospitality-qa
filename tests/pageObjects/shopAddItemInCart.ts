@@ -3,7 +3,7 @@ import BasePage from "./basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
 
-export class soapAddItemInCartPage extends BasePage {
+export class shopAddItemInCartPage extends BasePage {
   public viewPackageButton: Locator;
   public packageTitleLabel: Locator;
   public quantityInputField: Locator;
