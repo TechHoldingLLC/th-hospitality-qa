@@ -153,10 +153,10 @@ export class adminEventCreationWizardpage extends BasePage {
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
 
     await this.thumbnailUploadInput.setInputFiles(
-      path.join(__dirname, "../coca-cola-images/event/Coachella23-Banner.png")
+      path.join(__dirname, "../tests/data/coca-cola-images/event/Coachella-2020-1280x720-988x416.jpg")
     );
     await this.mediaUploadInput.setInputFiles(
-      path.join(__dirname, "../coca-cola-images/event/images.jpeg")
+      path.join(__dirname, "../tests/data/coca-cola-images/event/images.jpeg")
     );
     await this.clickElement(this.nextButton);
   }

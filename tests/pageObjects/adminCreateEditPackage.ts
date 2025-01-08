@@ -169,7 +169,7 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.clickOnRandomOptionFromDropdown(this.noOfGuestsDropdown);
     await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
     await this.clickElement(this.currencyAndPriceInput);
-    const totalQuantity = await this.generate2RandomDigits();
+    const totalQuantity = await this.generateTwoRandomDigits();
     await this.enterValuesInElement(
       this.totalQuantityAvailableInput,
       totalQuantity
@@ -180,13 +180,13 @@ export class adminCreateEditPackagePage extends BasePage {
 
     await this.enterValuesInElement(
       this.currencyAndPriceInput,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.thumbnailUpload.setInputFiles(
-      path.join(__dirname, "../coca-cola-images/packages/event-img1.webp")
+      path.join(__dirname, "../tests/data/coca-cola-images/packages/event-img1.webp")
     );
     await this.mediaUpload.setInputFiles(
-      path.join(__dirname, "../coca-cola-images/packages/event-img2.webp")
+      path.join(__dirname, "../tests/data/coca-cola-images/packages/coachella-2025-lineup-696x398.jpg")
     );
     await this.clickElement(this.nextButton);
   }
@@ -220,7 +220,7 @@ export class adminCreateEditPackagePage extends BasePage {
   }
 
   async generateNomenclatureProductNameFromPackage(): Promise<string> {
-    const randomDigits = await this.generate5RandomDigits();
+    const randomDigits = await this.generateFiveRandomDigits();
     return "Automated_Product_Created_Under_Package_" + randomDigits;
   }
 
@@ -237,7 +237,7 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.clickElement(createEditProductPage.airportTransferIcon);
     await this.enterValuesInElement(
       createEditProductPage.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.clickElement(createEditProductPage.saveButton);
   }
