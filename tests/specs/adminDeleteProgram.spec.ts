@@ -12,23 +12,20 @@ let viewProgramsPage: adminViewProgramsPage;
 let loginPage: adminLoginPage;
 let basePage: BasePage;
 let createEditProgram: adminCreateEditProgramPage;
-let deleteProgramPage :adminDeleteProgramPage;
+let deleteProgramPage: adminDeleteProgramPage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-//  await page.setViewportSize({ width: 1780, height: 720 });
+  //  await page.setViewportSize({ width: 1780, height: 720 });
   viewProgramsPage = new adminViewProgramsPage(page);
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
   createEditProgram = new adminCreateEditProgramPage(page);
   deleteProgramPage = new adminDeleteProgramPage(page);
-   
-  //Navigation to admin portal
+
   await basePage.navigateTo(config.adminPortalUrl);
-  //Login
   await loginPage.login(config.email, config.password);
-  //Navigation to Programs Listing page
   await basePage.clickElement(viewProgramsPage.programsButton);
 });
 
@@ -37,47 +34,78 @@ test.afterEach(async () => {
 });
 
 test("TC0086 - verify that the user can access a CTA to delete", async () => {
+  const expectedMessages = [
+    "No results",
+    "Try changing the filters or search query",
+  ];
+  const programName = await basePage.generateNomenclatureName("Program");
+  const expectedDeleteConfirmationMessage: string = `This will permanently delete the program "${programName}" and cannot be undone.`;
+  const expectedDeleteSuccessMessage: string = `${programName} was successfully deleted.`;
+
   try {
-    // Click on Add Program button
+    // Create program and validate
     await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await createEditProgram.createProgram(programName);
+    await createEditProgram.waitForConformationToAppearAndHidden();
 
-    //Generate Nomenclature name for program
-    const programInputText = await basePage.generateNomenclatureName("Program");
+    await deleteProgramPage.searchProgramByName(programName);
+    const isVisible: boolean =
+      await deleteProgramPage.validateProgramInputTextVisibility();
+    expect(isVisible).toBe(true);
 
-    //Fill up add program form and create a program
-    await createEditProgram.createProgram(programInputText);
+    await deleteProgramPage.openDeletePopup();
+    expect(await deleteProgramPage.getDeleteConfirmationMessage()).toBe(
+      expectedDeleteConfirmationMessage
+    );
 
-    //Verify program created successfully
-    expect(await basePage.isElementVisible(createEditProgram.createSuccessMessage)).toBe(true);
+    // Delete program and validate success message
+    await deleteProgramPage.deleteProgram();
+    await deleteProgramPage.page.waitForTimeout(2000);
+    expect(await deleteProgramPage.getDeleteSuccessMessage()).toBe(
+      expectedDeleteSuccessMessage
+    );
 
-    //Verify created program gets populated on program listing page
-    const createdProgramLocator = page.locator(`text=${programInputText}`).first();
-    expect(await basePage.getElementText(createdProgramLocator)).toEqual(programInputText);
+    // Conform delectation and validate
+    await deleteProgramPage.clickConformDelete();
+    await deleteProgramPage.searchProgramByName(programName);
 
-    // Delete Program
-    await deleteProgramPage.deleteProgram(programInputText);
-
-    // Verify Program successfully deleted or not
-    await deleteProgramPage.searchDeletedProgram(programInputText);
-
+    const actualErrorMessage = await deleteProgramPage.getNoResultsMessage();
+    expectedMessages.forEach((expectedMessage) => {
+      expect(actualErrorMessage).toContain(expectedMessage);
+    });
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
 });
 
-test('TC0087 - Verify that if the programs is not associated with packages, products and orders a confirmation prompt appears', async ()=>{
+test("TC0087 - Verify that if the program is not associated with packages, products, and orders, a confirmation prompt appears", async () => {
   try {
-
-    // Verify cancel button
-    await deleteProgramPage.cancelDeleteProgram(deleteProgramPage.cancelProgramButton);
-
-    // Verify 'X' button
-    await deleteProgramPage.cancelDeleteProgram(deleteProgramPage.closePopupButton);
-
-  } catch (error:any) {
+    // Verify using both cancel options
+    await deleteProgramPage.cancelDeleteProgramWithValidation("button");
+    await deleteProgramPage.cancelDeleteProgramWithValidation("logo");
+  } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
 });
 
+test("TC0088 - verify that if the programs is associated with packages, products and orders an error message appears.", async () => {
+  const failedMessage: string = "Failed to delete program";
+  const referenceMessage: string =
+    "This program can't be deleted because it is referenced by one or more products, packages or events.";
+
+  try {
+    await deleteProgramPage.getReferredProgramRow();
+    await deleteProgramPage.clickMenuButtonForNumericRow();
+    await deleteProgramPage.deleteSelectedProgramFromMenu();
+
+    const alertMessage = await deleteProgramPage.getAlertMessage();
+    expect(alertMessage).not.toBeNull();
+    expect(alertMessage).toContain(failedMessage);
+    expect(alertMessage).toContain(referenceMessage);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

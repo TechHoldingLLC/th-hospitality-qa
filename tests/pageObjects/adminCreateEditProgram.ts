@@ -62,4 +62,10 @@ export class adminCreateEditProgramPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.groupsDropdownList);
     await this.saveButton.click();
   }
+
+  async waitForConformationToAppearAndHidden(): Promise<void> {
+    const selector = 'text="Program has been created successfully"';
+    await this.page.waitForSelector(selector, { state: "visible" });
+    await this.page.waitForSelector(selector, { state: "hidden" });
+  }
 }
