@@ -175,6 +175,8 @@ filterData.forEach((data) => {
         await loginPage.login(config.email, config.password);
         await basePage.clickElement(viewUsersPage.usersButton);
 
+        await basePage.waitForPageToBeReady();
+
         // Get Data from the table
         const getValueFromColumnData: null | string =
           await basePage.getRandomValueFromListLocator(
@@ -193,7 +195,7 @@ filterData.forEach((data) => {
               : getValueFromColumnData.toString().trim().split(" ")[0];
 
           // filter data
-          viewUsersPage.filterData(data.menuItemLocator, inputValue);
+          await viewUsersPage.filterData(data.menuItemLocator, inputValue);
 
           // Check  no results should not display
           expect(await viewUsersPage.noResultsLabel.isVisible()).toBe(false);
