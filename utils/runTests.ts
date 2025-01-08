@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { logMessage, clearScreenshots } from "./logUtils";
+import { logMessage } from "./logUtils";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -23,7 +23,7 @@ const environments = {
 };
 
 // Validate environment
-const ENV = process.env.ENV || "dev";
+const ENV = process.env.ENV || "qa";
 if (!Object.keys(environments).includes(ENV)) {
   console.error(
     `Invalid environment: ${ENV}. Supported environments are: dev, qa.`
@@ -34,7 +34,6 @@ if (!Object.keys(environments).includes(ENV)) {
 const currentEnv = environments[ENV as keyof typeof environments];
 
 // Directories and paths
-const screenshotsDir = path.resolve("screenshots");
 const logsDir = path.resolve("logs");
 const allureResultsDir = path.resolve("allure-results");
 const allureReportDir = path.resolve("allure-report");
@@ -68,7 +67,6 @@ const initializeEnvironment = async () => {
     // Ensure directories exist
     await Promise.all([
       ensureDirectoryExists(logsDir),
-      ensureDirectoryExists(screenshotsDir),
       ensureDirectoryExists(allureResultsDir),
     ]);
 
@@ -83,10 +81,10 @@ const initializeEnvironment = async () => {
     // Recreate cleared directories
     await ensureDirectoryExists(allureResultsDir);
     await fs.writeFile(logFilePath, "");
-    clearScreenshots();
 
     logMessage(
-      `🚀 Starting the test execution in ${currentEnv.environmentName} using Chrome...`
+      `🚀 Starting the test execution in ${currentEnv.environmentName}"
+      }...`
     );
   } catch (error) {
     logMessage(`Error initializing environment: ${error}`);
@@ -100,7 +98,7 @@ const generateAllureFiles = async () => {
     allureResultsDir,
     "environment.properties"
   );
-  const environmentVariables = `Environment=${currentEnv.environmentName}\nPlatform=${currentEnv.platform}\nBrowser=Chrome`;
+  const environmentVariables = `Environment=${currentEnv.environmentName}\nPlatform=${currentEnv.platform}`;
   const executorFilePath = path.join(allureResultsDir, "executor.json");
   const executorData = {
     name: "Automation Executor",
