@@ -180,6 +180,8 @@ export class shopAddItemInCartPage extends BasePage {
 
       // Click on Add to Cart button
       await this.clickElement(this.addToCardButton);
+
+      await this.waitForPageToBeReady();
       await this.page.waitForTimeout(3000);
 
       const notificationVisible = await this.notificationLabel.isVisible();
