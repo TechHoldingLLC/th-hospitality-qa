@@ -4,12 +4,14 @@ import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import addItemInCartData from "../data/addItemInCartData.json";
+import { shopLogoutPage } from "../pageObjects/shopLogoutPage";
 
 let browser: Browser;
 let page: Page;
 let loginPage: adminLoginPage;
 let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
+let logoutPage: shopLogoutPage;
 
 let invalidValueListForQuantityField = [
   { inValidValue: 0 },
@@ -215,7 +217,7 @@ invalidValueListForQuantityField.forEach((inputValues) => {
   );
 });
 
-test("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
+test.only("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
   // Add Package in cart and verify
   const addedPackageName: string = await addItemInCartPage.addItemInCartPage();
 
@@ -225,6 +227,31 @@ test("TC0126 - Verify that items in the cart are retained after the user logs ou
   );
 
   // Verify item added or not in cart page
+  expect(
+    await addItemInCartPage.packageTitleInCartPage.last().textContent()
+  ).toBe(addedPackageName);
+
+  // Close cart popup
+  await basePage.clickElement(addItemInCartPage.closeCartDrawerButton);
+
+  // Log out fromm portal
+  logoutPage = new shopLogoutPage(page);
+  logoutPage.logout();
+
+  await basePage.waitForPageToBeReady();
+
+  // Login in protal
+  await loginPage.login(config.coordinator_email, config.coordinator_password);
+
+  // click on Cart button
+  await basePage.clickElement(addItemInCartPage.cartButton);
+
+  // Verify My Cart section open or not
+  expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+    true
+  );
+
+  // Verify item added is display or not in cart page
   expect(
     await addItemInCartPage.packageTitleInCartPage.last().textContent()
   ).toBe(addedPackageName);

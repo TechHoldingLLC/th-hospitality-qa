@@ -17,6 +17,7 @@ export class shopAddItemInCartPage extends BasePage {
   public emptyCartTitle: Locator;
   public emptyCartErrorMessage: Locator;
   public totalAmountValueLabel: Locator;
+  public closeCartDrawerButton: Locator;
 
   // Packages pages locator
   public packagesButton: Locator;
@@ -63,6 +64,9 @@ export class shopAddItemInCartPage extends BasePage {
     );
     this.totalAmountValueLabel = page.locator(
       "//p[text()='Total Amount']/following-sibling::p"
+    );
+    this.closeCartDrawerButton = page.locator(
+      "//button[@aria-label='Close Cart Drawer']"
     );
   }
 
