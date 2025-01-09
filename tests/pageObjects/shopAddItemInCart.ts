@@ -88,6 +88,10 @@ export class shopAddItemInCartPage extends BasePage {
     // Check package is not out of stock
     let isPackageOutofStock = await this.outOfStockButton.isVisible();
     if (isPackageOutofStock) {
+      // Close cart pop up
+      await this.clickElement(this.closeCartDrawerButton);
+
+      // Click on View Package button again
       await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
 
       isPackageOutofStock = await this.outOfStockButton.isVisible();
@@ -203,6 +207,9 @@ export class shopAddItemInCartPage extends BasePage {
         await this.page.waitForTimeout(3000);
 
         totalOrderAmount += packagePrice;
+      } else {
+        // Close cart pop up
+        await this.clickElement(this.closeCartDrawerButton);
       }
     }
 
