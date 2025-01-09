@@ -205,6 +205,9 @@ export class shopAddItemInCartPage extends BasePage {
             .replace("$", "")
         );
 
+        // Get title of package title
+        const packageTitle: string = await this.packageTitleLabel.innerText();
+
         // Click on Add to Cart button
         await this.clickElement(this.addToCardButton);
 
@@ -212,6 +215,10 @@ export class shopAddItemInCartPage extends BasePage {
         await this.page.waitForTimeout(3000);
 
         totalOrderAmount += packagePrice;
+
+        // Check if the value is already in  the array
+        if (!addedPackageNames.includes(packageTitle))
+          addedPackageNames.push(packageTitle);
       } else {
         // Close cart pop up
         await this.clickElement(this.closeCartDrawerButton);
