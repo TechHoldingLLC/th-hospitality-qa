@@ -17,13 +17,8 @@ test.beforeEach(async () => {
   basePage = new BasePage(page);
   loginPage = new adminLoginPage(page);
   eventCreationWizardPage = new adminEventCreationWizardpage(page);
-  // await basePage.navigateTo(config.adminPortalUrl);
-  // await loginPage.login(config.email, config.password);
-  await basePage.navigateTo("https://admin.dev.hospitality.thinfra.net/login");
-  await loginPage.login(
-    "superuser@dev.hospitality.thinfra.net",
-    "TestSuperUser%123"
-  );
+  await basePage.navigateTo(config.adminPortalUrl);
+  await loginPage.login(config.email, config.password);
   await basePage.clickElement(eventCreationWizardPage.eventsButton);
   await basePage.clickElement(eventCreationWizardPage.addEventButton);
 });
