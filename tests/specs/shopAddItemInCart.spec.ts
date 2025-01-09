@@ -176,11 +176,19 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
         (maxQtyPerOrder + 1).toString()
       );
 
-      expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
-        addItemInCartData.cartMaxQuantityErrorMessage +
-          maxQtyPerOrder.toString() +
-          "."
-      );
+      if (availableQty > maxQtyPerOrder) {
+        expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
+          addItemInCartData.cartMaxQuantityErrorMessage +
+            maxQtyPerOrder.toString() +
+            "."
+        );
+      } else {
+        expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
+          addItemInCartData.maximumAvailableQtyMessage +
+            availableQty.toString() +
+            "."
+        );
+      }
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
