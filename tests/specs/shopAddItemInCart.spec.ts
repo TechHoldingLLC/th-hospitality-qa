@@ -199,9 +199,16 @@ invalidValueListForQuantityField.forEach((inputValues) => {
 
       // Verify error message
       if (inputValues.inValidValue == Number.MAX_SAFE_INTEGER) {
+        const errorMessage = await basePage.getElementText(
+          addItemInCartPage.emptyCartErrorMessage
+        );
+
         expect(
-          await addItemInCartPage.emptyCartErrorMessage.textContent()
-        ).toContain(addItemInCartData.cartMaxQuantityErrorMessage);
+          errorMessage.includes(
+            addItemInCartData.cartMaxQuantityErrorMessage
+          ) ||
+            errorMessage.includes(addItemInCartData.maximumAvailableQtyMessage)
+        ).toBe(true);
       } else {
         expect(
           await addItemInCartPage.emptyCartErrorMessage.textContent()

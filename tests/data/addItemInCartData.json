@@ -1,5 +1,7 @@
 {
     "cartMaxQuantityErrorMessage": "Maximum quantity allowed for this package is ",
     "emptyCartErrorMessage":"You don't have anything in your cart. Let's change that, use the link below to start browsing our events and packages.",
-    "invalidInputValueMessage":"Quantity can not be less than 1."
+    "invalidInputValueMessage":"Quantity can not be less than 1.",
+    "maximumAvailableQtyMessage":"Maximum available quantity for this package is "
 }
+
