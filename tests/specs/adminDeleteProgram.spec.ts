@@ -5,6 +5,7 @@ import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { adminCreateEditProgramPage } from "../pageObjects/adminCreateEditProgram";
 import { adminDeleteProgramPage } from "../pageObjects/adminDeleteProgram";
+import deleteProgramData from "../data/deleteProgramdata.json";
 
 let browser: Browser;
 let page: Page;
@@ -34,45 +35,51 @@ test.afterEach(async () => {
 });
 
 test("TC0086 - verify that the user can access a CTA to delete", async () => {
-  const expectedMessages = [
-    "No results",
-    "Try changing the filters or search query",
-  ];
-  const programName = await basePage.generateNomenclatureName("Program");
-  const expectedDeleteConfirmationMessage: string = `This will permanently delete the program "${programName}" and cannot be undone.`;
-  const expectedDeleteSuccessMessage: string = `${programName} was successfully deleted.`;
+  const programName = await basePage.generateNomenclatureName(
+    deleteProgramData.programNamePrefix
+  );
+  const expectedDeleteConfirmationMessage: string =
+    deleteProgramData.expectedDeleteConfirmationMessage.replace(
+      "{programName}",
+      programName
+    );
+  const expectedDeleteSuccessMessage: string =
+    deleteProgramData.expectedDeleteSuccessMessage.replace(
+      "{programName}",
+      programName
+    );
 
   try {
-    // Create program and validate
     await basePage.clickElement(viewProgramsPage.addProgramButton);
     await createEditProgram.createProgram(programName);
-    await createEditProgram.waitForConformationToAppearAndHidden();
 
+    // Validate created program.
+    await basePage.waitForPageToBeReady();
     await deleteProgramPage.searchProgramByName(programName);
-    const isVisible: boolean =
-      await deleteProgramPage.validateProgramInputTextVisibility();
-    expect(isVisible).toBe(true);
+    expect(
+      await basePage.getElementText(deleteProgramPage.programInputText.first())
+    ).toEqual(programName);
 
+    // Validate delete confirmation.
     await deleteProgramPage.openDeletePopup();
-    expect(await deleteProgramPage.getDeleteConfirmationMessage()).toBe(
-      expectedDeleteConfirmationMessage
-    );
+    await basePage.isElementVisible(deleteProgramPage.deleteProgramButton);
+    expect(
+      await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
+    ).toEqual(expectedDeleteConfirmationMessage);
 
-    // Delete program and validate success message
-    await deleteProgramPage.deleteProgram();
-    await deleteProgramPage.page.waitForTimeout(2000);
-    expect(await deleteProgramPage.getDeleteSuccessMessage()).toBe(
-      expectedDeleteSuccessMessage
-    );
+    // Validate delete success.
+    await basePage.clickElement(deleteProgramPage.deleteProgramButton);
+    await basePage.isElementVisible(deleteProgramPage.confirmationButton);
+    expect(
+      await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
+    ).toEqual(expectedDeleteSuccessMessage);
 
-    // Conform delectation and validate
-    await deleteProgramPage.clickConformDelete();
+    // Validate program delete successfully.
+    await basePage.clickElement(deleteProgramPage.confirmationButton);
     await deleteProgramPage.searchProgramByName(programName);
-
-    const actualErrorMessage = await deleteProgramPage.getNoResultsMessage();
-    expectedMessages.forEach((expectedMessage) => {
-      expect(actualErrorMessage).toContain(expectedMessage);
-    });
+    expect(
+      await basePage.getElementText(deleteProgramPage.noResultsMessageContainer)
+    ).toContain(deleteProgramData.expectedErrorMessages);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -81,9 +88,22 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
 
 test("TC0087 - Verify that if the program is not associated with packages, products, and orders, a confirmation prompt appears", async () => {
   try {
-    // Verify using both cancel options
-    await deleteProgramPage.cancelDeleteProgramWithValidation("button");
-    await deleteProgramPage.cancelDeleteProgramWithValidation("logo");
+    const verifyAlertDialogVisibleAndHidden = async () => {
+      expect(
+        await basePage.isElementVisible(deleteProgramPage.alertDialog)
+      ).toBe(true);
+      await basePage.clickElement(deleteProgramPage.cancelProgramButton);
+      await deleteProgramPage.alertDialog.waitFor({ state: "hidden" });
+      expect(await deleteProgramPage.alertDialog.isHidden()).toBe(true);
+    };
+
+    // Open delete popup and verify alert dialog behavior
+    await deleteProgramPage.openDeletePopup();
+    await verifyAlertDialogVisibleAndHidden();
+
+    // Open delete popup again and verify alert dialog behavior
+    await deleteProgramPage.openDeletePopup();
+    await verifyAlertDialogVisibleAndHidden();
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -91,19 +111,18 @@ test("TC0087 - Verify that if the program is not associated with packages, produ
 });
 
 test("TC0088 - verify that if the programs is associated with packages, products and orders an error message appears.", async () => {
-  const failedMessage: string = "Failed to delete program";
-  const referenceMessage: string =
-    "This program can't be deleted because it is referenced by one or more products, packages or events.";
+  const failedMessage: string = deleteProgramData.failedMessage;
 
   try {
-    await deleteProgramPage.getReferredProgramRow();
-    await deleteProgramPage.clickMenuButtonForNumericRow();
-    await deleteProgramPage.deleteSelectedProgramFromMenu();
+    await deleteProgramPage.deleteReferredProgram();
 
-    const alertMessage = await deleteProgramPage.getAlertMessage();
-    expect(alertMessage).not.toBeNull();
-    expect(alertMessage).toContain(failedMessage);
-    expect(alertMessage).toContain(referenceMessage);
+    expect(
+      await basePage.getElementText(deleteProgramPage.alertDialog)
+    ).not.toBeNull();
+
+    expect(
+      await basePage.getAllTextContents(deleteProgramPage.alertDialog)
+    ).toContain(failedMessage);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

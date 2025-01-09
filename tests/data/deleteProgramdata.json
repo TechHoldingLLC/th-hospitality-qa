@@ -1,0 +1,7 @@
+{
+  "programNamePrefix": "Program",
+  "expectedDeleteConfirmationMessage": "This will permanently delete the program \"{programName}\" and cannot be undone.",
+  "expectedDeleteSuccessMessage": "{programName} was successfully deleted.",
+  "failedMessage": "Failed to delete programThis program can't be deleted because it is referenced by one or more products, packages or events.Got it",
+  "expectedErrorMessages": "No results"
+}
