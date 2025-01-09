@@ -20,7 +20,7 @@ let loginPage: adminLoginPage;
 let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
 let logoutPage: shopLogoutPage;
-let shopViewAndEditCart: shopViewAndEditCartPage;
+let ViewAndEditCartPage: shopViewAndEditCartPage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -29,7 +29,7 @@ test.beforeEach(async () => {
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
-  shopViewAndEditCart = new shopViewAndEditCartPage(page);
+  ViewAndEditCartPage = new shopViewAndEditCartPage(page);
   //Navigation to admin portal
   await basePage.navigateTo(config.soapPortalUrl);
   //Login
@@ -93,7 +93,7 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
 
     // Click on Delete button
     await basePage.clickElement(
-      page.locator(await shopViewAndEditCart.getDelectButton(addedPackageName))
+      page.locator(await ViewAndEditCartPage.getDelectButton(addedPackageName))
     );
 
     await basePage.waitForPageToBeReady();
@@ -102,10 +102,80 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
     expect(
       await page
         .locator(
-          await shopViewAndEditCart.getPackageCardLocator(addedPackageName)
+          await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
         )
         .isVisible()
     ).toBe(false);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0061 - Verify the user can proceed to checkout or go back to shopping", async () => {
+  try {
+    // Add Package in cart and verify
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
+    );
+
+    // Verify item added or not in cart page
+    expect(
+      await addItemInCartPage.packageTitleInCartPage.last().textContent()
+    ).toBe(addedPackageName);
+
+    // Click on Checkout button
+    await basePage.clickElement(ViewAndEditCartPage.checkOutButton);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0128 - Verify that the cart data persists when the user navigates away from the cart page.", async () => {
+  try {
+    // Add Package in cart and verify
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
+    );
+
+    // Verify item added or not in cart page
+    expect(
+      await addItemInCartPage.packageTitleInCartPage.last().textContent()
+    ).toBe(addedPackageName);
+
+    // Edit Quantity
+    await basePage.enterValuesInElement(
+      page.locator(
+        await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
+      ),
+      "2"
+    );
+
+    if (!(await addItemInCartPage.cartErrorMessage.isVisible())) {
+      // Click on "X" button
+      await basePage.clickElement(ViewAndEditCartPage.closeCartSectionButton);
+
+      // Open Cart Section
+      await basePage.clickElement(addItemInCartPage.cartButton);
+
+      // Verify added quantity of package
+      expect(
+        await page
+          .locator(
+            await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
+          )
+          .getAttribute("value")
+      ).toBe("2");
+    }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
