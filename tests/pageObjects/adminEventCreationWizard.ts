@@ -131,7 +131,6 @@ export class adminEventCreationWizardpage extends BasePage {
       this.saveDraftButton,
       this.packagesTab
     );
-    await this.page.waitForTimeout(3000);
   }
 
   async fillEventInformationForm(eventname: string) {
