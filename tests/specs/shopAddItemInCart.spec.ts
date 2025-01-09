@@ -260,7 +260,7 @@ test("TC0126 - Verify that items in the cart are retained after the user logs ou
 
 test("TC0127 - Verify that 'Total Amount' displayed correct values when multiple packages been added to cart", async () => {
   // Add multiple package
-  const totalPrice: number = await addItemInCartPage.addMultiplePackageInCart();
+  const { totalAmount } = await addItemInCartPage.addMultiplePackageInCart();
 
   // Click on Cart button
   await basePage.clickElement(addItemInCartPage.cartButton);
@@ -268,5 +268,5 @@ test("TC0127 - Verify that 'Total Amount' displayed correct values when multiple
   // Verify total amount
   expect(
     (await addItemInCartPage.totalAmountValueLabel.allInnerTexts()).toString()
-  ).toContain("$" + totalPrice.toString());
+  ).toContain("$" + totalAmount.toString());
 });

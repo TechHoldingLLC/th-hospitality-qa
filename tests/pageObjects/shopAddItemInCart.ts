@@ -153,12 +153,17 @@ export class shopAddItemInCartPage extends BasePage {
   }
 
   // Add multiple Package in cart
-  async addMultiplePackageInCart(): Promise<number> {
+  async addMultiplePackageInCart(): Promise<{
+    listOfAddedPackage: string[];
+    totalAmount: number;
+  }> {
     await this.waitForPageToBeReady();
 
     await this.waitForElementVisible(this.viewPackageButton.first());
 
     let totalOrderAmount: number = 0;
+    let addedPackageNames: string[] = [];
+
     let totalPackage = (await this.viewPackageButton.all()).length;
 
     totalPackage = totalPackage > 5 ? 5 : totalPackage;
@@ -178,6 +183,9 @@ export class shopAddItemInCartPage extends BasePage {
           .replace("$", "")
       );
 
+      // Get title of package title
+      const packageTitle: string = await this.packageTitleLabel.innerText();
+
       // Click on Add to Cart button
       await this.clickElement(this.addToCardButton);
 
@@ -188,9 +196,16 @@ export class shopAddItemInCartPage extends BasePage {
 
       if (!notificationVisible) {
         totalOrderAmount += packagePrice;
+
+        // Check if the value is already in  the array
+        if (!addedPackageNames.includes(packageTitle))
+          addedPackageNames.push(packageTitle);
       }
     }
 
-    return totalOrderAmount;
+    return {
+      listOfAddedPackage: addedPackageNames,
+      totalAmount: totalOrderAmount,
+    };
   }
 }
