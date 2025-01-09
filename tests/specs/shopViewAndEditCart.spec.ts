@@ -181,3 +181,59 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
     throw error;
   }
 });
+
+test.only("TC0129 - Verify that the cart functions correctly with a large number of items.", async () => {
+  try {
+    // Add all available package in cart
+    const listOfAddedPackage: string[] =
+      await addItemInCartPage.addAllPackageInCart();
+
+    console.log(listOfAddedPackage);
+
+    // Click on Cart button
+    await basePage.clickElement(addItemInCartPage.cartButton);
+
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
+    );
+
+    for (const addedPackageName in listOfAddedPackage) {
+      // Verify item added or not in cart page
+      expect(
+        await page
+          .locator(
+            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+          )
+          .isVisible()
+      ).toBe(true);
+
+      // Edit Quantity
+      await basePage.enterValuesInElement(
+        addItemInCartPage.packageQuantityField,
+        "2"
+      );
+
+      // Click on Delete button
+      await basePage.clickElement(
+        page.locator(
+          await ViewAndEditCartPage.getDelectButton(addedPackageName)
+        )
+      );
+
+      await basePage.waitForPageToBeReady();
+
+      // Verify Package is remove from cart or not
+      expect(
+        await page
+          .locator(
+            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+          )
+          .isVisible()
+      ).toBe(false);
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

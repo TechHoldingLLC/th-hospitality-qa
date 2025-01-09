@@ -208,4 +208,39 @@ export class shopAddItemInCartPage extends BasePage {
       totalAmount: totalOrderAmount,
     };
   }
+
+  // Add all available package in cart
+  async addAllPackageInCart(): Promise<string[]> {
+    await this.waitForPageToBeReady();
+
+    await this.waitForElementVisible(this.viewPackageButton.first());
+
+    let addedPackageNames: string[] = [];
+
+    let totalPackage = (await this.viewPackageButton.all()).length;
+
+    for (let index: number = 1; index <= totalPackage; index++) {
+      // Click on View Package button
+      await this.clickElement(this.viewPackageButton.nth(index));
+
+      // Get title of package title
+      const packageTitle: string = await this.packageTitleLabel.innerText();
+
+      // Click on Add to Cart button
+      await this.clickElement(this.addToCardButton);
+
+      await this.waitForPageToBeReady();
+      await this.page.waitForTimeout(3000);
+
+      const notificationVisible = await this.notificationLabel.isVisible();
+
+      if (!notificationVisible) {
+        // Check if the value is already in  the array
+        if (!addedPackageNames.includes(packageTitle))
+          addedPackageNames.push(packageTitle);
+      }
+    }
+
+    return addedPackageNames;
+  }
 }
