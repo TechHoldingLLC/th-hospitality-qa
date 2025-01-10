@@ -17,6 +17,7 @@ export class adminDeleteProgramPage extends BasePage {
   public noResultsMessageContainer: Locator;
   public menuButtonWithLocationGreaterThanZero: Locator;
   public paginationStatus: Locator;
+  public programDeleteSuccessLabel: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -47,18 +48,19 @@ export class adminDeleteProgramPage extends BasePage {
     this.noResultsMessageContainer = page.locator(
       ".flex.flex-col.items-center.gap-y-2"
     );
+    this.paginationStatus = page.getByText("1 of 1 pages");
+    this.programDeleteSuccessLabel = page.locator("label", {
+      hasText: "Program deleted",
+    });
     this.menuButtonWithLocationGreaterThanZero = page.locator(
       '//tr[td[5] > 0 or td[6] > 0 or td[7] > 0 or td[8] > 0]//button[@aria-haspopup="menu"]'
-    );
-    this.paginationStatus = page.locator(
-      '//p[normalize-space()="1 of 1 pages"]'
     );
   }
 
   async openDeletePopup(): Promise<void> {
     await this.clickElement(this.menuButtons.first());
     await this.clickElement(this.deleteButton);
-    await this.waitForElementVisible(this.deleteProgramButton)
+    await this.waitForElementVisible(this.deleteProgramButton);
   }
 
   async deleteReferredProgram(): Promise<void> {

@@ -66,7 +66,9 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
 
     // Validate delete success.
     await basePage.clickElement(deleteProgramPage.deleteProgramButton);
-    await basePage.waitForElementVisible(deleteProgramPage.confirmationButton);
+    await basePage.waitForElementVisible(
+      deleteProgramPage.programDeleteSuccessLabel
+    );
     expect(
       await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
     ).toEqual(expectedDeleteSuccessMessage);
