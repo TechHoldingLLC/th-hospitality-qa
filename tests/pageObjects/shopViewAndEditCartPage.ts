@@ -5,6 +5,8 @@ export class shopViewAndEditCartPage extends BasePage {
   public removePackageButton: Locator;
   public checkOutButton: Locator;
   public closeCartSectionButton: Locator;
+  public checkoutPageTitleLabel: Locator;
+  public backToCartPageButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -15,6 +17,10 @@ export class shopViewAndEditCartPage extends BasePage {
     this.checkOutButton = page.locator("//a[text()='Checkout']");
     this.closeCartSectionButton = page.locator(
       "//button[@aria-label='Close Cart Drawer']"
+    );
+    this.checkoutPageTitleLabel = page.locator("//h1[text()='Checkout']");
+    this.backToCartPageButton = page.locator(
+      "//nav/a/span[text()='Back to shopping cart']"
     );
   }
   async getRemovePackageButton(packageName: string) {

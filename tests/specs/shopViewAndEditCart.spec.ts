@@ -20,7 +20,7 @@ let loginPage: adminLoginPage;
 let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
 let logoutPage: shopLogoutPage;
-let ViewAndEditCartPage: shopViewAndEditCartPage;
+let viewAndEditCartPage: shopViewAndEditCartPage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -29,7 +29,7 @@ test.beforeEach(async () => {
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
-  ViewAndEditCartPage = new shopViewAndEditCartPage(page);
+  viewAndEditCartPage = new shopViewAndEditCartPage(page);
   //Navigation to admin portal
   await basePage.navigateTo(config.soapPortalUrl);
   //Login
@@ -87,13 +87,13 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
       ).toBe(addedPackageName);
 
       // Edit Quantity and Click on remove button
-      await ViewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
+      await viewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
 
       // Verify Package is remove from cart or not
       expect(
         await page
           .locator(
-            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+            await viewAndEditCartPage.getPackageCardLocator(addedPackageName)
           )
           .isVisible()
       ).toBe(false);
@@ -121,7 +121,16 @@ test("TC0061 - Verify the user can proceed to checkout or go back to shopping", 
       ).toBe(addedPackageName);
 
       // Click on Checkout button
-      await basePage.clickElement(ViewAndEditCartPage.checkOutButton);
+      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+
+      // Click on Back to shopping cart button
+      await basePage.clickElement(viewAndEditCartPage.backToCartPageButton);
+
+      // Click on "X" button
+      await basePage.clickElement(viewAndEditCartPage.closeCartSectionButton);
+
+      // Verify Cart section close or not
+      expect(await addItemInCartPage.cartButton.isVisible()).toBe(true);
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -149,14 +158,14 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
       // Edit Quantity
       await basePage.enterValuesInElement(
         page.locator(
-          await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
+          await viewAndEditCartPage.getPackageQuantityField(addedPackageName)
         ),
         "2"
       );
 
       if (!(await addItemInCartPage.cartErrorMessage.isVisible())) {
         // Click on "X" button
-        await basePage.clickElement(ViewAndEditCartPage.closeCartSectionButton);
+        await basePage.clickElement(viewAndEditCartPage.closeCartSectionButton);
 
         // Open Cart Section
         await basePage.clickElement(addItemInCartPage.cartButton);
@@ -165,7 +174,7 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
         expect(
           await page
             .locator(
-              await ViewAndEditCartPage.getPackageQuantityField(
+              await viewAndEditCartPage.getPackageQuantityField(
                 addedPackageName
               )
             )
@@ -179,7 +188,7 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
   }
 });
 
-test.only("TC0129 - Verify that the cart functions correctly with a large number of items.", async () => {
+test("TC0129 - Verify that the cart functions correctly with a large number of items.", async () => {
   try {
     test.setTimeout(300000); // Setting timeout for this specific test
 
@@ -200,19 +209,19 @@ test.only("TC0129 - Verify that the cart functions correctly with a large number
       expect(
         await page
           .locator(
-            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+            await viewAndEditCartPage.getPackageCardLocator(addedPackageName)
           )
           .isVisible()
       ).toBe(true);
 
       // Edit Quantity and Click on remove button
-      await ViewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
+      await viewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
 
       // Verify Package is remove from cart or not
       expect(
         await page
           .locator(
-            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+            await viewAndEditCartPage.getPackageCardLocator(addedPackageName)
           )
           .isVisible()
       ).toBe(false);
