@@ -59,9 +59,7 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
     await deleteProgramPage.openDeletePopup();
     await basePage.waitForPageToBeReady();
     expect(
-      await basePage.getElementText(
-        deleteProgramPage.deleteMessageLabel.first()
-      )
+      await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
     ).toEqual(expectedDeleteConfirmationMessage);
 
     // Validate delete success.
@@ -90,6 +88,9 @@ test("TC0087 - Verify that if the program is not associated with packages, produ
       expect(
         await basePage.isElementVisible(deleteProgramPage.alertDialog)
       ).toBe(true);
+      expect(
+        await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
+      ).toContain(deleteProgramData.expectedDeleteConfirmationMessage);
       await basePage.clickElement(deleteProgramPage.cancelProgramButton);
       await deleteProgramPage.alertDialog.waitFor({ state: "hidden" });
       expect(await deleteProgramPage.alertDialog.isHidden()).toBe(true);
