@@ -2,7 +2,10 @@ import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import path from "path";
 import { adminCreateEditPackagePage } from "./adminCreateEditPackage";
+import { adminCreateEditProgramPage } from "./adminCreateEditProgram";
+
 let createEditPackagePage: adminCreateEditPackagePage;
+let createEditProgramPage: adminCreateEditProgramPage;
 
 export class adminEventCreationWizardpage extends BasePage {
   public eventsButton: Locator;
@@ -40,10 +43,12 @@ export class adminEventCreationWizardpage extends BasePage {
   public cancelButton: Locator;
   public cancelPopUpText: Locator;
   public confirmCancelButton: Locator;
+  public addProgramButton: Locator;
 
   constructor(page: Page) {
     super(page);
     createEditPackagePage = new adminCreateEditPackagePage(page);
+    createEditProgramPage = new adminCreateEditProgramPage(page);
     this.eventsButton = page.locator("//a[@href='/events']");
     this.addEventButton = page.locator("//a[@href='/events/create']");
     this.productsTab = page.locator("//button[text()='Products']");
@@ -117,6 +122,9 @@ export class adminEventCreationWizardpage extends BasePage {
       "//div[@class='flex flex-col gap-y-1 px-6 pt-6']"
     );
     this.confirmCancelButton = page.locator("//button[text()='Continue']");
+    this.addProgramButton = page.locator(
+      "//a[@href='/events/create/program-create']"
+    );
   }
 
   async createEvent(eventname: string) {
@@ -202,7 +210,7 @@ export class adminEventCreationWizardpage extends BasePage {
   }
 
   async createEventWithNewObjects(eventname: string) {
-    await this.fillEventInformationForm(eventname);
+    await this.fillEventInformationFormWithNewProgram(eventname);
     await this.clickElement(this.addProductButton);
     await createEditPackagePage.createProductUnderPackage(
       await this.generateNomenclatureName("Product_Under_Event")
@@ -259,5 +267,48 @@ export class adminEventCreationWizardpage extends BasePage {
     await createEditPackagePage.clickElement(this.nextButton);
     await createEditPackagePage.addPackageProductForm();
     await this.clickElement(createEditPackagePage.submitButton);
+  }
+
+  async fillEventInformationFormWithNewProgram(eventname: string) {
+    await this.enterValuesInElement(this.eventNameInput, eventname);
+
+    // Generate start date & end date
+    const startDate = await this.getRandomFutureDate();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 5); // Add 5 days to the start date
+    const endDateFormatted = `${String(endDate.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(endDate.getDate()).padStart(2, "0")}-${endDate.getFullYear()}`;
+
+    await this.clickElement(this.eventStartDateInput);
+    await this.page.keyboard.type(startDate);
+    await this.clickElement(this.eventEndDateInput);
+    await this.page.keyboard.type(endDateFormatted);
+
+    await this.page.waitForTimeout(3000);
+    await this.clickOnRandomOptionFromDropdown(this.eventVenueDropdown);
+
+    // Create new program and link to event
+    await this.clickElement(this.addProgramButton);
+    const programName = await this.generateNomenclatureName(
+      "Program_Under_Event"
+    );
+    await createEditProgramPage.createProgram(programName);
+    await this.waitForElementToAppearAndDisappear(
+      createEditProgramPage.createSuccessMessage
+    );
+    await this.associatedProgramDropdown.selectOption(programName);
+
+    await this.thumbnailUploadInput.setInputFiles(
+      path.join(
+        __dirname,
+        "../data/coca-cola-images/event/Coachella-2020-1280x720-988x416.jpg"
+      )
+    );
+    await this.mediaUploadInput.setInputFiles(
+      path.join(__dirname, "../data/coca-cola-images/event/images.jpeg")
+    );
+    await this.clickElement(this.nextButton);
   }
 }
