@@ -101,6 +101,7 @@ export class shopAddItemInCartPage extends BasePage {
       // Get title of package title
       packageTitle = await this.packageTitleLabel.innerText();
 
+      console.log(packageTitle);
       // Click on Add to Cart button
       await this.clickElement(this.addToCardButton);
       await this.page.waitForTimeout(3000);
@@ -241,28 +242,31 @@ export class shopAddItemInCartPage extends BasePage {
 
     let totalPackage = (await this.viewPackageButton.all()).length;
 
-    for (let index: number = 1; index <= totalPackage; index++) {
+    for (let index: number = 0; index < totalPackage; index++) {
       // Click on View Package button
       await this.clickElement(this.viewPackageButton.nth(index));
 
-      // Get title of package title
-      const packageTitle: string = await this.packageTitleLabel.innerText();
+      // Check package is not out of stock
+      let isPackageOutofStock = await this.outOfStockButton.isVisible();
 
-      // Click on Add to Cart button
-      await this.clickElement(this.addToCardButton);
+      if (!isPackageOutofStock) {
+        // Get title of package title
+        const packageTitle: string = await this.packageTitleLabel.innerText();
 
-      await this.waitForPageToBeReady();
-      await this.page.waitForTimeout(3000);
+        // Click on Add to Cart button
+        await this.clickElement(this.addToCardButton);
 
-      const notificationVisible = await this.notificationLabel.isVisible();
+        await this.waitForPageToBeReady();
+        await this.page.waitForTimeout(3000);
 
-      if (!notificationVisible) {
         // Check if the value is already in  the array
         if (!addedPackageNames.includes(packageTitle))
           addedPackageNames.push(packageTitle);
+      } else {
+        // Close cart pop up
+        await this.clickElement(this.closeCartDrawerButton);
       }
     }
-
     return addedPackageNames;
   }
 }

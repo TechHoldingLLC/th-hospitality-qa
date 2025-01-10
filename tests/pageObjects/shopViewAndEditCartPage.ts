@@ -17,8 +17,8 @@ export class shopViewAndEditCartPage extends BasePage {
       "//button[@aria-label='Close Cart Drawer']"
     );
   }
-  async getDelectButton(packageName: string) {
-    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Packages Card"]//button`;
+  async getRemovePackageButton(packageName: string) {
+    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Package Card"]//button`;
   }
 
   async getPackageCardLocator(packageName: string) {
@@ -26,6 +26,26 @@ export class shopViewAndEditCartPage extends BasePage {
   }
 
   async getPackageQuantityField(packageName: string) {
-    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Packages Card"]//input`;
+    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Package Card"]//input`;
+  }
+
+  // Edit quantity and click on remove package from cart
+  async editQtyAndRemovePackage(packageName: string) {
+    // Edit Quantity
+    await this.enterValuesInElement(
+      this.page.locator(await this.getPackageQuantityField(packageName)),
+      "2"
+    );
+
+    await this.page.waitForTimeout(1000);
+
+    // Click on Delete button
+    await this.clickElement(
+      this.page.locator(await this.getRemovePackageButton(packageName))
+    );
+
+    await this.waitForPageToBeReady();
+
+    await this.page.waitForTimeout(4000);
   }
 }

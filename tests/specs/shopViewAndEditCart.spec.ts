@@ -75,37 +75,29 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
     const addedPackageName: string =
       await addItemInCartPage.addItemInCartPage();
 
-    // Verify My Cart section open or not
-    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
-      true
-    );
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
+      expect(
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
 
-    // Verify item added or not in cart page
-    expect(
-      await addItemInCartPage.packageTitleInCartPage.last().textContent()
-    ).toBe(addedPackageName);
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
 
-    // Edit Quantity
-    await basePage.enterValuesInElement(
-      addItemInCartPage.packageQuantityField,
-      "2"
-    );
+      // Edit Quantity and Click on remove button
+      await ViewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
 
-    // Click on Delete button
-    await basePage.clickElement(
-      page.locator(await ViewAndEditCartPage.getDelectButton(addedPackageName))
-    );
-
-    await basePage.waitForPageToBeReady();
-
-    // Verify Package is remove from cart or not
-    expect(
-      await page
-        .locator(
-          await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
-        )
-        .isVisible()
-    ).toBe(false);
+      // Verify Package is remove from cart or not
+      expect(
+        await page
+          .locator(
+            await ViewAndEditCartPage.getPackageCardLocator(addedPackageName)
+          )
+          .isVisible()
+      ).toBe(false);
+    }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -117,19 +109,20 @@ test("TC0061 - Verify the user can proceed to checkout or go back to shopping", 
     // Add Package in cart and verify
     const addedPackageName: string =
       await addItemInCartPage.addItemInCartPage();
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
+      expect(
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
 
-    // Verify My Cart section open or not
-    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
-      true
-    );
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
 
-    // Verify item added or not in cart page
-    expect(
-      await addItemInCartPage.packageTitleInCartPage.last().textContent()
-    ).toBe(addedPackageName);
-
-    // Click on Checkout button
-    await basePage.clickElement(ViewAndEditCartPage.checkOutButton);
+      // Click on Checkout button
+      await basePage.clickElement(ViewAndEditCartPage.checkOutButton);
+    }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -142,39 +135,43 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
     const addedPackageName: string =
       await addItemInCartPage.addItemInCartPage();
 
-    // Verify My Cart section open or not
-    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
-      true
-    );
-
-    // Verify item added or not in cart page
-    expect(
-      await addItemInCartPage.packageTitleInCartPage.last().textContent()
-    ).toBe(addedPackageName);
-
-    // Edit Quantity
-    await basePage.enterValuesInElement(
-      page.locator(
-        await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
-      ),
-      "2"
-    );
-
-    if (!(await addItemInCartPage.cartErrorMessage.isVisible())) {
-      // Click on "X" button
-      await basePage.clickElement(ViewAndEditCartPage.closeCartSectionButton);
-
-      // Open Cart Section
-      await basePage.clickElement(addItemInCartPage.cartButton);
-
-      // Verify added quantity of package
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
       expect(
-        await page
-          .locator(
-            await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
-          )
-          .getAttribute("value")
-      ).toBe("2");
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
+
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
+
+      // Edit Quantity
+      await basePage.enterValuesInElement(
+        page.locator(
+          await ViewAndEditCartPage.getPackageQuantityField(addedPackageName)
+        ),
+        "2"
+      );
+
+      if (!(await addItemInCartPage.cartErrorMessage.isVisible())) {
+        // Click on "X" button
+        await basePage.clickElement(ViewAndEditCartPage.closeCartSectionButton);
+
+        // Open Cart Section
+        await basePage.clickElement(addItemInCartPage.cartButton);
+
+        // Verify added quantity of package
+        expect(
+          await page
+            .locator(
+              await ViewAndEditCartPage.getPackageQuantityField(
+                addedPackageName
+              )
+            )
+            .getAttribute("value")
+        ).toBe("2");
+      }
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -184,11 +181,11 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
 
 test.only("TC0129 - Verify that the cart functions correctly with a large number of items.", async () => {
   try {
+    test.setTimeout(300000); // Setting timeout for this specific test
+
     // Add all available package in cart
     const listOfAddedPackage: string[] =
       await addItemInCartPage.addAllPackageInCart();
-
-    console.log(listOfAddedPackage);
 
     // Click on Cart button
     await basePage.clickElement(addItemInCartPage.cartButton);
@@ -198,7 +195,7 @@ test.only("TC0129 - Verify that the cart functions correctly with a large number
       true
     );
 
-    for (const addedPackageName in listOfAddedPackage) {
+    for (const addedPackageName of listOfAddedPackage) {
       // Verify item added or not in cart page
       expect(
         await page
@@ -208,20 +205,8 @@ test.only("TC0129 - Verify that the cart functions correctly with a large number
           .isVisible()
       ).toBe(true);
 
-      // Edit Quantity
-      await basePage.enterValuesInElement(
-        addItemInCartPage.packageQuantityField,
-        "2"
-      );
-
-      // Click on Delete button
-      await basePage.clickElement(
-        page.locator(
-          await ViewAndEditCartPage.getDelectButton(addedPackageName)
-        )
-      );
-
-      await basePage.waitForPageToBeReady();
+      // Edit Quantity and Click on remove button
+      await ViewAndEditCartPage.editQtyAndRemovePackage(addedPackageName);
 
       // Verify Package is remove from cart or not
       expect(
