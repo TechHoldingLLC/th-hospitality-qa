@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 
 export class adminDeleteProgramPage extends BasePage {
@@ -16,6 +16,7 @@ export class adminDeleteProgramPage extends BasePage {
   public programInputText: Locator;
   public noResultsMessageContainer: Locator;
   public menuButtonWithLocationGreaterThanZero: Locator;
+  public paginationStatus: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -49,12 +50,9 @@ export class adminDeleteProgramPage extends BasePage {
     this.menuButtonWithLocationGreaterThanZero = page.locator(
       '//tr[td[5] > 0 or td[6] > 0 or td[7] > 0 or td[8] > 0]//button[@aria-haspopup="menu"]'
     );
-  }
-
-  async searchProgramByName(programName: string): Promise<void> {
-    await this.searchInput.fill("");
-    await this.enterValuesInElement(this.searchInput, programName);
-    await this.page.waitForTimeout(3000);
+    this.paginationStatus = page.locator(
+      '//p[normalize-space()="1 of 1 pages"]'
+    );
   }
 
   async openDeletePopup(): Promise<void> {
@@ -67,6 +65,5 @@ export class adminDeleteProgramPage extends BasePage {
     await this.clickElement(this.menuButtonWithLocationGreaterThanZero.first());
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deleteProgramButton);
-    await this.isElementVisible(this.failedToDeleteProgramLabel);
   }
 }

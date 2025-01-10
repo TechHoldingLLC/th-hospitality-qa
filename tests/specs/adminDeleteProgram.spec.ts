@@ -5,7 +5,7 @@ import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { adminCreateEditProgramPage } from "../pageObjects/adminCreateEditProgram";
 import { adminDeleteProgramPage } from "../pageObjects/adminDeleteProgram";
-import deleteProgramData from "../data/deleteProgramdata.json";
+import deleteProgramData from "../data/deleteProgramData.json";
 
 let browser: Browser;
 let page: Page;
@@ -18,7 +18,6 @@ let deleteProgramPage: adminDeleteProgramPage;
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  //  await page.setViewportSize({ width: 1780, height: 720 });
   viewProgramsPage = new adminViewProgramsPage(page);
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
@@ -38,16 +37,8 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
   const programName = await basePage.generateNomenclatureName(
     deleteProgramData.programNamePrefix
   );
-  const expectedDeleteConfirmationMessage: string =
-    deleteProgramData.expectedDeleteConfirmationMessage.replace(
-      "{programName}",
-      programName
-    );
-  const expectedDeleteSuccessMessage: string =
-    deleteProgramData.expectedDeleteSuccessMessage.replace(
-      "{programName}",
-      programName
-    );
+  const expectedDeleteConfirmationMessage = `${deleteProgramData.expectedDeleteConfirmationMessage} "${programName}" ${deleteProgramData.deleteConfirmationSuffix}`;
+  const expectedDeleteSuccessMessage = `${programName} ${deleteProgramData.expectedDeleteSuccessMessage}`;
 
   try {
     await basePage.clickElement(viewProgramsPage.addProgramButton);
@@ -55,28 +46,34 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
 
     // Validate created program.
     await basePage.waitForPageToBeReady();
-    await deleteProgramPage.searchProgramByName(programName);
+    await basePage.enterValuesInElement(
+      deleteProgramPage.searchInput,
+      programName
+    );
+    await basePage.waitForElementVisible(deleteProgramPage.paginationStatus);
     expect(
       await basePage.getElementText(deleteProgramPage.programInputText.first())
     ).toEqual(programName);
 
     // Validate delete confirmation.
     await deleteProgramPage.openDeletePopup();
-    await basePage.isElementVisible(deleteProgramPage.deleteProgramButton);
+    await basePage.waitForElementVisible(deleteProgramPage.deleteProgramButton);
+    await basePage.waitForPageToBeReady();
     expect(
-      await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
+      await basePage.getElementText(
+        deleteProgramPage.deleteMessageLabel.first()
+      )
     ).toEqual(expectedDeleteConfirmationMessage);
 
     // Validate delete success.
     await basePage.clickElement(deleteProgramPage.deleteProgramButton);
-    await basePage.isElementVisible(deleteProgramPage.confirmationButton);
+    await basePage.waitForElementVisible(deleteProgramPage.confirmationButton);
     expect(
       await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
     ).toEqual(expectedDeleteSuccessMessage);
 
     // Validate program delete successfully.
     await basePage.clickElement(deleteProgramPage.confirmationButton);
-    await deleteProgramPage.searchProgramByName(programName);
     expect(
       await basePage.getElementText(deleteProgramPage.noResultsMessageContainer)
     ).toContain(deleteProgramData.expectedErrorMessages);
@@ -111,10 +108,14 @@ test("TC0087 - Verify that if the program is not associated with packages, produ
 });
 
 test("TC0088 - verify that if the programs is associated with packages, products and orders an error message appears.", async () => {
-  const failedMessage: string = deleteProgramData.failedMessage;
-
   try {
     await deleteProgramPage.deleteReferredProgram();
+
+    expect(
+      await basePage.isElementVisible(
+        deleteProgramPage.failedToDeleteProgramLabel
+      )
+    ).toBe(true);
 
     expect(
       await basePage.getElementText(deleteProgramPage.alertDialog)
@@ -122,7 +123,7 @@ test("TC0088 - verify that if the programs is associated with packages, products
 
     expect(
       await basePage.getAllTextContents(deleteProgramPage.alertDialog)
-    ).toContain(failedMessage);
+    ).toContain(deleteProgramData.failedMessage);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
