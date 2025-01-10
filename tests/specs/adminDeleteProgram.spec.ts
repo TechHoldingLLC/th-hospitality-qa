@@ -57,7 +57,6 @@ test("TC0086 - verify that the user can access a CTA to delete", async () => {
 
     // Validate delete confirmation.
     await deleteProgramPage.openDeletePopup();
-    await basePage.waitForElementVisible(deleteProgramPage.deleteProgramButton);
     await basePage.waitForPageToBeReady();
     expect(
       await basePage.getElementText(

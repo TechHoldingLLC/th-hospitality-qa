@@ -58,7 +58,7 @@ export class adminDeleteProgramPage extends BasePage {
   async openDeletePopup(): Promise<void> {
     await this.clickElement(this.menuButtons.first());
     await this.clickElement(this.deleteButton);
-    await this.deleteProgramButton.waitFor({ state: "visible" });
+    await this.waitForElementVisible(this.deleteProgramButton)
   }
 
   async deleteReferredProgram(): Promise<void> {
