@@ -52,6 +52,6 @@ export class shopViewAndEditCartPage extends BasePage {
 
     await this.waitForPageToBeReady();
 
-    await this.page.waitForTimeout(4000);
+    await this.page.waitForTimeout(5000);
   }
 }

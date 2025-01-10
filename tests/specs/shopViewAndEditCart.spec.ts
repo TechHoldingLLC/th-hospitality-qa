@@ -163,6 +163,8 @@ test("TC0128 - Verify that the cart data persists when the user navigates away f
         "2"
       );
 
+      await basePage.waitForPageToBeReady();
+
       if (!(await addItemInCartPage.cartErrorMessage.isVisible())) {
         // Click on "X" button
         await basePage.clickElement(viewAndEditCartPage.closeCartSectionButton);
