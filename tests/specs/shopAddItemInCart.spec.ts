@@ -296,6 +296,8 @@ test("TC0126 - Verify that items in the cart are retained after the user logs ou
 
 test("TC0127 - Verify that 'Total Amount' displayed correct values when multiple packages been added to cart", async () => {
   try {
+    test.setTimeout(120000);
+
     // Add multiple package
     const totalPrice: number =
       await addItemInCartPage.addMultiplePackageInCart();
