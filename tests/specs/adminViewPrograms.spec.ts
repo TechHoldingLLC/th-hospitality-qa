@@ -106,7 +106,7 @@ test("TC0039 - Verify the CTA to create a program", async () => {
   }
 });
 
-test.only("TC0038 - Verify that users can filter by Department", async () => {
+test("TC0038 - Verify that users can filter by Department", async () => {
   try {
     // click on Add filter button
     await basePage.clickElement(viewProgramsPage.addFilterButton);
@@ -145,7 +145,7 @@ test.only("TC0038 - Verify that users can filter by Department", async () => {
   }
 });
 
-test.only("TC0186 - Verify Filter functionality for Program Name by sorting order", async () => {
+test("TC0186 - Verify Filter functionality for Program Name by sorting order", async () => {
   try {
     // click on filter menu button
     await basePage.clickElement(viewProgramsPage.filterMenuButton);

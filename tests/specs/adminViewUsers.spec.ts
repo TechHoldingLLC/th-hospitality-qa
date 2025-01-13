@@ -166,7 +166,7 @@ test("TC0012 - Verify that coordinators cannot view a list of users", async () =
 });
 
 filterData.forEach((data) => {
-  test.only(
+  test(
     "TC0115 - Verify that user can filter the records based on entered " +
       data.filter,
     async () => {
@@ -227,7 +227,7 @@ filterData.forEach((data) => {
 });
 
 filterData.forEach((data) => {
-  test.only(
+  test(
     "TC0188 - Verify Filter functionality for " +
       data.filter +
       " by sorting order",

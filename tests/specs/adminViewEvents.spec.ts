@@ -165,7 +165,7 @@ test("TC0107 - Verify the list of events is paginated", async () => {
   }
 });
 
-test.only("TC0076 - Verify that users can filter by events", async () => {
+test("TC0076 - Verify that users can filter by events", async () => {
   try {
     // click on Add filter button
     await basePage.clickElement(viewEventsPage.addFilterButton);
@@ -204,7 +204,7 @@ test.only("TC0076 - Verify that users can filter by events", async () => {
   }
 });
 
-test.only("TC0187 - Verify Filter functionality for Event name by sorting order", async () => {
+test("TC0187 - Verify Filter functionality for Event name by sorting order", async () => {
   try {
     // click on filter menu button
     await basePage.clickElement(viewEventsPage.filterMenuButton);
