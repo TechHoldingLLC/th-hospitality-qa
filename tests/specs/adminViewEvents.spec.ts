@@ -164,3 +164,75 @@ test("TC0107 - Verify the list of events is paginated", async () => {
     throw error;
   }
 });
+
+test.only("TC0076 - Verify that users can filter by events", async () => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewEventsPage.addFilterButton);
+
+    // click on Status menu item
+    await basePage.clickElement(viewEventsPage.statusMenuItem);
+
+    // select random status from list
+    const selectedStatus: null | string =
+      await basePage.selectRandomItemFromMultiSelectList(
+        viewEventsPage.statusListFromMenuItem
+      );
+
+    if (selectedStatus === null) {
+      expect(
+        selectedStatus,
+        "Null value found while retrieving the text of the selected status."
+      ).not.toBeNull();
+    } else {
+      // Get Status column data locators
+      const satusColumnLocator = await basePage.getColumnDataLocators("Status");
+
+      expect(satusColumnLocator.length).toBeGreaterThan(0);
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of satusColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedStatus.toString());
+      }
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test.only("TC0187 - Verify Filter functionality for Event name by sorting order", async () => {
+  try {
+    // click on filter menu button
+    await basePage.clickElement(viewEventsPage.filterMenuButton);
+
+    // click on Event Name menu item
+    await basePage.clickElement(viewEventsPage.eventNameMenuItem);
+
+    // Click on Ascending button and verify data
+    const [actualDataAsc, sortedDataAsc] =
+      await basePage.performAndGetSortingData(
+        "Ascending",
+        viewEventsPage.eventNameColumnData,
+        "Event Name"
+      );
+
+    expect(actualDataAsc).toEqual(sortedDataAsc);
+
+    // Click on Descending button and verify data
+    const [actualDataDes, sortedDataDes] =
+      await basePage.performAndGetSortingData(
+        "Descending",
+        viewEventsPage.eventNameColumnData,
+        "Event Name"
+      );
+
+    expect(actualDataDes).toEqual(sortedDataDes);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

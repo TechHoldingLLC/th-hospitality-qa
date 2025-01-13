@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
+import BasePage from "./basePage";
 
-export class adminViewUsersPage {
-  private page: Page;
+export class adminViewUsersPage extends BasePage {
   public usersButton: Locator;
   public inviteUserButton: Locator;
   public nameHeader: Locator;
@@ -24,9 +24,14 @@ export class adminViewUsersPage {
   public statusColumnData: Locator;
   public lastLoginColumnData: Locator;
   public coordinatorAccessDeniedMessage: Locator;
+  public addFilterButton: Locator;
+  public firstNameMenuItem: Locator;
+  public filterInputField: Locator;
+  public noResultsLabel: Locator;
+  public filterMenuButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.usersButton = page.locator("//a[@href='/users']");
     this.inviteUserButton = page.locator("//a[@href='/users/invite']");
     this.nameHeader = page.locator("//th[@data-table-header-id='name']");
@@ -85,5 +90,28 @@ export class adminViewUsersPage {
     this.coordinatorAccessDeniedMessage = page.locator(
       "//span[text()='Incorrect email or password. Please try again.']"
     );
+    this.addFilterButton = page.locator("button#filters_menu_trigger");
+    this.firstNameMenuItem = page.locator(
+      "//div[@role='menuitem' and text()='First Name']"
+    );
+    this.filterInputField = page.locator("//div[@role='dialog']//input");
+    this.noResultsLabel = page.locator("text='No results'");
+    this.filterMenuButton = page.locator(
+      "//div[contains(@class,'flex items-start')]//button[@aria-haspopup='menu']"
+    );
+  }
+
+  // Filter data
+  async filterData(menuItemElement: string, inputData: string) {
+    // Click on Add Filter button
+    await this.clickElement(this.addFilterButton);
+
+    // Click on filter option
+    await this.clickElement(this.page.locator(menuItemElement));
+
+    // Enter value in filter Input Field
+    await this.enterValuesInElement(this.filterInputField, inputData);
+
+    await this.page.waitForTimeout(5000);
   }
 }

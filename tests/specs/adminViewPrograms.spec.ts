@@ -105,3 +105,75 @@ test("TC0039 - Verify the CTA to create a program", async () => {
     throw error;
   }
 });
+
+test.only("TC0038 - Verify that users can filter by Department", async () => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewProgramsPage.addFilterButton);
+
+    // click on Department menu item
+    await basePage.clickElement(viewProgramsPage.departmentMenuItem);
+
+    // select random department d from list
+    const selectedDepartment: null | string =
+      await basePage.selectRandomItemFromMultiSelectList(
+        viewProgramsPage.departmentListFromMenuItem
+      );
+
+    if (selectedDepartment === null) {
+      expect(
+        selectedDepartment,
+        "Null value found while retrieving the text of the selected department."
+      ).not.toBeNull();
+    } else {
+      // Get Department column data locators
+      const departmentColumnLocator = await basePage.getColumnDataLocators(
+        "Department"
+      );
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of departmentColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedDepartment.toString());
+      }
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test.only("TC0186 - Verify Filter functionality for Program Name by sorting order", async () => {
+  try {
+    // click on filter menu button
+    await basePage.clickElement(viewProgramsPage.filterMenuButton);
+
+    // click on Department menu item
+    await basePage.clickElement(viewProgramsPage.programNameMenuItem);
+
+    // Click on Ascending button and verify data
+    const [actualDataAsc, sortedDataAsc] =
+      await basePage.performAndGetSortingData(
+        "Ascending",
+        viewProgramsPage.programNameColumnData,
+        "Program Name"
+      );
+
+    expect(actualDataAsc).toEqual(sortedDataAsc);
+
+    // Click on Descending button and verify data
+    const [actualDataDes, sortedDataDes] =
+      await basePage.performAndGetSortingData(
+        "Descending",
+        viewProgramsPage.programNameColumnData,
+        "Program Name"
+      );
+
+    expect(actualDataDes).toEqual(sortedDataDes);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

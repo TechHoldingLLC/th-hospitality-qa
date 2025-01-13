@@ -108,3 +108,44 @@ test("TC0024 - Verify the CTAs to create edit and delete products are available"
     throw error;
   }
 });
+
+test.only("TC0023 - Verify that users can filter on type and program", async () => {
+  try {
+    // click on Add filter button
+    await basePage.clickElement(viewProductsPage.addFilterButton);
+
+    // click on Type menu item
+    await basePage.clickElement(viewProductsPage.typeMenuItem);
+
+    // select random product from list
+    const selectedProductType: null | string =
+      await basePage.selectRandomItemFromMultiSelectList(
+        viewProductsPage.productListFromTypeMenuItem
+      );
+
+    if (selectedProductType === null) {
+      expect(
+        selectedProductType,
+        "Null value found while retrieving the text of the selected product."
+      ).not.toBeNull();
+    } else {
+      // Get Product Type column data locators
+      const productTypeColumnLocator = await basePage.getColumnDataLocators(
+        "Product Type"
+      );
+
+      expect(productTypeColumnLocator.length).toBeGreaterThan(0);
+
+      // Iterate through rowData to validate each cell's content
+      for (const rowLocator of productTypeColumnLocator) {
+        const cellText = await basePage.getElementTextContent(rowLocator);
+
+        // Validate each row's textContent
+        expect(cellText).toEqual(selectedProductType.toString());
+      }
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});

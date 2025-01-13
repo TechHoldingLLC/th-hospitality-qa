@@ -30,6 +30,11 @@ export default class BasePage {
     return element.innerText();
   }
 
+  //Common method to retrieve text from an element
+  async getElementTextContent(element: Locator): Promise<null | string> {
+    return element.textContent();
+  }
+
   // Common method to wait for an element to be visible
   async waitForElementVisible(element: Locator | string) {
     if (typeof element === "string") {
@@ -53,9 +58,11 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+  async waitForElementToAppearAndDisappear(
+    selector: string | Locator
+  ): Promise<void> {
     // If the selector is a string, use waitForSelector, otherwise directly use the locator
-    if (typeof selector === 'string') {
+    if (typeof selector === "string") {
       // Wait for the selector to be visible
       await this.page.waitForSelector(selector, { state: "visible" });
       // Wait for the selector to be hidden
@@ -65,7 +72,7 @@ export default class BasePage {
       await selector.waitFor({ state: "visible" });
       await selector.waitFor({ state: "hidden" });
     }
-  }  
+  }
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -135,15 +142,23 @@ export default class BasePage {
 
   async selectRandomItemFromMultiSelectList(
     listElement: Locator
-  ): Promise<void> {
+  ): Promise<null | string> {
     // Wait for the list to be visible
     await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
     const items = await listElement.all();
     // Generate a random index to select an item
     const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select item
+    const selectedItem = items[randomIndex].textContent();
+
     // Click the random item
     await items[randomIndex].click();
+
+    await this.page.waitForTimeout(3000);
+
+    return selectedItem;
   }
 
   async mailinatorLogin(): Promise<void> {
@@ -260,5 +275,115 @@ export default class BasePage {
 
     // Return the date in MM-DD-YYYY format
     return `${month}-${day}-${year}`;
+  }
+
+  // Click on sorting option and verify data accordingly
+  async performAndGetSortingData(
+    sortingOrder: "Ascending" | "Descending",
+    columnLocator: Locator,
+    menuItem: string
+  ): Promise<[lowercaseDataRows: string[], sortedData: string[]]> {
+    // Click on Sorting order
+    await this.clickElement(
+      this.page.locator(
+        "//div[@role='menuitemradio' and text()='" + sortingOrder + "']"
+      )
+    );
+
+    await this.page.waitForLoadState("domcontentloaded");
+    await this.page.waitForTimeout(5000);
+
+    // Get data
+    const columnDataValues: string[] = await this.getAllTextContents(
+      columnLocator
+    );
+
+    // Remove all "-" values
+    const removeUnderScroreValue = columnDataValues.filter(
+      (str) => str !== "-"
+    );
+
+    let columnDataValuesInLowerCase: string[];
+
+    // Handle data based on menu item
+    if (menuItem == "First Name") {
+      columnDataValuesInLowerCase = removeUnderScroreValue.map((row) =>
+        row.toLowerCase().split(" ")[0].trim()
+      );
+    } else if (menuItem == "Last Name") {
+      columnDataValuesInLowerCase = removeUnderScroreValue.map((row) =>
+        row.toLowerCase().split(" ")[1].trim()
+      );
+    } else {
+      columnDataValuesInLowerCase = removeUnderScroreValue.map((row) =>
+        row.toLowerCase().replace("_", " ").trim()
+      );
+    }
+
+    // Assuming dataValues are numbers or strings that can be compared
+    const sortedData: string[] =
+      sortingOrder == "Ascending"
+        ? [...columnDataValuesInLowerCase].sort()
+        : // Descending order
+          [...columnDataValuesInLowerCase].sort().reverse();
+
+    return [columnDataValuesInLowerCase, sortedData];
+  }
+
+  // Verify column Data
+  async getColumnDataLocators(columnName: string): Promise<Array<Locator>> {
+    let rowData: Locator[] = [];
+    if (
+      (await this.page.locator("text='No results'").isVisible()) ||
+      (await this.page
+        .locator("text='Try changing the filters or search query'")
+        .isVisible())
+    ) {
+      console.log("No results shown for filtering this data");
+      return rowData;
+    }
+
+    // Find column Locators
+    const columnLocators = await this.page.locator("//table//th").all();
+
+    let columnNo: number = -1; // Initialize with -1 to indicate "not found"
+
+    // Iterate through the column locators to find the column index
+    for (let i = 0; i < columnLocators.length; i++) {
+      const data = await columnLocators[i].textContent();
+
+      // If textContent is null, skip to the next iteration
+      if (data && data === columnName) {
+        columnNo = i + 1;
+        break; // Exit the loop once the column is found
+      }
+    }
+
+    // Get all data from the specified column
+    if (columnNo > 0) {
+      rowData = await this.page
+        .locator("//table//tr/td[" + columnNo + "]")
+        .all();
+    }
+
+    return rowData;
+  }
+
+  // Select random element from list and return text of that element
+  async getRandomValueFromListLocator(listElement: Locator): Promise<string> {
+    await this.waitForElementVisible(listElement.first());
+
+    // Get all the list items
+    const items = await listElement.all();
+
+    // Generate a random index to select an item
+    const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select item
+    let getText = await items[randomIndex].textContent();
+
+    getText = getText == null ? "" : getText;
+
+    return getText;
   }
 }

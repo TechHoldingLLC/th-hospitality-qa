@@ -11,6 +11,7 @@ export class adminViewProgramsPage {
   public noOfEventsHeader: Locator;
   public noOfPackagesHeader: Locator;
   public noOfOrdersHeader: Locator;
+  public programNameColumnData: Locator;
   public groupsColumnData: Locator;
   public departmentColumnData: Locator;
   public eventDateRangeColumnData: Locator;
@@ -23,6 +24,11 @@ export class adminViewProgramsPage {
   public confirmDeleteButton: Locator;
   public addProgramHeader: Locator;
   public deleteProgramConfirmation: Locator;
+  public addFilterButton: Locator;
+  public departmentMenuItem: Locator;
+  public departmentListFromMenuItem: Locator;
+  public filterMenuButton: Locator;
+  public programNameMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -37,6 +43,9 @@ export class adminViewProgramsPage {
     this.noOfEventsHeader = page.locator("//span[text()='# of Events']");
     this.noOfPackagesHeader = page.locator("//span[text()='# of Packages']");
     this.noOfOrdersHeader = page.locator("//span[text()='# of Orders']");
+    this.programNameColumnData = page.locator(
+      "//table[@class='text-ui-fg-subtle txt-compact-small relative w-full']//td[1]"
+    );
     this.groupsColumnData = page.locator(
       "//table[@class='text-ui-fg-subtle txt-compact-small relative w-full']//td[3]"
     );
@@ -58,8 +67,17 @@ export class adminViewProgramsPage {
     this.editProgramHeader = page.locator("//h1[text()='Edit Program']");
     this.confirmDeleteButton = page.locator("//button[text()='Delete']");
     this.addProgramHeader = page.locator("//h1[text()='Add Program']");
-    this.deleteProgramConfirmation = page.locator(
-      "//button[text()='Delete']"
+    this.deleteProgramConfirmation = page.locator("//button[text()='Delete']");
+    this.addFilterButton = page.locator("button#filters_menu_trigger");
+    this.departmentMenuItem = page.locator(
+      "//div[@role='menuitem' and text()='Department']"
+    );
+    this.departmentListFromMenuItem = page.locator("//div[@role='option']");
+    this.filterMenuButton = page.locator(
+      "//div[contains(@class,'flex items-start')]//button[@aria-haspopup='menu']"
+    );
+    this.programNameMenuItem = page.locator(
+      "//div[@role='menuitemradio' and text()='Program Name']"
     );
   }
 }
