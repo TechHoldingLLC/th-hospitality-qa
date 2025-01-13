@@ -16,13 +16,35 @@
         "emaptyFieldMessage": "Intended business use is required"
       },
       {
-        "fieldName": "Approving Manager Name",
-        "inputData": "Testing Manager",
-        "emaptyFieldMessage": "Approving manager name is required"
+        "fieldName": "Intended Invitee Category",
+        "emaptyFieldMessage": "Invitee category is required"
       }, {
-        "fieldName": "Approving Manager Name",
-        "inputData": "Testing Manager",
-        "emaptyFieldMessage": "Approving manager name is required"
+        "fieldName": "Order Purpose",
+        "emaptyFieldMessage": "Order purpose is required"
+      }
+    ],
+    "departmentInformationSection": [
+      {
+        "fieldName": "Cost Centre Number",
+        "inputData": "Test 123",
+        "emaptyFieldMessage": "Cost centre number is required"
+      },
+      {
+        "fieldName": "GL Account Number",
+        "emaptyFieldMessage": "GL account number is required"
+      },
+      {
+        "fieldName": "Finance Contact Name",
+        "inputData": "Testing Name",
+        "emaptyFieldMessage": "Finance contact name is required"
+      },
+      {
+        "fieldName": "Finance Contact Email",
+        "inputData": "testing@email.com",
+        "emaptyFieldMessage": "Email is required"
+      }, {
+        "fieldName": "IO/WBS Element, If Available",
+        "inputData": "This is testing purpose"
       }
     ]
   }

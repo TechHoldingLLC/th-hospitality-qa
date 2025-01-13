@@ -53,9 +53,11 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+  async waitForElementToAppearAndDisappear(
+    selector: string | Locator
+  ): Promise<void> {
     // If the selector is a string, use waitForSelector, otherwise directly use the locator
-    if (typeof selector === 'string') {
+    if (typeof selector === "string") {
       // Wait for the selector to be visible
       await this.page.waitForSelector(selector, { state: "visible" });
       // Wait for the selector to be hidden
@@ -65,7 +67,7 @@ export default class BasePage {
       await selector.waitFor({ state: "visible" });
       await selector.waitFor({ state: "hidden" });
     }
-  }  
+  }
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -133,6 +135,15 @@ export default class BasePage {
     }
     // Select the random option by its value
     await dropdownElement.selectOption(randomOptionValue);
+  }
+
+  // Select specific option from dropdown
+  async selectOptionFromDropdown(
+    dropdownElement: Locator,
+    optionValue: string
+  ) {
+    // Select the random option by its value
+    await dropdownElement.selectOption(optionValue);
   }
 
   async selectRandomItemFromMultiSelectList(

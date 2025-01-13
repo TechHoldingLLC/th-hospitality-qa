@@ -7,6 +7,11 @@ export class shopCheckoutPage extends BasePage {
   public requestedPackagesField: Locator;
   public intendedInviteeCategoryDropdown: Locator;
   public orderPurposeDropdown: Locator;
+  public costCentreNumberField: Locator;
+  public glAccountNumberDropdown: Locator;
+  public financeContactNameField: Locator;
+  public financeContactEmailField: Locator;
+  public ioWBSElementField: Locator;
   public submitButton: Locator;
 
   constructor(page: Page) {
@@ -28,6 +33,21 @@ export class shopCheckoutPage extends BasePage {
       "//label[text()='Order Purpose']/following-sibling::select"
     );
     this.submitButton = page.locator("//button[@aria-label='Submit Checkout']");
+    this.costCentreNumberField = page.locator(
+      "//input[@name='department_information.cost_centre_number']"
+    );
+    this.glAccountNumberDropdown = page.locator(
+      "//label[text()='GL Account Number']/following-sibling::select"
+    );
+    this.financeContactNameField = page.locator(
+      "//input[@name='department_information.finance_contact_name']"
+    );
+    this.financeContactEmailField = page.locator(
+      "//input[@name='department_information.finance_email']"
+    );
+    this.ioWBSElementField = page.locator(
+      "//input[@name='department_information.io_wbs']"
+    );
   }
 
   async getErrorMessageElementForFields(elementName: string) {
