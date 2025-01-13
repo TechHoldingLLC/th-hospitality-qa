@@ -24,7 +24,7 @@ export class adminCreateEditProgramPage extends BasePage {
     this.programNameLabel = page.locator("//label[text()='Program Name']");
     this.departmentLabel = page.locator("//label[text()='Department']");
     this.groupsLabel = page.locator("//label[text()='Groups']");
-    this.programNameInput = page.locator("//input[@name='name']");
+    this.programNameInput = page.locator("//label[text()='Program Name']/following-sibling::div//input[@name='name']");
     this.departmentDropdown = page.locator("//select[@name='department']");
     this.groupsDropdown = page.locator("//div[@class='relative']//button");
     this.groupsDropdownList = page.locator(
