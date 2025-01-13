@@ -58,11 +58,19 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForUpdateSuccessMsgToAppearAndHidden(): Promise<void> {
-    const selector = 'text="Updated successfully."';
-    await this.page.waitForSelector(selector, { state: "visible" });
-    await this.page.waitForSelector(selector, { state: "hidden" });
-  }
+  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+    // If the selector is a string, use waitForSelector, otherwise directly use the locator
+    if (typeof selector === 'string') {
+      // Wait for the selector to be visible
+      await this.page.waitForSelector(selector, { state: "visible" });
+      // Wait for the selector to be hidden
+      await this.page.waitForSelector(selector, { state: "hidden" });
+    } else {
+      // If it's a Locator, use the locator's API directly
+      await selector.waitFor({ state: "visible" });
+      await selector.waitFor({ state: "hidden" });
+    }
+  }  
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -95,11 +103,6 @@ export default class BasePage {
   // Function to generate a random 5-character alphanumeric string
   async generateRandomString(): Promise<string> {
     return Math.random().toString(36).substring(2, 7); // generates 5 random characters
-  }
-  async waitForInvalidFieldsMsgToAppearAndHidden(): Promise<void> {
-    const selector = 'text="Incorrect email or password. Please try again."';
-    await this.page.waitForSelector(selector, { state: "visible" });
-    await this.page.waitForSelector(selector, { state: "hidden" });
   }
 
   async generateNomenclatureName(modulename: string): Promise<string> {
