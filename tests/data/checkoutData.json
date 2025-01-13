@@ -1,0 +1,29 @@
+{
+    "approvalAndPurposeSection": [
+      {
+        "fieldName": "Approving Manager Name",
+        "inputData": "Testing Manager",
+        "emaptyFieldMessage": "Approving manager name is required"
+      },
+      {
+        "fieldName": "Approving Manager Email",
+        "inputData": "testing@email.com",
+        "emaptyFieldMessage": "Email is required"
+      },
+      {
+        "fieldName": "Intended business use of Requested Packages",
+        "inputData": "This is testing purpose",
+        "emaptyFieldMessage": "Intended business use is required"
+      },
+      {
+        "fieldName": "Approving Manager Name",
+        "inputData": "Testing Manager",
+        "emaptyFieldMessage": "Approving manager name is required"
+      }, {
+        "fieldName": "Approving Manager Name",
+        "inputData": "Testing Manager",
+        "emaptyFieldMessage": "Approving manager name is required"
+      }
+    ]
+  }
+  

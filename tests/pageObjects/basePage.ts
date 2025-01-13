@@ -122,8 +122,10 @@ export default class BasePage {
     dropdownElement: Locator
   ): Promise<void> {
     const options = await dropdownElement.locator("option").all();
+
     // Generate a random index to select an option
-    const randomIndex = Math.floor(Math.random() * options.length);
+    const randomIndex = Math.floor(Math.random() * (options.length - 1) + 1);
+
     // Get the value of the random option
     const randomOptionValue = await options[randomIndex].getAttribute("value");
     if (!randomOptionValue) {
