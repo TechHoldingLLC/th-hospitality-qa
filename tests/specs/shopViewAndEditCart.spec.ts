@@ -10,8 +10,6 @@ import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
-import addItemInCartData from "../data/addItemInCartData.json";
-import { shopLogoutPage } from "../pageObjects/shopLogoutPage";
 import { shopViewAndEditCartPage } from "../pageObjects/shopViewAndEditCartPage";
 
 let browser: Browser;
@@ -19,7 +17,6 @@ let page: Page;
 let loginPage: adminLoginPage;
 let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
-let logoutPage: shopLogoutPage;
 let viewAndEditCartPage: shopViewAndEditCartPage;
 
 test.beforeEach(async () => {
