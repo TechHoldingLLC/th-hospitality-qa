@@ -27,7 +27,7 @@ test.beforeEach(async () => {
   basePage = new BasePage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
   //Navigation to admin portal
-  await basePage.navigateTo(config.soapPortalUrl);
+  await basePage.navigateTo(config.shopPortalUrl);
   //Login
   await loginPage.login(config.coordinator_email, config.coordinator_password);
 });
