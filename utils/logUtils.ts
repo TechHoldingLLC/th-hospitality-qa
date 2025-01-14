@@ -4,14 +4,6 @@ import * as path from "path";
 const logsDir = path.resolve("logs"); // Directory for log files
 const logFilePath = path.join(logsDir, "test-case.log");
 
-// Ensure a directory exists; create if it doesn't
-async function initializeLogFile() {
-  try {
-    await fs.writeFile(logFilePath, ""); // Clears the file
-  } catch (err) {
-    console.error("Failed to initialize log file:", err);
-  }
-}
 
 // Log a message with timestamp
 export async function logMessage(message: string) {
@@ -26,8 +18,3 @@ export async function logMessage(message: string) {
 
   console.log(message);
 }
-
-// Initialize log file on startup
-(async function initialize() {
-  await initializeLogFile();
-})();

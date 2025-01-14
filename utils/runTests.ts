@@ -37,7 +37,6 @@ const currentEnv = environments[ENV as keyof typeof environments];
 const logsDir = path.resolve("logs");
 const allureResultsDir = path.resolve("allure-results");
 const allureReportDir = path.resolve("allure-report");
-const playwrightHtmlReportDir = path.resolve("playwright-html-report");
 const logFilePath = path.join(logsDir, "test-case.log");
 const playwrightResultsDir = path.resolve("test-results");
 
@@ -74,7 +73,6 @@ const initializeEnvironment = async () => {
     await Promise.all([
       deleteDirectoryIfExists(allureResultsDir),
       deleteDirectoryIfExists(allureReportDir),
-      deleteDirectoryIfExists(playwrightHtmlReportDir),
       deleteDirectoryIfExists(playwrightResultsDir),
     ]);
 
@@ -92,7 +90,7 @@ const initializeEnvironment = async () => {
   }
 };
 
-// Generate environment details for Allure/HTML
+// Generate environment details for report
 const generateAllureFiles = async () => {
   const environmentFilePath = path.join(
     allureResultsDir,
@@ -146,7 +144,7 @@ const executeTests = async () => {
   logMessage("    📊 allure open ./allure-report");
 
   logMessage("To open the HTML report:");
-  logMessage("    📊 npx playwright show-report playwright-html-report");
+  logMessage("    📊 npx playwright show-report");
 })();
 
 // ----------------------
