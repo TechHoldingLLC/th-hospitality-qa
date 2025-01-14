@@ -152,7 +152,7 @@ test("TC0131 - Verify that that Section 1 of the form displays required fields c
   }
 });
 
-test.only("TC0132 - Verify that that Section 2a is displayed and functions correctly for the Third-Party order purpose.", async () => {
+test("TC0132 - Verify that that Section 2a is displayed and functions correctly for the Third-Party order purpose.", async () => {
   try {
     // Add Package in cart and verify
     const addedPackageName: string =
@@ -218,6 +218,108 @@ test.only("TC0132 - Verify that that Section 2a is displayed and functions corre
 
       // Verify fields are required message not display
       checkoutData.departmentInformationSection.forEach(async (field) => {
+        expect(
+          await page
+            .locator(
+              await checkoutpage.getErrorMessageElementForFields(
+                field.fieldName.toString()
+              )
+            )
+            .isVisible()
+        ).toBe(false);
+      });
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0133 - Verify that that Section 2b is displayed and functions correctly for the 'TCCC' order purpose.", async () => {
+  try {
+    // Add Package in cart and verify
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
+      expect(
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
+
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
+
+      // Click on Checkout button
+      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+
+      // Verify navigate to Checkout page
+      expect(
+        await basePage.isElementVisible(
+          viewAndEditCartPage.checkoutPageTitleLabel
+        )
+      ).toBe(true);
+
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "Third-Party"
+      );
+
+      // Enter name in Company Name field
+      await basePage.enterValuesInElement(
+        checkoutpage.companyNameField,
+        checkoutData.companyInformationSection[0].inputData as string
+      );
+
+      // Enter name in Company Name field
+      await basePage.enterValuesInElement(
+        checkoutpage.companyNameField,
+        checkoutData.companyInformationSection[0].inputData as string
+      );
+
+      // Enter address in Company Mailing Address field
+      await basePage.enterValuesInElement(
+        checkoutpage.companyMailingAddressField,
+        checkoutData.companyInformationSection[1].inputData as string
+      );
+
+      // Enter number in Purchase Order(PO) Number field
+      await basePage.enterValuesInElement(
+        checkoutpage.purchaseOrderNumberField,
+        checkoutData.companyInformationSection[2].inputData as string
+      );
+
+      // Enter email in Account Payable Contact Email field
+      await basePage.enterValuesInElement(
+        checkoutpage.accountPayableContactEmailField,
+        checkoutData.companyInformationSection[3].inputData as string
+      );
+
+      // Enter name in Account Payable Contact Name field
+      await basePage.enterValuesInElement(
+        checkoutpage.accountPayableContactNameField,
+        checkoutData.companyInformationSection[4].inputData as string
+      );
+
+      // Enter number in Account Payable Telephone Number field
+      await basePage.enterValuesInElement(
+        checkoutpage.accountPayableTelephoneField,
+        checkoutData.companyInformationSection[5].inputData as string
+      );
+
+      // Enter number in Tax Registration or VAT Number field
+      await basePage.enterValuesInElement(
+        checkoutpage.taxRegistrationorVATNameField,
+        checkoutData.companyInformationSection[6].inputData as string
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields are required message not display
+      checkoutData.companyInformationSection.forEach(async (field) => {
         expect(
           await page
             .locator(

@@ -12,6 +12,13 @@ export class shopCheckoutPage extends BasePage {
   public financeContactNameField: Locator;
   public financeContactEmailField: Locator;
   public ioWBSElementField: Locator;
+  public companyNameField: Locator;
+  public companyMailingAddressField: Locator;
+  public purchaseOrderNumberField: Locator;
+  public accountPayableContactEmailField: Locator;
+  public accountPayableContactNameField: Locator;
+  public accountPayableTelephoneField: Locator;
+  public taxRegistrationorVATNameField: Locator;
   public submitButton: Locator;
 
   constructor(page: Page) {
@@ -47,6 +54,27 @@ export class shopCheckoutPage extends BasePage {
     );
     this.ioWBSElementField = page.locator(
       "//input[@name='department_information.io_wbs']"
+    );
+    this.companyNameField = page.locator(
+      "//input[@name='company_information.company_name']"
+    );
+    this.companyMailingAddressField = page.locator(
+      "//input[@name='company_information.company_mail_address']"
+    );
+    this.purchaseOrderNumberField = page.locator(
+      "//input[@name='company_information.po_number']"
+    );
+    this.accountPayableContactEmailField = page.locator(
+      "//input[@name='company_information.account_payable_email']"
+    );
+    this.accountPayableContactNameField = page.locator(
+      "//input[@name='company_information.account_payable_name']"
+    );
+    this.accountPayableTelephoneField = page.locator(
+      "//input[@name='company_information.account_payable_contact_number']"
+    );
+    this.taxRegistrationorVATNameField = page.locator(
+      "//input[@name='company_information.vat_number']"
     );
   }
 

@@ -46,6 +46,42 @@
         "fieldName": "IO/WBS Element, If Available",
         "inputData": "This is testing purpose"
       }
+    ],
+    "companyInformationSection": [
+      {
+        "fieldName": "Company Name",
+        "inputData": "Test Name",
+        "emaptyFieldMessage": "Company name is required"
+      },
+      {
+        "fieldName": "Company Mailling Address", 
+        "inputData": "Test Adress",
+        "emaptyFieldMessage": "Company mailing address is required"
+      },
+      {
+        "fieldName": "Purchase Order(PO) Number",
+        "inputData": "Testing 123"
+      },
+      {
+        "fieldName": "Account Payable Contact Email",
+        "inputData": "testing@email.com",
+        "emaptyFieldMessage": "Email is required"
+      },
+      {
+       "fieldName": "Account Payable Contact Name", 
+        "inputData": "Test Name",
+        "emaptyFieldMessage": "Account payable name is required"
+      },
+      {
+        "fieldName": "Account Payable Telephone Number", 
+        "inputData": "1234567890",
+        "emaptyFieldMessage": "Must be a valid phone number"
+      },
+      {
+        "fieldName": "Tax Registration or VAT Number", 
+        "inputData": "Test 123",
+        "emaptyFieldMessage": "VAT number is required"
+      }
     ]
   }
   
