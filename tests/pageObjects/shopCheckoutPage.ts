@@ -19,6 +19,11 @@ export class shopCheckoutPage extends BasePage {
   public accountPayableContactNameField: Locator;
   public accountPayableTelephoneField: Locator;
   public taxRegistrationorVATNameField: Locator;
+  public ethicsComplianceCheckBox: Locator;
+  public financialCommitmentCheckbox: Locator;
+  public managerApprovalCheckbox: Locator;
+  public legalEntityDropdown: Locator;
+  public additionalNotesField: Locator;
   public submitButton: Locator;
 
   constructor(page: Page) {
@@ -76,9 +81,28 @@ export class shopCheckoutPage extends BasePage {
     this.taxRegistrationorVATNameField = page.locator(
       "//input[@name='company_information.vat_number']"
     );
+    this.ethicsComplianceCheckBox = page.locator(
+      "//label[@for='ethics-compliance']/preceding-sibling::button"
+    );
+    this.financialCommitmentCheckbox = page.locator(
+      "//label[@for='financial-commitment']/preceding-sibling::button"
+    );
+    this.managerApprovalCheckbox = page.locator(
+      "//label[@for='manager-approval']/preceding-sibling::button"
+    );
+    this.legalEntityDropdown = page.locator(
+      "//label[text()='Legal Entity']/following-sibling::select"
+    );
+    this.additionalNotesField = page.locator(
+      "//textarea[@id='additional-notes']"
+    );
   }
 
   async getErrorMessageElementForFields(elementName: string) {
     return `//label[text()='${elementName}']/following-sibling::span[contains(@class,'text-red')]`;
+  }
+
+  async getErrorMessageElementForCheckBoxFields(elementName: string) {
+    return `//label[text()='${elementName}']/parent::div/following-sibling::div[contains(@class,'text-red')]`;
   }
 }

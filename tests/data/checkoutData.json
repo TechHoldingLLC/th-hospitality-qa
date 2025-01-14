@@ -82,6 +82,27 @@
         "inputData": "Test 123",
         "emaptyFieldMessage": "VAT number is required"
       }
-    ]
+    ], "termsAndConditionsSection": [
+        {
+          "fieldName": "I understand that by placing this request, my group, business unit, or function agrees with TCCC Ethics and Compliance guidelines.",
+          "emaptyFieldMessage": "You must agree to the Ethics and Compliance"
+        },
+        {
+          "fieldName": "IMPORTANT: The submission of this completed request represents a formal financial commitment. The accounting location specified is financially committed to the charges if the requested tickets/packages are allocated. Service fees may apply and will be included in the total cost of your tickets/packages.", 
+          "emaptyFieldMessage": "You must agree to the Financial Commitment"
+        },
+        {
+          "fieldName": "The approving manager listed above must be authorized to approve charges for the designated accounting location and amount.",
+          "emaptyFieldMessage": "You must agree to this required field"
+        },
+        {
+          "fieldName": "Legal Entity",
+          "emaptyFieldMessage": "Legal entity is required"
+        },
+        {
+         "fieldName": "Additional Notes?", 
+          "inputData": "This is testing"
+        }
+      ]
   }
   

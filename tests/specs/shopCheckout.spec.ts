@@ -336,3 +336,155 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
     throw error;
   }
 });
+
+test("TC0134 - Verify that that the terms and conditions section is displayed and functional.", async () => {
+  try {
+    // Add Package in cart and verify
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
+      expect(
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
+
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
+
+      // Click on Checkout button
+      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+
+      // Verify navigate to Checkout page
+      expect(
+        await basePage.isElementVisible(
+          viewAndEditCartPage.checkoutPageTitleLabel
+        )
+      ).toBe(true);
+
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "Third-Party"
+      );
+
+      // Click on Ethics Compliance checkbox
+      await basePage.clickElement(checkoutpage.ethicsComplianceCheckBox);
+
+      // Click on Finacial Commitment checkbox
+      await basePage.clickElement(checkoutpage.financialCommitmentCheckbox);
+
+      // Click on Manager Approval checkbox
+      await basePage.clickElement(checkoutpage.managerApprovalCheckbox);
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields are required message not display
+      expect(
+        (await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForCheckBoxFields(
+              checkoutData.termsAndConditionsSection[0].fieldName as string
+            )
+          )
+          .isVisible()) &&
+          (await page
+            .locator(
+              await checkoutpage.getErrorMessageElementForCheckBoxFields(
+                checkoutData.termsAndConditionsSection[1].fieldName as string
+              )
+            )
+            .isVisible()) &&
+          (await page
+            .locator(
+              await checkoutpage.getErrorMessageElementForCheckBoxFields(
+                checkoutData.termsAndConditionsSection[2].fieldName as string
+              )
+            )
+            .isVisible())
+      ).toBe(false);
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0135 - Verify that that the legal entity dropdown is functional and required for submission", async () => {
+  try {
+    // Add Package in cart and verify
+    const addedPackageName: string =
+      await addItemInCartPage.addItemInCartPage();
+
+    if (addedPackageName != "") {
+      // Verify My Cart section open or not
+      expect(
+        await basePage.isElementVisible(addItemInCartPage.cartSection)
+      ).toBe(true);
+
+      // Verify item added or not in cart page
+      expect(
+        await addItemInCartPage.packageTitleInCartPage.last().textContent()
+      ).toBe(addedPackageName);
+
+      // Click on Checkout button
+      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+
+      // Verify navigate to Checkout page
+      expect(
+        await basePage.isElementVisible(
+          viewAndEditCartPage.checkoutPageTitleLabel
+        )
+      ).toBe(true);
+
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "Third-Party"
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields are required message not display
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.termsAndConditionsSection[3].fieldName as string
+            )
+          )
+          .isVisible()
+      ).toBe(true);
+
+      // Select random option from Legal Entity dropdown
+      await basePage.clickOnRandomOptionFromDropdown(
+        checkoutpage.legalEntityDropdown
+      );
+
+      // Enter text in Additional Notes field
+      await basePage.enterValuesInElement(
+        checkoutpage.additionalNotesField,
+        checkoutData.termsAndConditionsSection[4].inputData as string
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields are required message not display
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.termsAndConditionsSection[3].fieldName as string
+            )
+          )
+          .isVisible()
+      ).toBe(false);
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
