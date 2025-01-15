@@ -13,6 +13,7 @@ import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import { shopViewAndEditCartPage } from "../pageObjects/shopViewAndEditCartPage";
 import { shopCheckoutPage } from "../pageObjects/shopCheckoutPage";
 import checkoutData from "../data/checkoutData.json";
+import exp from "constants";
 
 let browser: Browser;
 let page: Page;
@@ -70,6 +71,7 @@ test.afterEach(async () => {
 
 test("TC0130 - Verify that the user can access the checkout flow.", async () => {
   try {
+    // Verify successfully navigate to Checkout page
     expect(
       await basePage.isElementVisible(viewAndEditCartPage.backToCartPageButton)
     ).toBe(true);
@@ -82,33 +84,8 @@ test("TC0130 - Verify that the user can access the checkout flow.", async () => 
 test("TC0131 - Verify that that Section 1 of the form displays required fields correctly.", async () => {
   try {
     if (addedPackageName != "") {
-      // Enter name in approving manager name field
-      await basePage.enterValuesInElement(
-        checkoutpage.approvingManagerNameField,
-        checkoutData.approvalAndPurposeSection[0].inputData as string
-      );
-
-      // Enter email in approving manager email field
-      await basePage.enterValuesInElement(
-        checkoutpage.approvingManagerEmailField,
-        checkoutData.approvalAndPurposeSection[1].inputData as string
-      );
-
-      // Enter data in Intended business use of Requested Packages field
-      await basePage.enterValuesInElement(
-        checkoutpage.requestedPackagesField,
-        checkoutData.approvalAndPurposeSection[2].inputData as string
-      );
-
-      // Select random option from Intended Invitee Category dropdown
-      await basePage.clickOnRandomOptionFromDropdown(
-        checkoutpage.intendedInviteeCategoryDropdown
-      );
-
-      // Select option from Order Purpose dropdown
-      await basePage.clickOnRandomOptionFromDropdown(
-        checkoutpage.orderPurposeDropdown
-      );
+      // Enter data in Approval and Purpose section
+      await checkoutpage.fillApprovalAndPurposeSection();
 
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
@@ -140,34 +117,8 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
         "TCCC"
       );
 
-      // Enter number in Cost Centre Number field
-      await basePage.enterValuesInElement(
-        checkoutpage.costCentreNumberField,
-        checkoutData.departmentInformationSection[0].inputData as string
-      );
-
-      // Select random option from GL Account Number dropdown
-      await basePage.clickOnRandomOptionFromDropdown(
-        checkoutpage.glAccountNumberDropdown
-      );
-
-      // Enter name in Finance Contact Name field
-      await basePage.enterValuesInElement(
-        checkoutpage.financeContactNameField,
-        checkoutData.departmentInformationSection[2].inputData as string
-      );
-
-      // Enter email in Finance Contact Email field
-      await basePage.enterValuesInElement(
-        checkoutpage.financeContactEmailField,
-        checkoutData.departmentInformationSection[3].inputData as string
-      );
-
-      // Enter email in Finance Contact Email field
-      await basePage.enterValuesInElement(
-        checkoutpage.ioWBSElementField,
-        checkoutData.departmentInformationSection[4].inputData as string
-      );
+      // Enter data in Department Information section
+      await checkoutpage.fillDepartmentInformationSection();
 
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
@@ -199,53 +150,8 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
         "Third-Party"
       );
 
-      // Enter name in Company Name field
-      await basePage.enterValuesInElement(
-        checkoutpage.companyNameField,
-        checkoutData.companyInformationSection[0].inputData as string
-      );
-
-      // Enter name in Company Name field
-      await basePage.enterValuesInElement(
-        checkoutpage.companyNameField,
-        checkoutData.companyInformationSection[0].inputData as string
-      );
-
-      // Enter address in Company Mailing Address field
-      await basePage.enterValuesInElement(
-        checkoutpage.companyMailingAddressField,
-        checkoutData.companyInformationSection[1].inputData as string
-      );
-
-      // Enter number in Purchase Order(PO) Number field
-      await basePage.enterValuesInElement(
-        checkoutpage.purchaseOrderNumberField,
-        checkoutData.companyInformationSection[2].inputData as string
-      );
-
-      // Enter email in Account Payable Contact Email field
-      await basePage.enterValuesInElement(
-        checkoutpage.accountPayableContactEmailField,
-        checkoutData.companyInformationSection[3].inputData as string
-      );
-
-      // Enter name in Account Payable Contact Name field
-      await basePage.enterValuesInElement(
-        checkoutpage.accountPayableContactNameField,
-        checkoutData.companyInformationSection[4].inputData as string
-      );
-
-      // Enter number in Account Payable Telephone Number field
-      await basePage.enterValuesInElement(
-        checkoutpage.accountPayableTelephoneField,
-        checkoutData.companyInformationSection[5].inputData as string
-      );
-
-      // Enter number in Tax Registration or VAT Number field
-      await basePage.enterValuesInElement(
-        checkoutpage.taxRegistrationorVATNameField,
-        checkoutData.companyInformationSection[6].inputData as string
-      );
+      // Enter data in Compnay Information section
+      await checkoutpage.fillCompanyInformationSection();
 
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
@@ -272,14 +178,8 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
 test("TC0134 - Verify that that the terms and conditions section is displayed and functional.", async () => {
   try {
     if (addedPackageName != "") {
-      // Click on Ethics Compliance checkbox
-      await basePage.clickElement(checkoutpage.ethicsComplianceCheckBox);
-
-      // Click on Finacial Commitment checkbox
-      await basePage.clickElement(checkoutpage.financialCommitmentCheckbox);
-
-      // Click on Manager Approval checkbox
-      await basePage.clickElement(checkoutpage.managerApprovalCheckbox);
+      // Select all checkbox in Terms and Conditions section
+      await checkoutpage.fillTermsAndConditionsSectionOne();
 
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
@@ -332,16 +232,8 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
           .isVisible()
       ).toBe(true);
 
-      // Select random option from Legal Entity dropdown
-      await basePage.clickOnRandomOptionFromDropdown(
-        checkoutpage.legalEntityDropdown
-      );
-
-      // Enter text in Additional Notes field
-      await basePage.enterValuesInElement(
-        checkoutpage.additionalNotesField,
-        checkoutData.termsAndConditionsSection[4].inputData as string
-      );
+      // Enter data in Terms and Condition section
+      await checkoutpage.fillTermsAndConditionsSectionTwo();
 
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
@@ -463,7 +355,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
   }
 });
 
-test.only("TC0138 - Verify that appropriate error messages are displayed for invalid input.", async () => {
+test("TC0138 - Verify that appropriate error messages are displayed for invalid input.", async () => {
   try {
     if (addedPackageName != "") {
       // Enter invalid data  in approving manager email field
@@ -543,6 +435,48 @@ test.only("TC0138 - Verify that appropriate error messages are displayed for inv
           .textContent()
       ).toBe(
         checkoutData.companyInformationSection[3].invalidDataMessage as string
+      );
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0136 - Verify that an order is created in 'Pending' status upon checkout completion.", async () => {
+  try {
+    if (addedPackageName != "") {
+      // Enter data in Approval and Purpose section
+      await checkoutpage.fillApprovalAndPurposeSection();
+
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "TCCC"
+      );
+
+      // Enter data in Department Information section
+      await checkoutpage.fillDepartmentInformationSection();
+
+      // Select all checkbox in Terms and Conditions section
+      await checkoutpage.fillTermsAndConditionsSectionOne();
+
+      // Enter data in Terms and Condition section
+      await checkoutpage.fillTermsAndConditionsSectionTwo();
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify Order success and Payment Intiated message are display or not
+      expect(
+        (await basePage.isElementVisible(
+          checkoutpage.paymentInitiatedMessage
+        )) &&
+          (await basePage.isElementVisible(checkoutpage.orderSuccessMessage))
+      ).toBe(true);
+
+      // Verify directly navigate to My account page or not
+      expect(await basePage.isElementVisible(checkoutpage.myAccountlabel)).toBe(
+        true
       );
     }
   } catch (error: any) {

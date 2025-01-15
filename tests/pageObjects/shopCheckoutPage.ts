@@ -1,5 +1,6 @@
 import { Browser, Locator, Page, expect } from "@playwright/test";
 import BasePage from "./basePage";
+import checkoutData from "../data/checkoutData.json";
 
 export class shopCheckoutPage extends BasePage {
   public approvingManagerNameField: Locator;
@@ -25,6 +26,9 @@ export class shopCheckoutPage extends BasePage {
   public legalEntityDropdown: Locator;
   public additionalNotesField: Locator;
   public submitButton: Locator;
+  public orderSuccessMessage: Locator;
+  public paymentInitiatedMessage: Locator;
+  public myAccountlabel: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -96,6 +100,13 @@ export class shopCheckoutPage extends BasePage {
     this.additionalNotesField = page.locator(
       "//textarea[@id='additional-notes']"
     );
+    this.orderSuccessMessage = page.locator(
+      "//span[text()='Order placed successfully!']"
+    );
+    this.paymentInitiatedMessage = page.locator(
+      "//span[text()='Payment initiated successfully!']"
+    );
+    this.myAccountlabel = page.locator("//h1[text()='My Account']");
   }
 
   async getErrorMessageElementForFields(elementName: string) {
@@ -104,5 +115,139 @@ export class shopCheckoutPage extends BasePage {
 
   async getErrorMessageElementForCheckBoxFields(elementName: string) {
     return `//label[text()='${elementName}']/parent::div/following-sibling::div[contains(@class,'text-red')]`;
+  }
+
+  // Enter data in Approval and Purpose section
+  async fillApprovalAndPurposeSection() {
+    // Enter name in approving manager name field
+    await this.enterValuesInElement(
+      this.approvingManagerNameField,
+      checkoutData.approvalAndPurposeSection[0].inputData as string
+    );
+
+    // Enter email in approving manager email field
+    await this.enterValuesInElement(
+      this.approvingManagerEmailField,
+      checkoutData.approvalAndPurposeSection[1].inputData as string
+    );
+
+    // Enter data in Intended business use of Requested Packages field
+    await this.enterValuesInElement(
+      this.requestedPackagesField,
+      checkoutData.approvalAndPurposeSection[2].inputData as string
+    );
+
+    // Select random option from Intended Invitee Category dropdown
+    await this.clickOnRandomOptionFromDropdown(
+      this.intendedInviteeCategoryDropdown
+    );
+
+    // Select option from Order Purpose dropdown
+    await this.clickOnRandomOptionFromDropdown(this.orderPurposeDropdown);
+  }
+
+  // Enter data in Department Information section
+  async fillDepartmentInformationSection() {
+    // Enter number in Cost Centre Number field
+    await this.enterValuesInElement(
+      this.costCentreNumberField,
+      checkoutData.departmentInformationSection[0].inputData as string
+    );
+
+    // Select random option from GL Account Number dropdown
+    await this.clickOnRandomOptionFromDropdown(this.glAccountNumberDropdown);
+
+    // Enter name in Finance Contact Name field
+    await this.enterValuesInElement(
+      this.financeContactNameField,
+      checkoutData.departmentInformationSection[2].inputData as string
+    );
+
+    // Enter email in Finance Contact Email field
+    await this.enterValuesInElement(
+      this.financeContactEmailField,
+      checkoutData.departmentInformationSection[3].inputData as string
+    );
+
+    // Enter email in Finance Contact Email field
+    await this.enterValuesInElement(
+      this.ioWBSElementField,
+      checkoutData.departmentInformationSection[4].inputData as string
+    );
+  }
+
+  // Enter data in Company Information section
+  async fillCompanyInformationSection() {
+    // Enter name in Company Name field
+    await this.enterValuesInElement(
+      this.companyNameField,
+      checkoutData.companyInformationSection[0].inputData as string
+    );
+
+    // Enter name in Company Name field
+    await this.enterValuesInElement(
+      this.companyNameField,
+      checkoutData.companyInformationSection[0].inputData as string
+    );
+
+    // Enter address in Company Mailing Address field
+    await this.enterValuesInElement(
+      this.companyMailingAddressField,
+      checkoutData.companyInformationSection[1].inputData as string
+    );
+
+    // Enter number in Purchase Order(PO) Number field
+    await this.enterValuesInElement(
+      this.purchaseOrderNumberField,
+      checkoutData.companyInformationSection[2].inputData as string
+    );
+
+    // Enter email in Account Payable Contact Email field
+    await this.enterValuesInElement(
+      this.accountPayableContactEmailField,
+      checkoutData.companyInformationSection[3].inputData as string
+    );
+
+    // Enter name in Account Payable Contact Name field
+    await this.enterValuesInElement(
+      this.accountPayableContactNameField,
+      checkoutData.companyInformationSection[4].inputData as string
+    );
+
+    // Enter number in Account Payable Telephone Number field
+    await this.enterValuesInElement(
+      this.accountPayableTelephoneField,
+      checkoutData.companyInformationSection[5].inputData as string
+    );
+
+    // Enter number in Tax Registration or VAT Number field
+    await this.enterValuesInElement(
+      this.taxRegistrationorVATNameField,
+      checkoutData.companyInformationSection[6].inputData as string
+    );
+  }
+
+  // Select all checkbox in Terms and Conditions section
+  async fillTermsAndConditionsSectionOne() {
+    // Click on Ethics Compliance checkbox
+    await this.clickElement(this.ethicsComplianceCheckBox);
+
+    // Click on Finacial Commitment checkbox
+    await this.clickElement(this.financialCommitmentCheckbox);
+
+    // Click on Manager Approval checkbox
+    await this.clickElement(this.managerApprovalCheckbox);
+  }
+
+  // Enter data in Terms and Conditions section
+  async fillTermsAndConditionsSectionTwo() {
+    // Select random option from Legal Entity dropdown
+    await this.clickOnRandomOptionFromDropdown(this.legalEntityDropdown);
+
+    // Enter text in Additional Notes field
+    await this.enterValuesInElement(
+      this.additionalNotesField,
+      checkoutData.termsAndConditionsSection[4].inputData as string
+    );
   }
 }
