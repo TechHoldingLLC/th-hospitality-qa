@@ -1,0 +1,7 @@
+{
+  "expectedDeleteConfirmationMessage": "This will permanently delete the product",
+  "deleteConfirmationSuffix": "and cannot be undone.",
+  "expectedDeleteSuccessMessage": "was successfully deleted.",
+  "failedMessage": "Failed to delete productThis product can't be deleted because it is referenced in one or more orders.Got it",
+  "expectedErrorMessages": "No results"
+}
