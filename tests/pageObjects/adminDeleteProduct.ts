@@ -4,7 +4,6 @@ import BasePage from "./basePage";
 export class adminDeleteProductPage extends BasePage {
   public searchInput: Locator;
   public productInputText: Locator;
-  public paginationStatus: Locator;
   public menuButton: Locator;
   public deleteButton: Locator;
   public deleteProductButton: Locator;
@@ -20,13 +19,8 @@ export class adminDeleteProductPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.searchInput = page.locator('input[placeholder="Search"]');
-    this.productInputText = page.locator('[tabindex="0"]');
-    this.paginationStatus = page.locator(
-      '//p[normalize-space()="1 of 1 pages"]'
-    );
-    this.menuButton = page.locator(
-      "(//a//button[@type='button' and @data-state='closed'])"
-    );
+    this.productInputText = page.locator("//span[@title]");
+    this.menuButton = page.locator('td div button[aria-haspopup="menu"]');
     this.deleteButton = page.getByRole("menuitem", { name: "Delete" });
     this.deleteProductButton = page.getByRole("button", { name: "Delete" });
     this.deleteMessageLabel = page.locator(
@@ -50,6 +44,12 @@ export class adminDeleteProductPage extends BasePage {
       "Failed to delete product"
     );
   }
+
+  async menuButtonByProductName(productName: string): Promise<Locator> {
+    return this.page.locator(
+      `//tr[td[normalize-space() = '${productName}']]//button[@aria-haspopup="menu"]`
+    );
+}
 
   async openDeletePopup(): Promise<void> {
     await this.clickElement(this.menuButton.first());

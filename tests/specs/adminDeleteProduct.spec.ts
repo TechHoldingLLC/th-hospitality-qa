@@ -29,7 +29,7 @@ test.afterEach(async () => {
   await browser.close();
 });
 
-test("TC0092 - verify that the user can access a CTA to delete.", async () => {
+test("TC0092 - Verify that an admin can successfully delete a product that is not associated with packages or event.", async () => {
   try {
     // Create and validate product.
     await basePage.clickElement(createEditProductPage.addProductButton);
@@ -46,7 +46,9 @@ test("TC0092 - verify that the user can access a CTA to delete.", async () => {
       deleteProductPage.searchInput,
       productName
     );
-    await basePage.waitForElementVisible(deleteProductPage.paginationStatus);
+    await basePage.waitForElementVisible(
+      await deleteProductPage.menuButtonByProductName(productName)
+    );
     expect(
       await basePage.getElementText(deleteProductPage.productInputText.first())
     ).toEqual(productName);
@@ -66,7 +68,7 @@ test("TC0092 - verify that the user can access a CTA to delete.", async () => {
       deleteProductPage.deletedSuccessStatus
     );
     expect(
-      await basePage.getElementText(deleteProductPage.deleteMessageLabel)
+      await basePage.getElementText(deleteProductPage.deleteMessageLabel.last())
     ).toEqual(
       `${productName} ${deleteProductData.expectedDeleteSuccessMessage}`
     );
