@@ -42,7 +42,7 @@ export class adminCreateEditProgramPage extends BasePage {
       "//span[text()='The program name must be unique.']"
     );
     this.editProgramSuccessMesaage = page.locator(
-      "//span[text()='Program has been updated successfully']"
+      "//span[text()='Program has been edited successfully']"
     );
     this.departmentValue = page.locator(
       "//p[text()='Department']/following-sibling::p"

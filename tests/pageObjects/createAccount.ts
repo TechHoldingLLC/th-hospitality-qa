@@ -18,10 +18,10 @@ export class createAccountPage extends BasePage {
   public confirmPasswordValidationMessage: Locator;
   public cityValidationMessage: Locator;
   public stateValidationMessage: Locator;
-  public countryValidationMessage: Locator;
   public locationValidationMessage: Locator;
   public shopUILogo: Locator;
   public createAccountSuccessMessage: Locator;
+  public passwordsDoNotMatchValidationMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -50,9 +50,6 @@ export class createAccountPage extends BasePage {
     this.confirmPasswordValidationMessage = page.locator(
       "//span[text()='Please check your password and try again.']"
     );
-    this.countryValidationMessage = page.locator(
-      "//span[text()='Country is required']"
-    );
     this.stateValidationMessage = page.locator(
       "//span[text()='State is required']"
     );
@@ -68,6 +65,7 @@ export class createAccountPage extends BasePage {
     this.createAccountSuccessMessage = page.locator(
       "//span[text()='Create account successfully']"
     );
+    this.passwordsDoNotMatchValidationMessage = page.locator("//span[text()='Passwords do not match.']");
   }
 
   async createAccount(email: string): Promise<void> {

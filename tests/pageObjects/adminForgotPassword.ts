@@ -62,43 +62,10 @@ export class adminForgotPasswordPage extends BasePage {
     );
   }
 
-  async navigateToResetPaswordPageFromMailinatorInbox(): Promise<void> {
-    await this.confirmNewEmailAndGoToBody("resetUser");
-    await this.clickElement(this.mailinatorLinksTab);
-
-    // Navigate to the link's URL directly in the same tab
-    const link = await this.mailinatorResetPasswordButtonLink.getAttribute(
-      "href"
-    );
-
-    if (link) {
-      await this.page.goto(link); // Directly navigate to the link's URL
-    } else {
-      throw new Error("Reset password link not found");
-    }
-    await this.page.waitForLoadState("domcontentloaded");
-  }
-
   async openResetPasswordLinkFromExpiredEmail(): Promise<void> {
-    await this.enterValuesInElement(this.mailinatorInboxField, "resetUser");
-    await this.clickElement(this.mailinatorGoBTN);
-    await this.page.waitForTimeout(3000);
-    await this.page
-      .locator("//table[@class='table-striped jambo_table']//tr[4]")
-      .click();
-
-    await this.clickElement(this.mailinatorLinksTab);
-    // Navigate to the link's URL directly in the same tab
-    const link = await this.mailinatorResetPasswordButtonLink.getAttribute(
-      "href"
-    );
-
-    if (link) {
-      await this.page.goto(link); // Directly navigate to the link's URL
-    } else {
-      throw new Error("Reset password link not found");
-    }
-    await this.page.waitForLoadState("domcontentloaded");
+    const iframeElement = this.page.frameLocator('iframe[name="ifinbox"]');
+    const expiredEmail = await iframeElement.locator('button:has-text("Reset your EPICS event system password")').last().click();
+    await this.openResetPasswordLinkFromEmail();
   }
 
   async requestNewPassword(email: string): Promise<void> {

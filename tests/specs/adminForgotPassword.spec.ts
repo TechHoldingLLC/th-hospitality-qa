@@ -39,9 +39,9 @@ test("TC0005 - Verify that the user can access a screen to enter their email add
     ).toBe(true);
 
     //Login into email domian
-    await basePage.mailinatorLogin();
-    //Check for new received email and click on link received for 'Reset Password'
-    await forgotPasswordPage.navigateToResetPaswordPageFromMailinatorInbox();
+    await basePage.yopmailLogin(forgotPasswordData.resetUserEmail);
+    //Click on 'Reset Password' link
+    await basePage.openResetPasswordLinkFromEmail();
     expect(
       await basePage.isElementVisible(forgotPasswordPage.changePasswordButton)
     ).toBe(true);
@@ -105,7 +105,7 @@ test("TC0005 - Verify that the user can access a screen to enter their email add
 test("TC0008 - Verify that 'Reset Password' link gets expire after 15 minute post generated", async () => {
   try {
     //Login into email domian
-    await basePage.mailinatorLogin();
+    await basePage.yopmailLogin(forgotPasswordData.resetUserEmail);
     //Open email with expired link and click on link
     await forgotPasswordPage.openResetPasswordLinkFromExpiredEmail();
     await basePage.waitForElementVisible(

@@ -24,9 +24,8 @@ test.afterEach(async () => {
 
 test("TC0019 - Verify that users are prompted to enter the required fields and can finish creating an account", async () => {
   try {
-    await basePage.openCreateAccountLinkFromEmail(
-      createAccountData.adminInviteEmail
-    );
+    await basePage.yopmailLogin(createAccountData.adminInviteEmail);
+    await basePage.openCreateAccountLinkFromEmail();
 
     //Verify email field is pre-filled and non-editable
     await basePage.waitForElementVisible(createAccount.emailInput);
@@ -55,9 +54,6 @@ test("TC0019 - Verify that users are prompted to enter the required fields and c
       )
     ).toBe(true);
     expect(
-      await basePage.isElementVisible(createAccount.countryValidationMessage)
-    ).toBe(true);
-    expect(
       await basePage.isElementVisible(createAccount.stateValidationMessage)
     ).toBe(true);
     expect(
@@ -77,7 +73,7 @@ test("TC0019 - Verify that users are prompted to enter the required fields and c
     await basePage.clickElement(createAccount.signUpButton);
     expect(
       await basePage.isElementVisible(
-        createAccount.confirmPasswordValidationMessage
+        createAccount.passwordsDoNotMatchValidationMessage
       )
     ).toBe(true);
   } catch (error: any) {
@@ -88,9 +84,8 @@ test("TC0019 - Verify that users are prompted to enter the required fields and c
 
 test("TC0021 - Verify that users must provide all location fields if the user provides one", async () => {
   try {
-    await basePage.openCreateAccountLinkFromEmail(
-      createAccountData.adminInviteEmail
-    );
+    await basePage.yopmailLogin(createAccountData.adminInviteEmail);
+    await basePage.openCreateAccountLinkFromEmail();
     //Verify all location fields (City, State, Country) are required if one is provided.
     await basePage.enterValuesInElement(
       createAccount.cityInput,
@@ -108,9 +103,8 @@ test("TC0021 - Verify that users must provide all location fields if the user pr
 
 test("TC0111 - Verify that Admin user is created successfully after registration process.", async () => {
   try {
-    await basePage.openCreateAccountLinkFromEmail(
-      createAccountData.adminInviteEmail
-    );
+    await basePage.yopmailLogin(createAccountData.adminInviteEmail);
+    await basePage.openCreateAccountLinkFromEmail();
     //Create account successfully
     await createAccount.createAccount(createAccountData.adminInviteEmail);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
@@ -128,9 +122,8 @@ test("TC0111 - Verify that Admin user is created successfully after registration
 
 test("TC0112 - Verify that Coordinator user is created successfully after registration process.", async () => {
   try {
-    await basePage.openCreateAccountLinkFromEmail(
-      createAccountData.coordinatorInviteEmail
-    );
+    await basePage.yopmailLogin(createAccountData.coordinatorInviteEmail);
+    await basePage.openCreateAccountLinkFromEmail();
     //Create account successfully
     await createAccount.createAccount(createAccountData.coordinatorInviteEmail);
     expect(

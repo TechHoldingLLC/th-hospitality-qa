@@ -42,7 +42,8 @@ test("TC0014 - Verify that admins can initiate invitations for (admin) from the 
     ).toEqual(inviteUserData.invitationSuccessMessage);
 
     //Click on 'Create Account' button from email body and verify navigation URL
-    await basePage.openCreateAccountLinkFromEmail(email);
+    await basePage.yopmailLogin(email);
+    await basePage.openCreateAccountLinkFromEmail();
     expect(page.url()).toContain(
       inviteUserData.urls.expectedBaseURLAdminPortal
     );
@@ -70,7 +71,8 @@ test("TC0108 - Verify that admins can initiate invitations for (coordinator) fro
     ).toEqual(inviteUserData.invitationSuccessMessage);
 
     //Click on 'Create Account' button from email body and verify navigation URL
-    await basePage.openCreateAccountLinkFromEmail(email);
+    await basePage.yopmailLogin(email);
+    await basePage.openCreateAccountLinkFromEmail();
     expect(page.url()).toContain(
       inviteUserData.urls.expectedBaseURLCoordinator
     );

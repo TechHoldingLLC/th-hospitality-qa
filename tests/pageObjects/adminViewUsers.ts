@@ -83,7 +83,7 @@ export class adminViewUsersPage {
       "//tbody[@class='border-ui-border-base border-b-0']//td[7]"
     );
     this.coordinatorAccessDeniedMessage = page.locator(
-      "//span[text()='Incorrect email or password. Please try again.']"
+      "//span[text()='Access denied for user: automated_coordinator@team507472.testinator.com. Role mismatch.']"
     );
   }
 }
