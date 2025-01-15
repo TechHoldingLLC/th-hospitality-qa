@@ -33,7 +33,7 @@ test.afterEach(async () => {
   await browser.close();
 });
 
-test("TC0086 - verify that the user can access a CTA to delete", async () => {
+test("TC0086 - Verify that an admin can successfully delete a program that is not associated with events, packages, or products.", async () => {
   const programName = await basePage.generateNomenclatureName(
     deleteProgramData.programNamePrefix
   );
