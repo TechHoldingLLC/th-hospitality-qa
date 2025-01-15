@@ -28,7 +28,10 @@ export class shopCheckoutPage extends BasePage {
   public submitButton: Locator;
   public orderSuccessMessage: Locator;
   public paymentInitiatedMessage: Locator;
-  public myAccountlabel: Locator;
+  public myAccountLink: Locator;
+  public myAccountLabel: Locator;
+  public ordersButton: Locator;
+  public orderID: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -106,7 +109,14 @@ export class shopCheckoutPage extends BasePage {
     this.paymentInitiatedMessage = page.locator(
       "//span[text()='Payment initiated successfully!']"
     );
-    this.myAccountlabel = page.locator("//h1[text()='My Account']");
+    this.myAccountLink = page.locator("//a[text()='My Account']");
+    this.myAccountLabel = page.locator("//h1[text()='My Account']");
+    this.ordersButton = page.locator(
+      "//button[contains(@aria-controls,'orders')]"
+    );
+    this.orderID = page.locator(
+      "//label[text()='Order Id:']/following-sibling::p/span"
+    );
   }
 
   async getErrorMessageElementForFields(elementName: string) {
@@ -249,5 +259,35 @@ export class shopCheckoutPage extends BasePage {
       this.additionalNotesField,
       checkoutData.termsAndConditionsSection[4].inputData as string
     );
+  }
+
+  // Navigate to Order page from My Account
+  async navigatetoOrderpage() {
+    // Click on my account
+    await this.clickElement(this.myAccountLink);
+
+    await this.waitForPageToBeReady();
+    await this.page.waitForTimeout(2000);
+
+    await this.clickElement(this.ordersButton);
+
+    await this.waitForPageToBeReady();
+    await this.page.waitForTimeout(2000);
+  }
+
+  // Get Order ID list from My Account page
+  async getOrderIDList(): Promise<string[]> {
+    await this.isElementVisible(this.orderID.first());
+
+    // Get the count of list items
+    const count = await this.orderID.count();
+
+    const orderIDData: string[] = [];
+    for (let i = 0; i < count; i++) {
+      const text = await this.orderID.nth(i).innerText();
+      orderIDData.push(text);
+    }
+
+    return orderIDData;
   }
 }
