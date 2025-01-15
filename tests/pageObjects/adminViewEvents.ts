@@ -28,6 +28,11 @@ export class adminViewEventsPage {
   public eventList: Locator;
   public nextButton: Locator;
   public prevButton: Locator;
+  public addFilterButton: Locator;
+  public statusMenuItem: Locator;
+  public statusListFromMenuItem: Locator;
+  public filterMenuButton: Locator;
+  public eventNameMenuItem: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -75,5 +80,16 @@ export class adminViewEventsPage {
     this.eventList = page.locator("//tbody//tr");
     this.nextButton = page.locator("//button[text()='Next']");
     this.prevButton = page.locator("//button[text()='Prev']");
+    this.addFilterButton = page.locator("button#filters_menu_trigger");
+    this.statusMenuItem = page.locator(
+      "//div[@role='menuitem' and text()='Status']"
+    );
+    this.statusListFromMenuItem = page.locator("//div[@role='option']");
+    this.filterMenuButton = page.locator(
+      "//div[contains(@class,'flex items-start')]//button[@aria-haspopup='menu']"
+    );
+    this.eventNameMenuItem = page.locator(
+      "//div[@role='menuitemradio' and text()='Event Name']"
+    );
   }
 }
