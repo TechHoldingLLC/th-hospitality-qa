@@ -3,45 +3,45 @@
       {
         "fieldName": "Approving Manager Name",
         "inputData": "Testing Manager",
-        "emaptyFieldMessage": "Approving manager name is required"
+        "emptyFieldMessage": "Approving manager name is required"
       },
       {
         "fieldName": "Approving Manager Email",
         "inputData": "testing@email.com",
-        "emaptyFieldMessage": "Email is required"
+        "emptyFieldMessage": "Email is required"
       },
       {
         "fieldName": "Intended business use of Requested Packages",
         "inputData": "This is testing purpose",
-        "emaptyFieldMessage": "Intended business use is required"
+        "emptyFieldMessage": "Intended business use is required"
       },
       {
         "fieldName": "Intended Invitee Category",
-        "emaptyFieldMessage": "Invitee category is required"
+        "emptyFieldMessage": "Invitee category is required"
       }, {
         "fieldName": "Order Purpose",
-        "emaptyFieldMessage": "Order purpose is required"
+        "emptyFieldMessage": "Order purpose is required"
       }
     ],
     "departmentInformationSection": [
       {
         "fieldName": "Cost Centre Number",
         "inputData": "Test 123",
-        "emaptyFieldMessage": "Cost centre number is required"
+        "emptyFieldMessage": "Cost centre number is required"
       },
       {
         "fieldName": "GL Account Number",
-        "emaptyFieldMessage": "GL account number is required"
+        "emptyFieldMessage": "GL account number is required"
       },
       {
         "fieldName": "Finance Contact Name",
         "inputData": "Testing Name",
-        "emaptyFieldMessage": "Finance contact name is required"
+        "emptyFieldMessage": "Finance contact name is required"
       },
       {
         "fieldName": "Finance Contact Email",
         "inputData": "testing@email.com",
-        "emaptyFieldMessage": "Email is required"
+        "emptyFieldMessage": "Email is required"
       }, {
         "fieldName": "IO/WBS Element, If Available",
         "inputData": "This is testing purpose"
@@ -51,12 +51,12 @@
       {
         "fieldName": "Company Name",
         "inputData": "Test Name",
-        "emaptyFieldMessage": "Company name is required"
+        "emptyFieldMessage": "Company name is required"
       },
       {
         "fieldName": "Company Mailling Address", 
         "inputData": "Test Adress",
-        "emaptyFieldMessage": "Company mailing address is required"
+        "emptyFieldMessage": "Company mailing address is required"
       },
       {
         "fieldName": "Purchase Order(PO) Number",
@@ -65,39 +65,39 @@
       {
         "fieldName": "Account Payable Contact Email",
         "inputData": "testing@email.com",
-        "emaptyFieldMessage": "Email is required"
+        "emptyFieldMessage": "Email is required"
       },
       {
        "fieldName": "Account Payable Contact Name", 
         "inputData": "Test Name",
-        "emaptyFieldMessage": "Account payable name is required"
+        "emptyFieldMessage": "Account payable name is required"
       },
       {
         "fieldName": "Account Payable Telephone Number", 
         "inputData": "1234567890",
-        "emaptyFieldMessage": "Must be a valid phone number"
+        "emptyFieldMessage": "Must be a valid phone number"
       },
       {
         "fieldName": "Tax Registration or VAT Number", 
         "inputData": "Test 123",
-        "emaptyFieldMessage": "VAT number is required"
+        "emptyFieldMessage": "VAT number is required"
       }
     ], "termsAndConditionsSection": [
         {
           "fieldName": "I understand that by placing this request, my group, business unit, or function agrees with TCCC Ethics and Compliance guidelines.",
-          "emaptyFieldMessage": "You must agree to the Ethics and Compliance"
+          "emptyFieldMessage": "You must agree to the Ethics and Compliance"
         },
         {
           "fieldName": "IMPORTANT: The submission of this completed request represents a formal financial commitment. The accounting location specified is financially committed to the charges if the requested tickets/packages are allocated. Service fees may apply and will be included in the total cost of your tickets/packages.", 
-          "emaptyFieldMessage": "You must agree to the Financial Commitment"
+          "emptyFieldMessage": "You must agree to the Financial Commitment"
         },
         {
           "fieldName": "The approving manager listed above must be authorized to approve charges for the designated accounting location and amount.",
-          "emaptyFieldMessage": "You must agree to this required field"
+          "emptyFieldMessage": "You must agree to this required field"
         },
         {
           "fieldName": "Legal Entity",
-          "emaptyFieldMessage": "Legal entity is required"
+          "emptyFieldMessage": "Legal entity is required"
         },
         {
          "fieldName": "Additional Notes?", 

@@ -21,6 +21,7 @@ let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
 let viewAndEditCartPage: shopViewAndEditCartPage;
 let checkoutpage: shopCheckoutPage;
+let addedPackageName: string;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
@@ -36,6 +37,31 @@ test.beforeEach(async () => {
   await basePage.navigateTo(config.soapPortalUrl);
   //Login
   await loginPage.login(config.coordinator_email, config.coordinator_password);
+
+  // Add Package in cart and verify
+  addedPackageName = await addItemInCartPage.addItemInCartPage();
+
+  if (addedPackageName != "") {
+    // Verify My Cart section open or not
+    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
+      true
+    );
+
+    // Verify item added or not in cart page
+    expect(
+      await addItemInCartPage.packageTitleInCartPage.last().textContent()
+    ).toBe(addedPackageName);
+
+    // Click on Checkout button
+    await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+
+    // Verify navigate to Checkout page
+    expect(
+      await basePage.isElementVisible(
+        viewAndEditCartPage.checkoutPageTitleLabel
+      )
+    ).toBe(true);
+  }
 });
 
 test.afterEach(async () => {
@@ -44,31 +70,9 @@ test.afterEach(async () => {
 
 test("TC0130 - Verify that the user can access the checkout flow.", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
-    if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-    }
+    expect(
+      await basePage.isElementVisible(viewAndEditCartPage.backToCartPageButton)
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -77,31 +81,7 @@ test("TC0130 - Verify that the user can access the checkout flow.", async () => 
 
 test("TC0131 - Verify that that Section 1 of the form displays required fields correctly.", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
     if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-
       // Enter name in approving manager name field
       await basePage.enterValuesInElement(
         checkoutpage.approvingManagerNameField,
@@ -154,31 +134,7 @@ test("TC0131 - Verify that that Section 1 of the form displays required fields c
 
 test("TC0132 - Verify that that Section 2a is displayed and functions correctly for the Third-Party order purpose.", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
     if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-
       await basePage.selectOptionFromDropdown(
         checkoutpage.orderPurposeDropdown,
         "TCCC"
@@ -237,31 +193,7 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
 
 test("TC0133 - Verify that that Section 2b is displayed and functions correctly for the 'TCCC' order purpose.", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
     if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-
       await basePage.selectOptionFromDropdown(
         checkoutpage.orderPurposeDropdown,
         "Third-Party"
@@ -339,36 +271,7 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
 
 test("TC0134 - Verify that that the terms and conditions section is displayed and functional.", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
     if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-
-      await basePage.selectOptionFromDropdown(
-        checkoutpage.orderPurposeDropdown,
-        "Third-Party"
-      );
-
       // Click on Ethics Compliance checkbox
       await basePage.clickElement(checkoutpage.ethicsComplianceCheckBox);
 
@@ -414,36 +317,7 @@ test("TC0134 - Verify that that the terms and conditions section is displayed an
 
 test("TC0135 - Verify that that the legal entity dropdown is functional and required for submission", async () => {
   try {
-    // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
-
     if (addedPackageName != "") {
-      // Verify My Cart section open or not
-      expect(
-        await basePage.isElementVisible(addItemInCartPage.cartSection)
-      ).toBe(true);
-
-      // Verify item added or not in cart page
-      expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
-
-      // Click on Checkout button
-      await basePage.clickElement(viewAndEditCartPage.checkOutButton);
-
-      // Verify navigate to Checkout page
-      expect(
-        await basePage.isElementVisible(
-          viewAndEditCartPage.checkoutPageTitleLabel
-        )
-      ).toBe(true);
-
-      await basePage.selectOptionFromDropdown(
-        checkoutpage.orderPurposeDropdown,
-        "Third-Party"
-      );
-
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
 
