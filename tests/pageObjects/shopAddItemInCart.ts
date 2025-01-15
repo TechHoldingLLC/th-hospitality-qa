@@ -1,4 +1,4 @@
-import { Browser, Locator, Page, expect } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
@@ -7,7 +7,7 @@ export class shopAddItemInCartPage extends BasePage {
   public viewPackageButton: Locator;
   public packageTitleLabel: Locator;
   public quantityInputField: Locator;
-  public addToCardButton: Locator;
+  public addToCartButton: Locator;
   public notificationLabel: Locator;
   public cartButton: Locator;
   public packageQuantityField: Locator;
@@ -22,7 +22,7 @@ export class shopAddItemInCartPage extends BasePage {
   public outOfStockButton: Locator;
   public updateInCartButton: Locator;
 
-  // Packages pages locator
+  // Packages page locator
   public packagesButton: Locator;
   public nextButton: Locator;
   public availableQuantityLabel: Locator;
@@ -38,7 +38,7 @@ export class shopAddItemInCartPage extends BasePage {
       "//section[@role='dialog']//h3[@aria-label='Package Title']"
     );
     this.quantityInputField = page.locator("//input[@aria-label='Quantity']");
-    this.addToCardButton = page.locator(
+    this.addToCartButton = page.locator(
       "//button[@aria-label='Add/Update to Cart Button']"
     );
     this.notificationLabel = page.locator(
@@ -80,8 +80,8 @@ export class shopAddItemInCartPage extends BasePage {
     this.updateInCartButton = page.locator("//button[text()='Update in Cart']");
   }
 
-  // Add item in cart
-  async addItemInCartPage(): Promise<string> {
+  // Add item to cart
+  async addItemInCart(): Promise<string> {
     let packageTitle: string = "";
 
     // Click on View Package button
@@ -104,7 +104,7 @@ export class shopAddItemInCartPage extends BasePage {
       packageTitle = await this.packageTitleLabel.innerText();
 
       // Click on Add to Cart button
-      await this.clickElement(this.addToCardButton);
+      await this.clickElement(this.addToCartButton);
       await this.page.waitForTimeout(3000);
 
       // click on Cart button
@@ -114,7 +114,7 @@ export class shopAddItemInCartPage extends BasePage {
     return packageTitle;
   }
 
-  // Get Available Quantity and Max Quantity per order from package page
+  // Get Available Quantity and Max Quantity per order from Admin panel
   async getNumberOfAvialableQtyAndMaxQtyPerOrder(
     packageName: string
   ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
@@ -172,8 +172,8 @@ export class shopAddItemInCartPage extends BasePage {
     return { availableQty, maxQtyPerOrder };
   }
 
-  // Add multiple Package in cart
-  async addMultiplePackageInCart(): Promise<number> {
+  // Add multiple Packages to cart
+  async addMultiplePackagesToCart(): Promise<number> {
     await this.waitForPageToBeReady();
 
     await this.waitForElementVisible(this.viewPackageButton.first());
@@ -206,7 +206,7 @@ export class shopAddItemInCartPage extends BasePage {
         );
 
         // Click on Add to Cart button
-        await this.clickElement(this.addToCardButton);
+        await this.clickElement(this.addToCartButton);
 
         await this.waitForPageToBeReady();
         await this.page.waitForTimeout(3000);
