@@ -8,7 +8,9 @@
       {
         "fieldName": "Approving Manager Email",
         "inputData": "testing@email.com",
-        "emptyFieldMessage": "Email is required"
+        "invalidData": "abc",
+        "emptyFieldMessage": "Email is required",
+        "invalidDataMessage": "Invalid email address"
       },
       {
         "fieldName": "Intended business use of Requested Packages",
@@ -18,7 +20,8 @@
       {
         "fieldName": "Intended Invitee Category",
         "emptyFieldMessage": "Invitee category is required"
-      }, {
+      }, 
+      {
         "fieldName": "Order Purpose",
         "emptyFieldMessage": "Order purpose is required"
       }
@@ -41,7 +44,9 @@
       {
         "fieldName": "Finance Contact Email",
         "inputData": "testing@email.com",
-        "emptyFieldMessage": "Email is required"
+        "invalidData": "abc",
+        "emptyFieldMessage": "Email is required",
+        "invalidDataMessage": "Invalid email address"
       }, {
         "fieldName": "IO/WBS Element, If Available",
         "inputData": "This is testing purpose"
@@ -54,7 +59,7 @@
         "emptyFieldMessage": "Company name is required"
       },
       {
-        "fieldName": "Company Mailling Address", 
+        "fieldName": "Company Mailing Address", 
         "inputData": "Test Adress",
         "emptyFieldMessage": "Company mailing address is required"
       },
@@ -65,7 +70,9 @@
       {
         "fieldName": "Account Payable Contact Email",
         "inputData": "testing@email.com",
-        "emptyFieldMessage": "Email is required"
+        "invalidData": "abc",
+        "emptyFieldMessage": "Email is required",
+        "invalidDataMessage": "Invalid email address"
       },
       {
        "fieldName": "Account Payable Contact Name", 

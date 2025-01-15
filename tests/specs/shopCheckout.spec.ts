@@ -178,7 +178,7 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
           await page
             .locator(
               await checkoutpage.getErrorMessageElementForFields(
-                field.fieldName.toString()
+                field.fieldName as string
               )
             )
             .isVisible()
@@ -256,7 +256,7 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
           await page
             .locator(
               await checkoutpage.getErrorMessageElementForFields(
-                field.fieldName.toString()
+                field.fieldName as string
               )
             )
             .isVisible()
@@ -321,7 +321,7 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
       // Click on submit button
       await basePage.clickElement(checkoutpage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify fields are required message display
       expect(
         await page
           .locator(
@@ -356,6 +356,194 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
           )
           .isVisible()
       ).toBe(false);
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0138 - Verify that appropriate error messages are displayed for missing input.", async () => {
+  try {
+    if (addedPackageName != "") {
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields required message are display or not
+      checkoutData.approvalAndPurposeSection.forEach(async (field) => {
+        expect(
+          await page
+            .locator(
+              await checkoutpage.getErrorMessageElementForFields(
+                field.fieldName as string
+              )
+            )
+            .textContent()
+        ).toBe(field.emptyFieldMessage as string);
+      });
+
+      for (let int = 0; int < 3; int++) {
+        expect(
+          await page
+            .locator(
+              await checkoutpage.getErrorMessageElementForCheckBoxFields(
+                checkoutData.termsAndConditionsSection[int].fieldName as string
+              )
+            )
+            .textContent()
+        ).toBe(
+          checkoutData.termsAndConditionsSection[int]
+            .emptyFieldMessage as string
+        );
+      }
+
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.termsAndConditionsSection[3].fieldName as string
+            )
+          )
+          .textContent()
+      ).toBe(
+        checkoutData.termsAndConditionsSection[3].emptyFieldMessage as string
+      );
+
+      // Select TCCC option from order purpose dropdown
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "TCCC"
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields required message are display or not in Department Information section
+      checkoutData.departmentInformationSection.forEach(async (field) => {
+        if (field.emptyFieldMessage) {
+          expect(
+            await page
+              .locator(
+                await checkoutpage.getErrorMessageElementForFields(
+                  field.fieldName as string
+                )
+              )
+              .textContent()
+          ).toBe(field.emptyFieldMessage as string);
+        }
+      });
+
+      // Select Third Party option from order purpose dropdown
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "Third-Party"
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify fields required message are display or not in Company Information section
+      checkoutData.companyInformationSection.forEach(async (field) => {
+        if (field.emptyFieldMessage) {
+          expect(
+            await page
+              .locator(
+                await checkoutpage.getErrorMessageElementForFields(
+                  field.fieldName as string
+                )
+              )
+              .textContent()
+          ).toBe(field.emptyFieldMessage as string);
+        }
+      });
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test.only("TC0138 - Verify that appropriate error messages are displayed for invalid input.", async () => {
+  try {
+    if (addedPackageName != "") {
+      // Enter invalid data  in approving manager email field
+      await basePage.enterValuesInElement(
+        checkoutpage.approvingManagerEmailField,
+        checkoutData.approvalAndPurposeSection[1].invalidData as string
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify invalid email address message
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.approvalAndPurposeSection[1].fieldName as string
+            )
+          )
+          .textContent()
+      ).toBe(
+        checkoutData.approvalAndPurposeSection[1].invalidDataMessage as string
+      );
+
+      // Select TCCC option from order purpose dropdown
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "TCCC"
+      );
+
+      // Enter invalid data in Finance Contact Email field
+      await basePage.enterValuesInElement(
+        checkoutpage.financeContactEmailField,
+        checkoutData.departmentInformationSection[3].invalidData as string
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify invalid email address message
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.departmentInformationSection[3].fieldName as string
+            )
+          )
+          .textContent()
+      ).toBe(
+        checkoutData.departmentInformationSection[3]
+          .invalidDataMessage as string
+      );
+
+      // Select Third Party option from order purpose dropdown
+      await basePage.selectOptionFromDropdown(
+        checkoutpage.orderPurposeDropdown,
+        "Third-Party"
+      );
+
+      // Enter invaid data in Account Payable Contact Email field
+      await basePage.enterValuesInElement(
+        checkoutpage.accountPayableContactEmailField,
+        checkoutData.companyInformationSection[3].invalidData as string
+      );
+
+      // Click on submit button
+      await basePage.clickElement(checkoutpage.submitButton);
+
+      // Verify invalid email address message
+      expect(
+        await page
+          .locator(
+            await checkoutpage.getErrorMessageElementForFields(
+              checkoutData.companyInformationSection[3].fieldName as string
+            )
+          )
+          .textContent()
+      ).toBe(
+        checkoutData.companyInformationSection[3].invalidDataMessage as string
+      );
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
