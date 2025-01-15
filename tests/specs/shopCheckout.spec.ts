@@ -6,19 +6,16 @@ import {
   expect,
   Locator,
 } from "@playwright/test";
-import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import { shopViewAndEditCartPage } from "../pageObjects/shopViewAndEditCartPage";
 import { shopCheckoutPage } from "../pageObjects/shopCheckoutPage";
 import checkoutData from "../data/checkoutData.json";
-import exp from "constants";
 
 let browser: Browser;
 let page: Page;
 let loginPage: adminLoginPage;
-let basePage: BasePage;
 let addItemInCartPage: shopAddItemInCartPage;
 let viewAndEditCartPage: shopViewAndEditCartPage;
 let checkoutPage: shopCheckoutPage;
@@ -29,13 +26,11 @@ test.beforeEach(async () => {
   page = await browser.newPage();
   await page.setViewportSize({ width: 1780, height: 720 });
   loginPage = new adminLoginPage(page);
-  basePage = new BasePage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
-  viewAndEditCartPage = new shopViewAndEditCartPage(page);
   checkoutPage = new shopCheckoutPage(page);
 
   //Navigation to admin portal
-  await basePage.navigateTo(config.soapPortalUrl);
+  await checkoutPage.navigateTo(config.soapPortalUrl);
   //Login
   await loginPage.login(config.coordinator_email, config.coordinator_password);
 
@@ -44,9 +39,9 @@ test.beforeEach(async () => {
 
   if (addedPackageName != "") {
     // Verify My Cart section open or not
-    expect(await basePage.isElementVisible(addItemInCartPage.cartSection)).toBe(
-      true
-    );
+    expect(
+      await checkoutPage.isElementVisible(addItemInCartPage.cartSection)
+    ).toBe(true);
 
     // Verify item added or not in cart page
     expect(
@@ -54,11 +49,11 @@ test.beforeEach(async () => {
     ).toBe(addedPackageName);
 
     // Click on Checkout button
-    await basePage.clickElement(viewAndEditCartPage.checkOutButton);
+    await checkoutPage.clickElement(viewAndEditCartPage.checkOutButton);
 
     // Verify navigate to Checkout page
     expect(
-      await basePage.isElementVisible(
+      await checkoutPage.isElementVisible(
         viewAndEditCartPage.checkoutPageTitleLabel
       )
     ).toBe(true);
@@ -73,7 +68,9 @@ test("TC0130 - Verify that the user can access the checkout flow.", async () => 
   try {
     // Verify successfully navigate to Checkout page
     expect(
-      await basePage.isElementVisible(viewAndEditCartPage.backToCartPageButton)
+      await checkoutPage.isElementVisible(
+        viewAndEditCartPage.backToCartPageButton
+      )
     ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -88,7 +85,7 @@ test("TC0131 - Verify that that Section 1 of the form displays required fields c
       await checkoutPage.fillApprovalAndPurposeSection();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message not display
       checkoutData.approvalAndPurposeSection.forEach(async (field) => {
@@ -112,7 +109,7 @@ test("TC0131 - Verify that that Section 1 of the form displays required fields c
 test("TC0132 - Verify that that Section 2a is displayed and functions correctly for the Third-Party order purpose.", async () => {
   try {
     if (addedPackageName != "") {
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "TCCC"
       );
@@ -121,7 +118,7 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
       await checkoutPage.fillDepartmentInformationSection();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message not display
       checkoutData.departmentInformationSection.forEach(async (field) => {
@@ -145,7 +142,7 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
 test("TC0133 - Verify that that Section 2b is displayed and functions correctly for the 'TCCC' order purpose.", async () => {
   try {
     if (addedPackageName != "") {
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "Third-Party"
       );
@@ -154,7 +151,7 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
       await checkoutPage.fillCompanyInformationSection();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message not display
       checkoutData.companyInformationSection.forEach(async (field) => {
@@ -182,7 +179,7 @@ test("TC0134 - Verify that that the terms and conditions section is displayed an
       await checkoutPage.fillTermsAndConditionsSectionOne();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message not display
       expect(
@@ -219,7 +216,7 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
   try {
     if (addedPackageName != "") {
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message display
       expect(
@@ -236,7 +233,7 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
       await checkoutPage.fillTermsAndConditionsSectionTwo();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields are required message not display
       expect(
@@ -259,7 +256,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
   try {
     if (addedPackageName != "") {
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields required message are display or not
       checkoutData.approvalAndPurposeSection.forEach(async (field) => {
@@ -302,13 +299,13 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
       );
 
       // Select TCCC option from order purpose dropdown
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "TCCC"
       );
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields required message are display or not in Department Information section
       checkoutData.departmentInformationSection.forEach(async (field) => {
@@ -326,13 +323,13 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
       });
 
       // Select Third Party option from order purpose dropdown
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "Third-Party"
       );
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify fields required message are display or not in Company Information section
       checkoutData.companyInformationSection.forEach(async (field) => {
@@ -359,13 +356,13 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
   try {
     if (addedPackageName != "") {
       // Enter invalid data  in approving manager email field
-      await basePage.enterValuesInElement(
+      await checkoutPage.enterValuesInElement(
         checkoutPage.approvingManagerEmailField,
         checkoutData.approvalAndPurposeSection[1].invalidData as string
       );
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify invalid email address message
       expect(
@@ -381,19 +378,19 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
       );
 
       // Select TCCC option from order purpose dropdown
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "TCCC"
       );
 
       // Enter invalid data in Finance Contact Email field
-      await basePage.enterValuesInElement(
+      await checkoutPage.enterValuesInElement(
         checkoutPage.financeContactEmailField,
         checkoutData.departmentInformationSection[3].invalidData as string
       );
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify invalid email address message
       expect(
@@ -410,19 +407,19 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
       );
 
       // Select Third Party option from order purpose dropdown
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "Third-Party"
       );
 
       // Enter invaid data in Account Payable Contact Email field
-      await basePage.enterValuesInElement(
+      await checkoutPage.enterValuesInElement(
         checkoutPage.accountPayableContactEmailField,
         checkoutData.companyInformationSection[3].invalidData as string
       );
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify invalid email address message
       expect(
@@ -470,7 +467,7 @@ test("TC0136 - Verify that an order is created in 'Pending' status upon checkout
       // Enter data in Approval and Purpose section
       await checkoutPage.fillApprovalAndPurposeSection();
 
-      await basePage.selectOptionFromDropdown(
+      await checkoutPage.selectOptionFromDropdown(
         checkoutPage.orderPurposeDropdown,
         "TCCC"
       );
@@ -485,20 +482,22 @@ test("TC0136 - Verify that an order is created in 'Pending' status upon checkout
       await checkoutPage.fillTermsAndConditionsSectionTwo();
 
       // Click on submit button
-      await basePage.clickElement(checkoutPage.submitButton);
+      await checkoutPage.clickElement(checkoutPage.submitButton);
 
       // Verify Order success and Payment Intiated message are display or not
       expect(
-        (await basePage.isElementVisible(
+        (await checkoutPage.isElementVisible(
           checkoutPage.paymentInitiatedMessage
         )) &&
-          (await basePage.isElementVisible(checkoutPage.orderSuccessMessage))
+          (await checkoutPage.isElementVisible(
+            checkoutPage.orderSuccessMessage
+          ))
       ).toBe(true);
 
       // Verify directly navigate to My account page or not
-      expect(await basePage.isElementVisible(checkoutPage.myAccountLabel)).toBe(
-        true
-      );
+      expect(
+        await checkoutPage.isElementVisible(checkoutPage.myAccountLabel)
+      ).toBe(true);
 
       // Get Order ID list
       const orderNewIDList: string[] = await checkoutPage.getOrderIDList();
