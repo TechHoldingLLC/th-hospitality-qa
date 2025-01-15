@@ -1,0 +1,7 @@
+{
+  "expectedDeleteConfirmationMessage": "This will permanently delete the event",
+  "deleteConfirmationSuffix": "and cannot be undone.",
+  "expectedDeleteSuccessMessage": "was successfully deleted.",
+  "failedMessage": "Failed to delete eventThis event can't be deleted because it is referenced by one or more products, packages or events.Got it",
+  "expectedErrorMessages": "No results"
+}
