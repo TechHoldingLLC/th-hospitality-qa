@@ -20,6 +20,7 @@ export class shopAddItemInCartPage extends BasePage {
   public closeCartDrawerButton: Locator;
   public packagePriceLabel: Locator;
   public outOfStockButton: Locator;
+  public updateInCartButton: Locator;
 
   // Packages pages locator
   public packagesButton: Locator;
@@ -76,6 +77,7 @@ export class shopAddItemInCartPage extends BasePage {
       "//p[text()='Package Price']/following-sibling::p"
     );
     this.outOfStockButton = page.locator("//button[text()='Out of Stock']");
+    this.updateInCartButton = page.locator("//button[text()='Update in Cart']");
   }
 
   // Add item in cart
@@ -192,7 +194,10 @@ export class shopAddItemInCartPage extends BasePage {
       // Check package is not out of stock
       let isPackageOutofStock = await this.outOfStockButton.isVisible();
 
-      if (!isPackageOutofStock) {
+      // Check package is already added or not
+      let isPackageAlreadyAdded = await this.updateInCartButton.isVisible();
+
+      if (!isPackageOutofStock || !isPackageAlreadyAdded) {
         // Get price of package
         const packagePrice: number = parseFloat(
           (await this.packagePriceLabel.allTextContents())
