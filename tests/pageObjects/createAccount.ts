@@ -72,6 +72,7 @@ export class createAccountPage extends BasePage {
     const username = email.split("@")[0];
     const firstname = username.split("_")[0];
     const lastname = username.split("_").slice(1).join("_");
+    await this.waitForPageToBeReady();
     await this.enterValuesInElement(this.firstNameInput, firstname);
     await this.enterValuesInElement(this.lastNameInput, lastname);
     await this.enterValuesInElement(

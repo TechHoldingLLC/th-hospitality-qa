@@ -83,7 +83,9 @@ export class adminCreateEditProductPage extends BasePage {
     this.stayEndDate = page.locator(
       "//label[text()='Stay End Date']/following-sibling::div"
     );
-    this.productUpdateSuccessMessage = page.locator("//span[text()='Product has been updated successfully']")
+    this.productUpdateSuccessMessage = page.locator(
+      "//span[text()='Product has been updated successfully']"
+    );
   }
 
   async createProductWithGift(): Promise<string> {
@@ -139,6 +141,7 @@ export class adminCreateEditProductPage extends BasePage {
         );
       }
     }
+
     await this.page.waitForTimeout(2000);
     await this.clickElement(this.saveButton);
     return productName;
@@ -174,7 +177,7 @@ export class adminCreateEditProductPage extends BasePage {
     await this.page.keyboard.type(startDate);
     await this.page.locator("//div[@aria-label='month, ']").last().click();
     await this.page.keyboard.type(endDateFormatted);
-    
+
     await this.clickElement(this.saveButton);
     return productName;
   }

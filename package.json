@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "This repo is managed by QA team for Coke-Playwright Automation",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test:priority": "npx playwright test tests/specs/adminInviteUser.spec.ts && npx playwright test tests/specs/createAccount.spec.ts && npx playwright test $(find tests/specs -type f -name '*.spec.ts' | grep -v 'adminInviteUser.spec.ts' | grep -v 'createAccount.spec.ts')"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

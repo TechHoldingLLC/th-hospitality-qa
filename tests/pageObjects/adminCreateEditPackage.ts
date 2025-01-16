@@ -46,6 +46,7 @@ export class adminCreateEditPackagePage extends BasePage {
   public addNewProductButton: Locator;
   public continueButton: Locator;
   public packageUpdateMessage: Locator;
+  public detailsTab: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -140,6 +141,7 @@ export class adminCreateEditPackagePage extends BasePage {
     this.packageUpdateMessage = page.locator(
       "//span[text()='Package Updated Successfully']"
     );
+    this.detailsTab = page.locator("//button[text()='Details']");
   }
 
   async addPackage(packagename: string): Promise<void> {
@@ -199,6 +201,27 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.page.waitForTimeout(2000);
     await this.clickElement(this.selectProductButton);
     await this.page.waitForTimeout(2000);
+
+    // Continue looping as long as the selectProductDropdown is empty
+    while (
+      (await this.page.$('option[value="no-products"][disabled]')) !== null
+    ) {
+      await this.page.mouse.click(10, 10);
+      await this.detailsTab.click();
+      await this.page.waitForTimeout(2000);
+      await this.waitForPageToBeReady();
+      await this.clickOnRandomOptionFromDropdown(
+        this.associatedProgramDropdown
+      );
+      await this.clickElement(this.nextButton);
+
+      // Re-enter the search value and click the select product button again
+      await this.enterValuesInElement(this.productSearchInput, "a");
+      await this.page.waitForTimeout(2000);
+      await this.clickElement(this.selectProductButton);
+      await this.page.waitForTimeout(2000);
+    }
+
     await this.clickOnRandomOptionFromDropdown(this.selectProductDropdown);
     await this.page.mouse.click(10, 10);
     const totalProductQuantity = await this.getElementText(
