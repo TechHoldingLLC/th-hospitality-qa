@@ -1,0 +1,8 @@
+{
+  "programNamePrefix": "Program",
+  "expectedDeleteConfirmationMessage": "This will permanently delete the program",
+  "deleteConfirmationSuffix": "and cannot be undone.",
+  "expectedDeleteSuccessMessage": "was successfully deleted.",
+  "failedMessage": "Failed to delete programThis program can't be deleted because it is referenced by one or more products, packages or events.Got it",
+  "expectedErrorMessages": "No results"
+}
