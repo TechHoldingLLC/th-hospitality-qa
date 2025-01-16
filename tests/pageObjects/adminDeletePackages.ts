@@ -79,13 +79,12 @@ export class adminDeletePackagesPage extends BasePage {
   }
 
   async clickPackageMenuButton(packageName: string): Promise<void> {
-    const packageLocator = this.page.locator(
+    const clickPackageButton = this.page.locator(
       `//div[normalize-space()='${packageName}']/ancestor::td/following-sibling::td//button`
     );
     await this.page.waitForTimeout(2000);
-    let packageFound = await packageLocator.isVisible();
-
-    if (!packageFound) {
+    let isPackageVisible = await clickPackageButton.isVisible();
+    if (!isPackageVisible) {
       let isNextEnabled = await this.nextButton.isEnabled();
       if (isNextEnabled) {
         await this.clickElement(this.nextButton);
@@ -95,7 +94,7 @@ export class adminDeletePackagesPage extends BasePage {
         console.error(`${packageName} not found on the page`);
       }
     } else {
-      await this.clickElement(packageLocator);
+      await this.clickElement(clickPackageButton);
       await this.waitForPageToBeReady();
     }
   }
