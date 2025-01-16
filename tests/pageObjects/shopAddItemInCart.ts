@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { chromium, Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
@@ -219,5 +219,37 @@ export class shopAddItemInCartPage extends BasePage {
     }
 
     return totalOrderAmount;
+  }
+
+  // Get Available Quantity and Max Quantity per order from Admin panel
+  async getNumberOfAvialableQtyAndMaxQtyPerOrderFromAdmin(
+    packageName: string
+  ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
+    const browser = await chromium.launch({
+      headless: false,
+      channel: "chrome",
+    });
+
+    // Open new tab
+    const newTab: Page = await browser.newPage();
+    const login: adminLoginPage = new adminLoginPage(newTab);
+    const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
+      newTab
+    );
+
+    // Open admin portal and login
+    await newTab.goto(config.adminPortalUrl);
+    await login.login(config.email, config.password);
+
+    // Navigate to Packages
+    await addItemInCart.packagesButton.click();
+
+    // Get Available Quantity and Max Quantity per order Data
+    const { availableQty, maxQtyPerOrder } =
+      await addItemInCart.getNumberOfAvialableQtyAndMaxQtyPerOrder(packageName);
+
+    await newTab.close();
+
+    return { availableQty, maxQtyPerOrder };
   }
 }

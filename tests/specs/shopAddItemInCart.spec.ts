@@ -77,27 +77,11 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
         await addItemInCartPage.packageTitleInCartPage.last().textContent()
       ).toBe(addedPackageName);
 
-      // Open new tab
-      const newTab: Page = await browser.newPage();
-      const login: adminLoginPage = new adminLoginPage(newTab);
-      const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
-        newTab
-      );
-
-      // Open admin portal and login
-      await newTab.goto(config.adminPortalUrl);
-      await login.login(config.email, config.password);
-
-      // Navigate to Packages
-      await addItemInCart.packagesButton.click();
-
       // Get Available Quantity and Max Quantity per order Data
       const { availableQty, maxQtyPerOrder } =
-        await addItemInCart.getNumberOfAvialableQtyAndMaxQtyPerOrder(
+        await addItemInCartPage.getNumberOfAvialableQtyAndMaxQtyPerOrderFromAdmin(
           addedPackageName
         );
-
-      await newTab.close();
 
       const maxNumber: number =
         availableQty < maxQtyPerOrder ? availableQty : maxQtyPerOrder;
@@ -138,27 +122,11 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
         await addItemInCartPage.packageTitleInCartPage.last().textContent()
       ).toBe(addedPackageName);
 
-      // Open new tab
-      const newTab: Page = await browser.newPage();
-      const login: adminLoginPage = new adminLoginPage(newTab);
-      const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
-        newTab
-      );
-
-      // Open admin portal and login
-      await newTab.goto(config.adminPortalUrl);
-      await login.login(config.email, config.password);
-
-      // Navigate to Packages
-      await addItemInCart.packagesButton.click();
-
       // Get Available Quantity and Max Quantity per order Data
       const { availableQty, maxQtyPerOrder } =
-        await addItemInCart.getNumberOfAvialableQtyAndMaxQtyPerOrder(
+        await addItemInCartPage.getNumberOfAvialableQtyAndMaxQtyPerOrderFromAdmin(
           addedPackageName
         );
-
-      await newTab.close();
 
       await page.bringToFront();
 
