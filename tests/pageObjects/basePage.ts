@@ -1,5 +1,4 @@
 import { Page, Locator, expect } from "@playwright/test";
-import { config } from "../config/config.qa";
 
 export default class BasePage {
   readonly page: Page;
@@ -53,9 +52,11 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+  async waitForElementToAppearAndDisappear(
+    selector: string | Locator
+  ): Promise<void> {
     // If the selector is a string, use waitForSelector, otherwise directly use the locator
-    if (typeof selector === 'string') {
+    if (typeof selector === "string") {
       // Wait for the selector to be visible
       await this.page.waitForSelector(selector, { state: "visible" });
       // Wait for the selector to be hidden
@@ -65,7 +66,7 @@ export default class BasePage {
       await selector.waitFor({ state: "visible" });
       await selector.waitFor({ state: "hidden" });
     }
-  }  
+  }
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -146,13 +147,6 @@ export default class BasePage {
     await items[randomIndex].click();
   }
 
-  async mailinatorLogin(): Promise<void> {
-    await this.navigateTo("https://www.mailinator.com/v4/login.jsp");
-    await this.page.locator("#many_login_email").fill(config.email);
-    await this.page.locator("#many_login_password").fill("QAteam@2024");
-    await this.page.locator("//a[@class='btn btn-default submit']").click();
-  }
-
   async generateNomenclatureEmail(role: string) {
     const randomDigits = await this.generateFiveRandomDigits();
     return (
@@ -161,43 +155,8 @@ export default class BasePage {
     );
   }
 
-  //This method is for mailinator
-  async confirmNewEmailAndGoToBody(email: string): Promise<void> {
-    await this.page.waitForTimeout(5000);
-    await this.enterValuesInElement(this.page.locator("#inbox_field"), email);
-    await this.clickElement(
-      this.page.locator("//button[@class='primary-btn']")
-    );
-    const emailTimestamp = await this.page
-      .locator("//table[@class='table-striped jambo_table']//tr[1]//td[5]")
-      .textContent();
-    if (emailTimestamp?.trim() === "just now") {
-      await this.clickElement(
-        this.page.locator("//table[@class='table-striped jambo_table']//tr[1]")
-      );
-    } else {
-      console.log("Email not received yet. Reloading the page...");
-      await this.page.waitForTimeout(3000);
-      await this.page.reload();
-      await this.page.waitForLoadState("domcontentloaded");
-      const updatedEmailTimestamp = await this.page
-        .locator("//table[@class='table-striped jambo_table']//tr[1]//td[5]")
-        .textContent();
-      if (updatedEmailTimestamp?.trim() === "just now") {
-        await this.clickElement(
-          this.page.locator(
-            "//table[@class='table-striped jambo_table']//tr[1]"
-          )
-        );
-      } else {
-        console.log("No new email received after reload.");
-        throw new Error("No new email received after reload.");
-      }
-    }
-  }
-
-  //This method is for YopMail
-  async openCreateAccountLinkFromEmail(email: string) {
+  // Login to Yopmail
+  async yopmailLogin(email: string) {
     await this.navigateTo("https://yopmail.com/en/");
     await this.enterValuesInElement(
       this.page.locator("//input[@id='login']"),
@@ -205,15 +164,35 @@ export default class BasePage {
     );
     await this.page.waitForTimeout(3000);
     await this.page.keyboard.press("Enter");
-    // Locate the iframe by its name attribute
+  }
+
+  //This method is for YopMail
+  async openCreateAccountLinkFromEmail() {
     const iframeElement = this.page.frameLocator('iframe[name="ifmail"]');
-    // Wait for the "Create Account" link to be visible and click it
     const createAccountLink = iframeElement.locator("a", {
       hasText: "Create Account",
     });
 
     // Navigate to the link's URL directly in the same tab
     const link = await createAccountLink.getAttribute("href");
+
+    if (link) {
+      await this.page.goto(link); // Directly navigate to the link's URL
+    } else {
+      throw new Error("Create account link not found");
+    }
+    await this.page.waitForLoadState("domcontentloaded");
+  }
+
+  // Yopmail method to open reset password link from email
+  async openResetPasswordLinkFromEmail() {
+    const iframeElement = this.page.frameLocator('iframe[name="ifmail"]');
+    const resetPasswordLink = iframeElement.locator("a", {
+      hasText: "Reset Password",
+    });
+
+    // Navigate to the link's URL directly in the same tab
+    const link = await resetPasswordLink.getAttribute("href");
 
     if (link) {
       await this.page.goto(link); // Directly navigate to the link's URL

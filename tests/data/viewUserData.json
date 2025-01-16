@@ -1,3 +1,3 @@
 {
-    "coordinatorAccessDeniedText": "Incorrect email or password. Please try again."
+    "coordinatorAccessDeniedText": "Access denied for user: automated_coordinator@team507472.testinator.com. Role mismatch."
 }

@@ -83,7 +83,7 @@ export class adminInviteUserPage extends BasePage {
   }
 
   async generateLocatorByEmail(email: string): Promise<Locator> {
-    const xpath = `//*[text()='${email}']/../../../following-sibling::td[4]`;
+    const xpath = `//*[text()='${email}']/../../../../following-sibling::td[4]`;
     return this.page.locator(xpath);
   }
 }

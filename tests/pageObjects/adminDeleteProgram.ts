@@ -68,4 +68,8 @@ export class adminDeleteProgramPage extends BasePage {
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deleteProgramButton);
   }
+
+  async getDeletedProgramMessageLocator(programName: string) {
+    return `//label[text()='${programName} was successfully deleted.']`;
+  }
 }
