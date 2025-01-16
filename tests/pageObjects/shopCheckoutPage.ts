@@ -261,7 +261,7 @@ export class shopCheckoutPage extends BasePage {
     );
   }
 
-  // Navigate to Order page from My Account
+  // Navigate to Orders page from My Account
   async navigatetoOrderpage() {
     // Click on my account
     await this.clickElement(this.myAccountLink);
@@ -269,13 +269,14 @@ export class shopCheckoutPage extends BasePage {
     await this.waitForPageToBeReady();
     await this.page.waitForTimeout(2000);
 
+    // Click on Orders tab
     await this.clickElement(this.ordersButton);
 
     await this.waitForPageToBeReady();
     await this.page.waitForTimeout(2000);
   }
 
-  // Get Order ID list from My Account page
+  // Get Order ID list from My Account > Orders page
   async getOrderIDList(): Promise<string[]> {
     await this.isElementVisible(this.orderID.first());
 

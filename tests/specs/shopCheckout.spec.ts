@@ -38,12 +38,12 @@ test.beforeEach(async () => {
   addedPackageName = await addItemInCartPage.addItemInCartPage();
 
   if (addedPackageName != "") {
-    // Verify My Cart section open or not
+    // Verify My Cart section is opened
     expect(
       await checkoutPage.isElementVisible(addItemInCartPage.cartSection)
     ).toBe(true);
 
-    // Verify item added or not in cart page
+    // Verify item is added in cart page
     expect(
       await addItemInCartPage.packageTitleInCartPage.last().textContent()
     ).toBe(addedPackageName);
@@ -51,12 +51,9 @@ test.beforeEach(async () => {
     // Click on Checkout button
     await checkoutPage.clickElement(viewAndEditCartPage.checkOutButton);
 
-    // Verify navigate to Checkout page
-    expect(
-      await checkoutPage.isElementVisible(
-        viewAndEditCartPage.checkoutPageTitleLabel
-      )
-    ).toBe(true);
+    await checkoutPage.isElementVisible(
+      viewAndEditCartPage.checkoutPageTitleLabel
+    );
   }
 });
 
@@ -87,7 +84,7 @@ test("TC0131 - Verify that that Section 1 of the form displays required fields c
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify error message for the required fields are not displayed
       checkoutData.approvalAndPurposeSection.forEach(async (field) => {
         expect(
           await page
@@ -120,7 +117,7 @@ test("TC0132 - Verify that that Section 2a is displayed and functions correctly 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify error message for the required fields are not displayed
       checkoutData.departmentInformationSection.forEach(async (field) => {
         expect(
           await page
@@ -153,7 +150,7 @@ test("TC0133 - Verify that that Section 2b is displayed and functions correctly 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify error message for the required fields are not displayed
       checkoutData.companyInformationSection.forEach(async (field) => {
         expect(
           await page
@@ -181,7 +178,7 @@ test("TC0134 - Verify that that the terms and conditions section is displayed an
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify error message for the required fields are not displayed
       expect(
         (await page
           .locator(
@@ -218,7 +215,7 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message display
+      // Verify error message for the required field is displayed
       expect(
         await page
           .locator(
@@ -235,7 +232,7 @@ test("TC0135 - Verify that that the legal entity dropdown is functional and requ
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields are required message not display
+      // Verify error message for the required field is not displayed
       expect(
         await page
           .locator(
@@ -258,7 +255,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields required message are display or not
+      // Verify fields required message are displayed
       checkoutData.approvalAndPurposeSection.forEach(async (field) => {
         expect(
           await page
@@ -307,7 +304,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields required message are display or not in Department Information section
+      // Verify fields required message are displayed in Department Information section
       checkoutData.departmentInformationSection.forEach(async (field) => {
         if (field.emptyFieldMessage) {
           expect(
@@ -331,7 +328,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify fields required message are display or not in Company Information section
+      // Verify fields required message are displayed in Company Information section
       checkoutData.companyInformationSection.forEach(async (field) => {
         if (field.emptyFieldMessage) {
           expect(
@@ -355,7 +352,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for missing 
 test("TC0138 - Verify that appropriate error messages are displayed for invalid input.", async () => {
   try {
     if (addedPackageName != "") {
-      // Enter invalid data  in approving manager email field
+      // Enter invalid data in approving manager email field
       await checkoutPage.enterValuesInElement(
         checkoutPage.approvingManagerEmailField,
         checkoutData.approvalAndPurposeSection[1].invalidData as string
@@ -364,7 +361,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify invalid email address message
+      // Verify invalid email address message is displayed
       expect(
         await page
           .locator(
@@ -392,7 +389,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify invalid email address message
+      // Verify invalid email address message is displayed
       expect(
         await page
           .locator(
@@ -421,7 +418,7 @@ test("TC0138 - Verify that appropriate error messages are displayed for invalid 
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify invalid email address message
+      // Verify invalid email address message is displayed
       expect(
         await page
           .locator(
@@ -484,7 +481,7 @@ test("TC0136 - Verify that an order is created in 'Pending' status upon checkout
       // Click on submit button
       await checkoutPage.clickElement(checkoutPage.submitButton);
 
-      // Verify Order success and Payment Intiated message are display or not
+      // Verify Order success and Payment Intiated message are displayed
       expect(
         (await checkoutPage.isElementVisible(
           checkoutPage.paymentInitiatedMessage
@@ -494,7 +491,7 @@ test("TC0136 - Verify that an order is created in 'Pending' status upon checkout
           ))
       ).toBe(true);
 
-      // Verify directly navigate to My account page or not
+      // Verify directly navigate to My account page
       expect(
         await checkoutPage.isElementVisible(checkoutPage.myAccountLabel)
       ).toBe(true);
@@ -507,7 +504,7 @@ test("TC0136 - Verify that an order is created in 'Pending' status upon checkout
         (element) => !orderIDList.includes(element)
       );
 
-      // Verify new order id found or not
+      // Verify new order id is found
       expect(uniqueValue.length).toBe(1);
     }
   } catch (error: any) {
