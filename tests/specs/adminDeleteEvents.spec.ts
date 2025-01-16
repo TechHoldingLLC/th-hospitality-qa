@@ -88,7 +88,7 @@ test("TC0084 - Verify that if the events is not associated with packages, produc
         await basePage.getElementText(deleteEventPage.deleteMessageLabel)
       ).toContain(deleteEventData.expectedDeleteConfirmationMessage);
       await basePage.clickElement(deleteEventPage.cancelEventButton);
-      await deleteEventPage.alertDialog.waitFor({ state: "hidden" });
+      await basePage.waitForElementHidden(deleteEventPage.alertDialog);
       expect(await deleteEventPage.alertDialog.isHidden()).toBe(true);
     };
 
