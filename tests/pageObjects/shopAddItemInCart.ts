@@ -115,7 +115,7 @@ export class shopAddItemInCartPage extends BasePage {
   }
 
   // Get Available Quantity and Max Quantity per order from Admin panel
-  async getNumberOfAvialableQtyAndMaxQtyPerOrder(
+  async retrievePackageData(
     packageName: string
   ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
     let availableQty: number = 0;
@@ -246,7 +246,7 @@ export class shopAddItemInCartPage extends BasePage {
 
     // Get Available Quantity and Max Quantity per order Data
     const { availableQty, maxQtyPerOrder } =
-      await addItemInCart.getNumberOfAvialableQtyAndMaxQtyPerOrder(packageName);
+      await addItemInCart.retrievePackageData(packageName);
 
     await newTab.close();
 
