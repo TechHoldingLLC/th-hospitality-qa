@@ -30,6 +30,12 @@ export default class BasePage {
     return element.innerText();
   }
 
+  // Common method to hover an element
+  async hoverElement(element: Locator) {
+    await element.waitFor({ state: "visible" });
+    await element.hover();
+  }
+
   // Common method to wait for an element to be visible
   async waitForElementVisible(element: Locator | string) {
     if (typeof element === "string") {
@@ -53,9 +59,11 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+  async waitForElementToAppearAndDisappear(
+    selector: string | Locator
+  ): Promise<void> {
     // If the selector is a string, use waitForSelector, otherwise directly use the locator
-    if (typeof selector === 'string') {
+    if (typeof selector === "string") {
       // Wait for the selector to be visible
       await this.page.waitForSelector(selector, { state: "visible" });
       // Wait for the selector to be hidden
@@ -65,7 +73,7 @@ export default class BasePage {
       await selector.waitFor({ state: "visible" });
       await selector.waitFor({ state: "hidden" });
     }
-  }  
+  }
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -135,15 +143,23 @@ export default class BasePage {
 
   async selectRandomItemFromMultiSelectList(
     listElement: Locator
-  ): Promise<void> {
+  ): Promise<null | string> {
     // Wait for the list to be visible
     await listElement.first().waitFor({ state: "visible" });
     // Get all the list items
     const items = await listElement.all();
     // Generate a random index to select an item
     const randomIndex = Math.floor(Math.random() * items.length);
+
+    // Get text of select item
+    const selectedItem = items[randomIndex].textContent();
+
     // Click the random item
     await items[randomIndex].click();
+
+    await this.page.waitForTimeout(3000);
+
+    return selectedItem;
   }
 
   async mailinatorLogin(): Promise<void> {
