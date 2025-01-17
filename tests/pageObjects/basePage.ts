@@ -32,7 +32,7 @@ export default class BasePage {
 
   // Common method to hover an element
   async hoverElement(element: Locator) {
-    await element.waitFor({ state: "visible" });
+    await element.waitFor({ state: "attached" });
     await element.hover();
   }
 

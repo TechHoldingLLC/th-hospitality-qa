@@ -252,15 +252,16 @@ test("TC0143 - Verify the behaviour when guest data is incomplete.", async () =>
     await ordersTab.navigateToOrdersTab();
 
     // Get count of visible orders
-    const orderCount: number = (await ordersTab.incompleteStatusLocator.all())
-      .length;
+    const orderCount: number = (
+      await ordersTab.incompleteStatusLocatorInCollapseView.all()
+    ).length;
 
     if (orderCount > 0) {
       const randomOrder = Math.floor(Math.random() * (orderCount - 0) + 0);
 
       // Mouse hover on incomplete Guest information status in Collapse view
       await ordersTab.hoverElement(
-        ordersTab.incompleteStatusLocator.nth(randomOrder)
+        ordersTab.incompleteStatusLocatorInCollapseView.nth(randomOrder)
       );
 
       // Verify incomplete Guest Information Message
@@ -272,13 +273,15 @@ test("TC0143 - Verify the behaviour when guest data is incomplete.", async () =>
 
       // Click on element for expand view
       await ordersTab.clickElement(
-        ordersTab.incompleteStatusLocator.nth(randomOrder)
+        ordersTab.incompleteStatusLocatorInCollapseView.nth(randomOrder)
       );
 
       await ordersTab.waitForElementVisible(ordersTab.selectPackageDropdown);
 
       // Mouse hover on incomplete Guest information status in Expand view
-      await ordersTab.clickElement(ordersTab.incompleteStatusLocator);
+      await ordersTab.hoverElement(
+        ordersTab.incompleteStatusLocatorInExpandView
+      );
 
       // Verify incomplete Guest Information Message
       expect(

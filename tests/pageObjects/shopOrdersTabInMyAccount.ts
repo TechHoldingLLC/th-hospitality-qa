@@ -13,7 +13,8 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
   public editAndDeleteMenuButton: Locator;
   public editGuestButton: Locator;
   public deleteGuestButton: Locator;
-  public incompleteStatusLocator: Locator;
+  public incompleteStatusLocatorInCollapseView: Locator;
+  public incompleteStatusLocatorInExpandView: Locator;
   public incompleteGuestInformationMessageLabel: Locator;
 
   constructor(page: Page) {
@@ -51,8 +52,11 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
     this.incompleteGuestInformationMessageLabel = page.locator(
       "//div[@data-side='top']/span"
     );
-    this.incompleteStatusLocator = page.locator(
+    this.incompleteStatusLocatorInCollapseView = page.locator(
       "//label[text()='# of Guests:']/following-sibling::p/*[name()='svg'][2]//*[name()='path' and @stroke='#F97316'][1]"
+    );
+    this.incompleteStatusLocatorInExpandView = page.locator(
+      "//div/div[@class='w-full ']//label[text()='# of Guests:']/following-sibling::p/*[name()='svg'][2]"
     );
   }
 
