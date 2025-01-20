@@ -16,6 +16,7 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
   public incompleteStatusLocatorInCollapseView: Locator;
   public incompleteStatusLocatorInExpandView: Locator;
   public incompleteGuestInformationMessageLabel: Locator;
+  public nextPageButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -58,13 +59,18 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
     this.incompleteStatusLocatorInExpandView = page.locator(
       "//div/div[@class='w-full ']//label[text()='# of Guests:']/following-sibling::p/*[name()='svg'][2]"
     );
+    this.nextPageButton = page.locator("//button[@aria-label='Next page']");
   }
 
   async getFieldsLocatorForOrderData(fieldName: string) {
     return `//label[text()='${fieldName}:']/following-sibling::p/span[text() != '']`;
   }
 
-  // Navigate to Orders tab from My Account page
+  /**
+   * Navigates to the "Orders" tab from the "My Account" page.
+   *
+   * @returns {Promise<void>} - Resolves once the navigation is complete.
+   */
   async navigateToOrdersTab() {
     // Click on my account
     await this.clickElement(this.myAccountLink);
@@ -80,7 +86,11 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
     await this.page.waitForTimeout(3000);
   }
 
-  // Get total of Guests from Select Package dropdown option list
+  /**
+   * Retrieves the total number of guests from all available options in the "Select Package" dropdown.
+   *
+   * @returns {Promise<number>} - Resolves to the total number of guests across all options in the dropdown.
+   */
   async getTotalGuestsFromselectPackageDropdownOption(): Promise<number> {
     let totalGuestsCount = 0;
 
@@ -104,7 +114,13 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
     return totalGuestsCount;
   }
 
-  // Expand order based on guestInformationStatus
+  /**
+   * Expands an order based on the status of guest information (Complete or Incomplete).
+   *
+   * @param guestInformationStatus - The status of the guest information to filter orders by.
+   *
+   * @returns {Promise<boolean>} - Resolves to a boolean indicating whether an order was expanded:
+   */
   async expandOrderByStatusOfGuestInformation(
     guestInformationStatus: "Incomplete" | "Complete"
   ): Promise<boolean> {
@@ -147,7 +163,12 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
     return orderExpanded;
   }
 
-  // Find the package that has remaining or complete guest information to be added based on guestInformationStatus, and select that package option.
+  /**
+   * Clicks on a package option based on the guest information status.
+   *
+   * @param guestInformationStatus - The status of the guest information. Can be either:
+   *
+   */
   async clickOnPackageByStatusOfGuestInformation(
     guestInformationStatus: "Incomplete" | "Complete"
   ) {
@@ -182,5 +203,66 @@ export class shopOrdersTabInMyAccountPage extends BasePage {
         break;
       }
     }
+  }
+
+  /**
+   * Navigates through program order pages to find an expired program order based on the program date.
+   * If an expired program order is found, it clicks on it and navigates to the corresponding order page.
+   * If no expired program order is found or if the "Next" button is disabled, it stops the search.
+   *
+   * @returns {Promise<boolean>} - Returns `true` if an expired program order is found and navigated to,
+   *                               `false` if no expired order is found or there are no more pages.
+   */
+  async navigateToExpiredProrgramOrder(): Promise<boolean> {
+    let isNavigateToOrder: boolean = false; // Flag to track whether we should navigate to the expired program order
+    let isnextButtonEnabled: boolean = false; // Flag to track whether the 'next' button is enabled
+
+    while (!isNavigateToOrder) {
+      // Get the locators for all 'Program Date' elements on the current page
+      const programDateLocators: Locator[] = await this.page
+        .locator(await this.getFieldsLocatorForOrderData("Program Date"))
+        .all();
+
+      for (const element of programDateLocators) {
+        // Extract the program date text
+        const programDateLabel: string = (await this.getElementText(element))
+          .split("-")[1]
+          .trim(); // Get the date part and remove any extra spaces
+
+        // Get today's date
+        const todayDate = new Date();
+
+        // Convert the program date from string to a Date object
+        const programDate = new Date(programDateLabel);
+
+        if (programDate < todayDate) {
+          // Epand Order
+          await this.clickElement(element);
+
+          await this.waitForElementVisible(this.selectPackageDropdown);
+
+          return true;
+        }
+      }
+
+      // Check if the 'next' button is enabled to determine if we should go to the next page
+      isnextButtonEnabled = (await this.nextPageButton.isEnabled()).valueOf();
+
+      // If the 'next' button is not enabled, it means there are no more pages to navigate to
+      if (!isnextButtonEnabled) {
+        console.log("Experied Program order is not available");
+        break;
+      }
+
+      // Click on next button if enabled
+      await this.clickElement(this.nextPageButton);
+
+      console.log("naviage 2");
+      // Wait for page load
+      await this.page.waitForLoadState("domcontentloaded");
+      await this.page.waitForTimeout(2000);
+    }
+
+    return isNavigateToOrder;
   }
 }

@@ -353,3 +353,63 @@ test("TC0231 - Verify that populated guest spots are displayed with a call to ac
     throw error;
   }
 });
+
+test("TC0233 - Verify that Guest adding/editing/deleting is disabled when the program is in the past 1", async () => {
+  try {
+    // Navigate to Orders tab
+    await ordersTab.navigateToOrdersTab();
+
+    const expiredOrderFound: boolean =
+      await ordersTab.navigateToExpiredProrgramOrder();
+
+    if (expiredOrderFound) {
+      // Click on Select Package dropdown
+      await ordersTab.clickElement(ordersTab.selectPackageDropdown);
+
+      // Select random option from Select Package dropdown
+      const selectedOption: null | string =
+        await ordersTab.selectRandomItemFromMultiSelectList(
+          ordersTab.selectPackageOptionList
+        );
+
+      if (selectedOption === null) {
+        expect(
+          selectedOption,
+          "Null value found while retrieving the text of the selected package option."
+        ).not.toBeNull();
+      } else {
+        // Get added Guest details number
+        const getNumberMatches = selectedOption.match(/\((\d+)\/(\d+)\)/);
+
+        const addedGuestDetailsNumber: number = getNumberMatches
+          ? parseInt(getNumberMatches[1])
+          : -1;
+
+        // Verify Guest Details based on find number
+        if (addedGuestDetailsNumber == 0) {
+          // Verify Add Guest button is disabled
+          expect(
+            await ordersTab.isElementDisabled(ordersTab.addGuestButton)
+          ).toBe(true);
+        } else if (addedGuestDetailsNumber > 0) {
+          // Click on Edit / Delete menu button
+          await ordersTab.clickElement(ordersTab.editAndDeleteMenuButton);
+
+          // Verify Edit Guest and Delete Guest button is disabled
+          expect(
+            (await ordersTab.isElementDisabled(ordersTab.editGuestButton)) &&
+              (await ordersTab.isElementDisabled(ordersTab.deleteGuestButton))
+          ).toBe(true);
+        } else {
+          expect(
+            addedGuestDetailsNumber,
+            "The expected value does not match the selected option text."
+          ).not.toBe(-1);
+        }
+      }
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
