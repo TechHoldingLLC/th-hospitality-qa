@@ -161,7 +161,7 @@ test("TC0219 - Verify that an admin can approve an order.", async () => {
     // Verify action sheet has Approve Order CTA
     expect(
       await basePage.isElementVisible(viewOrderListPage.approveOrderButton)
-    );
+    ).toBe(true);
 
     // Approve selected order and verify updated status after approval
     await basePage.clickElement(viewOrderListPage.approveOrderButton);
@@ -177,6 +177,103 @@ test("TC0219 - Verify that an admin can approve an order.", async () => {
     expect(await viewOrderListPage.getOrderStatusById(orderId)).toEqual(
       "Approved"
     );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0220 - Verify that an admin can deny an order.", async () => {
+  try {
+    // Pick the Order with Pending status
+    const orderId = await viewOrderListPage.openActionSheetForGivenStatus(
+      "Pending"
+    );
+    // Verify action sheet has Deny Order CTA
+    expect(
+      await basePage.isElementVisible(viewOrderListPage.denyOrderButton)
+    ).toBe(true);
+
+    // Deny selected order and verify updated status after denial
+    await basePage.clickElement(viewOrderListPage.denyOrderButton);
+    expect(
+      await basePage.isElementVisible(viewOrderListPage.orderDenySuccessMessage)
+    ).toBe(true);
+    await basePage.waitForElementHidden(
+      viewOrderListPage.orderDenySuccessMessage
+    );
+    await basePage.waitForPageToBeReady();
+    expect(await viewOrderListPage.getOrderStatusById(orderId)).toEqual(
+      "Denied"
+    );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0221 - Verify that an admin can cancel an approved order.", async () => {
+  try {
+    // Pick the Order with Approved status
+    const orderId = await viewOrderListPage.openActionSheetForGivenStatus(
+      "Approved"
+    );
+    // Verify action sheet has Cancel Order CTA
+    expect(
+      await basePage.isElementVisible(viewOrderListPage.cancelOrderButton)
+    ).toBe(true);
+
+    // Cancel selected order and verify updated status after cancellation
+    await basePage.clickElement(viewOrderListPage.cancelOrderButton);
+    expect(
+      await basePage.isElementVisible(
+        viewOrderListPage.orderCancelSuccessMessage
+      )
+    ).toBe(true);
+    await basePage.waitForElementHidden(
+      viewOrderListPage.orderCancelSuccessMessage
+    );
+    await basePage.waitForPageToBeReady();
+    expect(await viewOrderListPage.getOrderStatusById(orderId)).toEqual(
+      "Cancelled"
+    );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0222 - Verify that an admin can edit an order.", async () => {
+  try {
+    // Pick the Order with Pending status
+    const orderId = await viewOrderListPage.openActionSheetForGivenStatus(
+      "Pending"
+    );
+    // Verify action sheet has Edit Order CTA
+    expect(
+      await basePage.isElementVisible(viewOrderListPage.editOrderButton)
+    ).toBe(true);
+
+    //Verify user has privilage to edit an order
+    await basePage.clickElement(viewOrderListPage.editOrderButton);
+    expect(
+      await basePage.isElementVisible(viewOrderListPage.editOrderHeader)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0223 - Verify that the 'Guests' column displays the completed/total guests ratio correctly.", async () => {
+  try {
+    const validationResults =
+      await viewOrderListPage.getGuestsColumnValidationResults();
+    // Perform assertions on the validation results
+    for (const result of validationResults) {
+      expect(result.isValidFormat).toBe(true); // Ensure the format is valid (e.g., X/Y Guests)
+      expect(result.isSvgPresent).toBe(true); // Ensure the SVG icon is present
+    }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
