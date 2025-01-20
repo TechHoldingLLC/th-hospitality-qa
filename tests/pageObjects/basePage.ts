@@ -30,7 +30,11 @@ export default class BasePage {
     return element.innerText();
   }
 
-  // Common method to hover an element
+  /**
+   * This method waits for the provided element to become visible, then simulates a hover action on it.
+   *
+   * @param {Locator} element - The element to hover over.
+   */
   async hoverElement(element: Locator) {
     await element.waitFor({ state: "attached" });
     await element.hover();
