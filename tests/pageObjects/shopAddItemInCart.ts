@@ -1,4 +1,4 @@
-import { Browser, Locator, Page, expect } from "@playwright/test";
+import { chromium, Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
@@ -7,7 +7,7 @@ export class shopAddItemInCartPage extends BasePage {
   public viewPackageButton: Locator;
   public packageTitleLabel: Locator;
   public quantityInputField: Locator;
-  public addToCardButton: Locator;
+  public addToCartButton: Locator;
   public notificationLabel: Locator;
   public cartButton: Locator;
   public packageQuantityField: Locator;
@@ -20,8 +20,9 @@ export class shopAddItemInCartPage extends BasePage {
   public closeCartDrawerButton: Locator;
   public packagePriceLabel: Locator;
   public outOfStockButton: Locator;
+  public updateInCartButton: Locator;
 
-  // Packages pages locator
+  // Packages page locator
   public packagesButton: Locator;
   public nextButton: Locator;
   public availableQuantityLabel: Locator;
@@ -37,7 +38,7 @@ export class shopAddItemInCartPage extends BasePage {
       "//section[@role='dialog']//h3[@aria-label='Package Title']"
     );
     this.quantityInputField = page.locator("//input[@aria-label='Quantity']");
-    this.addToCardButton = page.locator(
+    this.addToCartButton = page.locator(
       "//button[@aria-label='Add/Update to Cart Button']"
     );
     this.notificationLabel = page.locator(
@@ -76,10 +77,11 @@ export class shopAddItemInCartPage extends BasePage {
       "//p[text()='Package Price']/following-sibling::p"
     );
     this.outOfStockButton = page.locator("//button[text()='Out of Stock']");
+    this.updateInCartButton = page.locator("//button[text()='Update in Cart']");
   }
 
-  // Add item in cart
-  async addItemInCartPage(): Promise<string> {
+  // Add item to cart
+  async addItemInCart(): Promise<string> {
     let packageTitle: string = "";
 
     // Click on View Package button
@@ -103,7 +105,7 @@ export class shopAddItemInCartPage extends BasePage {
 
       console.log(packageTitle);
       // Click on Add to Cart button
-      await this.clickElement(this.addToCardButton);
+      await this.clickElement(this.addToCartButton);
       await this.page.waitForTimeout(3000);
 
       // click on Cart button
@@ -113,8 +115,8 @@ export class shopAddItemInCartPage extends BasePage {
     return packageTitle;
   }
 
-  // Get Available Quantity and Max Quantity per order from package page
-  async getNumberOfAvialableQtyAndMaxQtyPerOrder(
+  // Get Available Quantity and Max Quantity per order from Admin panel
+  async retrievePackageData(
     packageName: string
   ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
     let availableQty: number = 0;
@@ -172,7 +174,7 @@ export class shopAddItemInCartPage extends BasePage {
   }
 
   // Add multiple Package in cart
-  async addMultiplePackageInCart(): Promise<{
+  async addMultiplePackagesToCart(): Promise<{
     listOfAddedPackage: string[];
     totalAmount: number;
   }> {
@@ -198,7 +200,10 @@ export class shopAddItemInCartPage extends BasePage {
       // Check package is not out of stock
       let isPackageOutofStock = await this.outOfStockButton.isVisible();
 
-      if (!isPackageOutofStock) {
+      // Check package is already added or not
+      let isPackageAlreadyAdded = await this.updateInCartButton.isVisible();
+
+      if (!isPackageOutofStock && !isPackageAlreadyAdded) {
         // Get price of package
         const packagePrice: number = parseFloat(
           (await this.packagePriceLabel.allTextContents())
@@ -210,7 +215,7 @@ export class shopAddItemInCartPage extends BasePage {
         const packageTitle: string = await this.packageTitleLabel.innerText();
 
         // Click on Add to Cart button
-        await this.clickElement(this.addToCardButton);
+        await this.clickElement(this.addToCartButton);
 
         await this.waitForPageToBeReady();
         await this.page.waitForTimeout(3000);
@@ -254,7 +259,7 @@ export class shopAddItemInCartPage extends BasePage {
         const packageTitle: string = await this.packageTitleLabel.innerText();
 
         // Click on Add to Cart button
-        await this.clickElement(this.addToCardButton);
+        await this.clickElement(this.addToCartButton);
 
         await this.waitForPageToBeReady();
         await this.page.waitForTimeout(3000);
@@ -268,5 +273,37 @@ export class shopAddItemInCartPage extends BasePage {
       }
     }
     return addedPackageNames;
+  }
+
+  // Get Available Quantity and Max Quantity per order from Admin panel
+  async getNumberOfAvialableQtyAndMaxQtyPerOrderFromAdmin(
+    packageName: string
+  ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
+    const browser = await chromium.launch({
+      headless: false,
+      channel: "chrome",
+    });
+
+    // Open new tab
+    const newTab: Page = await browser.newPage();
+    const login: adminLoginPage = new adminLoginPage(newTab);
+    const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
+      newTab
+    );
+
+    // Open admin portal and login
+    await newTab.goto(config.adminPortalUrl);
+    await login.login(config.email, config.password);
+
+    // Navigate to Packages
+    await addItemInCart.packagesButton.click();
+
+    // Get Available Quantity and Max Quantity per order Data
+    const { availableQty, maxQtyPerOrder } =
+      await addItemInCart.retrievePackageData(packageName);
+
+    await newTab.close();
+
+    return { availableQty, maxQtyPerOrder };
   }
 }
