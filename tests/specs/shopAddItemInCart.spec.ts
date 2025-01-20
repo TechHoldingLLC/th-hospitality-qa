@@ -155,9 +155,9 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
   }
 });
 
-test("TC0125 - Verify that application validates invalid input 0 in to quantity field under cart page", async () => {
+test("TC0125 - Verify that application validates invalid input in to quantity field under cart page", async () => {
   try {
-    // Open Package details pop up and edit quantity
+    // Open Package details pop up and enter "0" value in quantity field
     await addItemInCartPage.editQuantityInPackageDetailsPopup("0");
 
     // Verify Error message
@@ -166,16 +166,12 @@ test("TC0125 - Verify that application validates invalid input 0 in to quantity 
         addItemInCartPage.emptyCartErrorMessage
       )
     ).toBe(addItemInCartData.invalidInputValueMessage);
-  } catch (error: any) {
-    console.error(`Test failed: ${error.message}`);
-    throw error;
-  }
-});
 
-test("TC0125 - Verify that application validates invalid input -1 in to quantity field under cart page", async () => {
-  try {
-    // Open Package details pop up and edit quantity
-    await addItemInCartPage.editQuantityInPackageDetailsPopup("-1");
+    // Enter "-1" value in quantity field
+    await addItemInCartPage.enterValuesInElement(
+      addItemInCartPage.quantityInputField,
+      "-1"
+    );
 
     // Verify Error message
     expect(
@@ -183,16 +179,10 @@ test("TC0125 - Verify that application validates invalid input -1 in to quantity
         addItemInCartPage.emptyCartErrorMessage
       )
     ).toBe(addItemInCartData.invalidInputValueMessage);
-  } catch (error: any) {
-    console.error(`Test failed: ${error.message}`);
-    throw error;
-  }
-});
 
-test("TC0125 - Verify that application validates invalid input 'Max Integer number' in to quantity field under cart page", async () => {
-  try {
-    // Open Package details pop up and edit quantity
-    await addItemInCartPage.editQuantityInPackageDetailsPopup(
+    // Enter max integer value in quantity field
+    await addItemInCartPage.enterValuesInElement(
+      addItemInCartPage.quantityInputField,
       Number.MAX_SAFE_INTEGER.toString()
     );
 
