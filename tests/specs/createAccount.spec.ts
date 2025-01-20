@@ -138,9 +138,9 @@ test("TC0112 - Verify that Coordinator user is created successfully after regist
       await basePage.isElementVisible(createAccount.createAccountSuccessMessage)
     ).toBe(true);
 
-    await page.waitForURL(config.soapPortalUrl);
+    await page.waitForURL(config.shopPortalUrl);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
-    expect(page.url()).toEqual(config.soapPortalUrl);
+    expect(page.url()).toEqual(config.shopPortalUrl);
 
     //Verify login as newly registered coordinator
     await loginPage.login(
