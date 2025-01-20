@@ -28,7 +28,7 @@ test.beforeEach(async () => {
   addItemInCartPage = new shopAddItemInCartPage(page);
   viewAndEditCartPage = new shopViewAndEditCartPage(page);
   //Navigation to admin portal
-  await basePage.navigateTo(config.soapPortalUrl);
+  await basePage.navigateTo(config.shopPortalUrl);
   //Login
   await loginPage.login(config.coordinator_email, config.coordinator_password);
 });
@@ -41,7 +41,7 @@ test("TC0059 - Verify that the user can access a persistent cart CTA on the micr
   try {
     // Add multiple packages
     const { listOfAddedPackage } =
-      await addItemInCartPage.addMultiplePackageInCart();
+      await addItemInCartPage.addMultiplePackagesToCart();
 
     // Click on Cart button
     await basePage.clickElement(addItemInCartPage.cartButton);
@@ -69,8 +69,7 @@ test("TC0059 - Verify that the user can access a persistent cart CTA on the micr
 test("TC0060 - Verify the user can edit the cart quantities and remove items from the cart.", async () => {
   try {
     // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
+    const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
     if (addedPackageName != "") {
       // Verify My Cart section is opened
@@ -104,8 +103,7 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
 test("TC0061 - Verify the user can proceed to checkout or go back to shopping", async () => {
   try {
     // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
+    const addedPackageName: string = await addItemInCartPage.addItemInCart();
     if (addedPackageName != "") {
       // Verify My Cart section is opened
       expect(
@@ -138,8 +136,7 @@ test("TC0061 - Verify the user can proceed to checkout or go back to shopping", 
 test("TC0128 - Verify that the cart data persists when the user navigates away from the cart page.", async () => {
   try {
     // Add Package in cart and verify
-    const addedPackageName: string =
-      await addItemInCartPage.addItemInCartPage();
+    const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
     if (addedPackageName != "") {
       // Verify My Cart section is opened
