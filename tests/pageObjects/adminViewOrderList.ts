@@ -29,6 +29,10 @@ export class adminViewOrderListPage extends BasePage {
   public actionColumnList: Locator;
   public nextButton: Locator;
   public orderAppoveSuccessMessage: Locator;
+  public orderDenySuccessMessage: Locator;
+  public orderCancelSuccessMessage: Locator;
+  public editOrderHeader: Locator;
+  public guestsColumnSVGElements: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -99,6 +103,16 @@ export class adminViewOrderListPage extends BasePage {
     this.orderAppoveSuccessMessage = page.locator(
       "//span[text()='Order has been approved successfully.']"
     );
+    this.orderDenySuccessMessage = page.locator(
+      "//span[text()='Order has been denied successfully.']"
+    );
+    this.orderCancelSuccessMessage = page.locator(
+      "//span[text()='Order has been cancelled successfully.']"
+    );
+    this.editOrderHeader = page.locator("//h2[text()='Edit Order']");
+    this.guestsColumnSVGElements = page.locator(
+      "//tbody[@class='border-ui-border-base border-b-0']//tr//td[7]/descendant::a//*[name()='svg']"
+    );
   }
 
   async validateOrderDateColumnWithSpecificFormat(): Promise<
@@ -137,49 +151,65 @@ export class adminViewOrderListPage extends BasePage {
     return results;
   }
 
+  // Travers through pages, find order with given status and click on actions CTA
   async openActionSheetForGivenStatus(status: string): Promise<string> {
     let isStatusFound = false;
     let orderId: string | null = null;
 
+    await this.page.waitForTimeout(3000);
+
     // Loop to traverse across pages
     while (!isStatusFound) {
-      const rows = await this.orderStatusColumnDataList.all(); // Get all rows in the status column
+      await this.waitForPageToBeReady();
+
+      // Dynamically fetch all rows for the current page
+      const rowsCount = await this.orderStatusColumnDataList.count();
 
       // Loop through the current page's rows
-      for (let i = 0; i < rows.length; i++) {
-        const statusText = await rows[i].textContent(); // Get text of status in the row
-        const trimmedStatusText = statusText?.trim() || "";
+      for (let i = 0; i < rowsCount; i++) {
+        const rowLocator = this.orderStatusColumnDataList.nth(i);
+        const statusText = (await rowLocator.textContent())?.trim() || "";
 
         // If the status matches the provided value, click the corresponding menu button
-        if (trimmedStatusText === status) {
+        if (statusText === status) {
+          await this.page.waitForTimeout(2000); // Optional wait for visual debugging
           const menuButton = this.actionColumnList.nth(i); // Get the menu button in the same row
           await menuButton.click(); // Click on the menu button
 
+          await this.waitForPageToBeReady();
+
           // Fetch the Order ID from the same row (assuming it's in the first column)
-          orderId = await this.orderIdColumnDataList.nth(i).textContent();
+          const orderIdLocator = this.orderIdColumnDataList.nth(i);
+          orderId = (await orderIdLocator.textContent())?.trim() || null;
 
           isStatusFound = true; // Set the flag to true to exit the loop
           break; // Exit the row loop once a match is found and the menu button is clicked
         }
       }
 
-      // If status is not found on the current page, check if the next button is enabled
+      // If status is not found and there are more pages to check, navigate to the next page
       if (!isStatusFound) {
         const isNextButtonEnabled = await this.nextButton.isEnabled(); // Check if the next button is enabled
         if (isNextButtonEnabled) {
           await this.nextButton.click(); // Click the next button to go to the next page
-          await this.page.waitForTimeout(1000); // Optionally, wait for the next page to load
+          await this.page.waitForTimeout(2000); // Wait for the next page to load
+          await this.waitForPageToBeReady();
         } else {
-          console.log("Status not found on any page.");
+          console.error(
+            `No more pages to check, and status "${status}" was not found.`
+          );
           break; // Exit the loop if there are no more pages
         }
       }
     }
+
     // Ensure Order ID is a string, throw an error if null
     if (orderId === null) {
+      console.error(`Order ID not found for status: ${status}.`);
       throw new Error(`Order ID not found.`);
     }
-    return orderId; // Return the Order ID after status match, or null if not found
+
+    return orderId; // Return the Order ID after status match
   }
 
   async getOrderStatusById(orderId: string): Promise<string> {
@@ -190,5 +220,36 @@ export class adminViewOrderListPage extends BasePage {
       )
     );
     return status;
+  }
+
+  async getGuestsColumnValidationResults(): Promise<
+    {
+      isValidFormat: boolean;
+      numerator?: number;
+      denominator?: number;
+      isSvgPresent: boolean;
+    }[]
+  > {
+    const guestElements = await this.guestsColumnDataList.elementHandles();
+
+    const results = [];
+    for (const element of guestElements) {
+      const textContent = await element.textContent();
+      const match = textContent?.match(/^(\d+)\/(\d+) Guests$/);
+
+      const numerator = match ? parseInt(match[1], 10) : undefined;
+      const denominator = match ? parseInt(match[2], 10) : undefined;
+      const isValidFormat =
+        !!match &&
+        numerator! >= 0 &&
+        denominator! > 0 &&
+        numerator! <= denominator!;
+      const svgIcon = await element.$("svg");
+      const isSvgPresent = !!svgIcon;
+
+      results.push({ isValidFormat, numerator, denominator, isSvgPresent });
+    }
+
+    return results;
   }
 }
