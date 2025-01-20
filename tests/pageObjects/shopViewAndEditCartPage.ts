@@ -35,7 +35,12 @@ export class shopViewAndEditCartPage extends BasePage {
     return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Package Card"]//input`;
   }
 
-  // Edit quantity and click on remove package from cart
+  /**
+   * Edits the quantity of a specified package in the cart and removes the package.
+   *
+   * @param {string} packageName - The name of the package to be edited and removed from the cart.
+
+   */
   async editQtyAndRemovePackage(packageName: string) {
     // Edit Quantity
     await this.enterValuesInElement(
