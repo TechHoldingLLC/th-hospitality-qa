@@ -1,5 +1,5 @@
 export const config = {
-  adminPortalUrl: "https://admin.qa.hospitality.thinfra.net/login",
+  adminPortalUrl: "https://admin.qa.cocacola.hostedseats.com/",
   landingPageUrl: "TBD",
   email: "prabhav.joshi@techholding.co",
   password: "Test@123",
