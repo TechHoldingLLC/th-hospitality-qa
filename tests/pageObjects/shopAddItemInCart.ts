@@ -252,4 +252,20 @@ export class shopAddItemInCartPage extends BasePage {
 
     return { availableQty, maxQtyPerOrder };
   }
+
+  /**
+   * Opens the package detail popup and updates the quantity.
+   *
+   * @param {string} inputValue - The value to set in the quantity input field for the package.
+   *
+   */
+  async editQuantityInPackageDetailsPopup(inputValue: string) {
+    // Click on View Package button
+    await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
+
+    await this.waitForPageToBeReady();
+
+    // Enter value in quantity field
+    await this.enterValuesInElement(this.quantityInputField, inputValue);
+  }
 }

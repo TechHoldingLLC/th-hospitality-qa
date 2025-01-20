@@ -20,7 +20,6 @@ let invalidValueListForQuantityField = [
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  await page.setViewportSize({ width: 1780, height: 720 });
   loginPage = new adminLoginPage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
   //Navigation to admin portal
@@ -156,51 +155,60 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
   }
 });
 
-invalidValueListForQuantityField.forEach((inputValues) => {
-  test(
-    "TC0125 - Verify that application validates invalid input " +
-      inputValues.inValidValue +
-      " in to quantity field under cart page",
-    async () => {
-      try {
-        // Click on View Package button
-        await addItemInCartPage.selectRandomItemFromMultiSelectList(
-          addItemInCartPage.viewPackageButton
-        );
+test("TC0125 - Verify that application validates invalid input 0 in to quantity field under cart page", async () => {
+  try {
+    // Open Package details pop up and edit quantity
+    await addItemInCartPage.editQuantityInPackageDetailsPopup("0");
 
-        await addItemInCartPage.waitForPageToBeReady();
+    // Verify Error message
+    expect(
+      await addItemInCartPage.getElementText(
+        addItemInCartPage.emptyCartErrorMessage
+      )
+    ).toBe(addItemInCartData.invalidInputValueMessage);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
 
-        // Enter value in quantity field
-        await addItemInCartPage.enterValuesInElement(
-          addItemInCartPage.quantityInputField,
-          inputValues.inValidValue.toString()
-        );
+test("TC0125 - Verify that application validates invalid input -1 in to quantity field under cart page", async () => {
+  try {
+    // Open Package details pop up and edit quantity
+    await addItemInCartPage.editQuantityInPackageDetailsPopup("-1");
 
-        // Verify error message
-        if (inputValues.inValidValue == Number.MAX_SAFE_INTEGER) {
-          const errorMessage = await addItemInCartPage.getElementText(
-            addItemInCartPage.emptyCartErrorMessage
-          );
+    // Verify Error message
+    expect(
+      await addItemInCartPage.getElementText(
+        addItemInCartPage.emptyCartErrorMessage
+      )
+    ).toBe(addItemInCartData.invalidInputValueMessage);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
 
-          expect(
-            errorMessage.includes(
-              addItemInCartData.cartMaxQuantityErrorMessage
-            ) ||
-              errorMessage.includes(
-                addItemInCartData.maximumAvailableQtyMessage
-              )
-          ).toBe(true);
-        } else {
-          expect(
-            await addItemInCartPage.emptyCartErrorMessage.textContent()
-          ).toBe(addItemInCartData.invalidInputValueMessage);
-        }
-      } catch (error: any) {
-        console.error(`Test failed: ${error.message}`);
-        throw error;
-      }
-    }
-  );
+test("TC0125 - Verify that application validates invalid input 'Max Integer number' in to quantity field under cart page", async () => {
+  try {
+    // Open Package details pop up and edit quantity
+    await addItemInCartPage.editQuantityInPackageDetailsPopup(
+      Number.MAX_SAFE_INTEGER.toString()
+    );
+
+    const errorMessage: string = await addItemInCartPage.getElementText(
+      addItemInCartPage.emptyCartErrorMessage
+    );
+
+    // Verify Error message
+    expect(
+      errorMessage.includes(addItemInCartData.cartMaxQuantityErrorMessage) ||
+        errorMessage.includes(addItemInCartData.maximumAvailableQtyMessage)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
 });
 
 test("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
