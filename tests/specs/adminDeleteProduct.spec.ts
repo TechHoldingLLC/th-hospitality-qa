@@ -4,7 +4,6 @@ import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import { config } from "../config/config.qa";
 import { adminCreateEditProductPage } from "../pageObjects/adminCreateEditProduct";
 import { adminDeleteProductPage } from "../pageObjects/adminDeleteProduct";
-import deleteProductData from "../data/deleteProductData.json";
 
 let browser: Browser;
 let page: Page;
@@ -31,7 +30,7 @@ test.afterEach(async () => {
 
 test("TC0092 - Verify that an admin can successfully delete a product that is not associated with packages or event.", async () => {
   try {
-    // Create and validate product.
+    // Create a product and validate its successful creation.
     await basePage.clickElement(createEditProductPage.addProductButton);
     const productName = await createEditProductPage.createProductWithGift();
     await basePage.waitForPageToBeReady();
@@ -46,38 +45,29 @@ test("TC0092 - Verify that an admin can successfully delete a product that is no
       deleteProductPage.searchInput,
       productName
     );
-    await basePage.waitForElementVisible(
-      await deleteProductPage.menuButtonByProductName(productName)
-    );
+    await basePage.waitForElementVisible(deleteProductPage.nextButton);
+    await deleteProductPage.openDeletePopupByProductName(productName);
     expect(
-      await basePage.getElementText(deleteProductPage.productInputText.first())
-    ).toEqual(productName);
+      await basePage.isElementVisible(
+        await deleteProductPage.getDeleteConfirmationLocator(productName)
+      )
+    ).toBe(true);
 
-    // Validate delete product confirmation.
-    await deleteProductPage.openDeletePopup();
-    await basePage.waitForPageToBeReady();
-    expect(
-      await basePage.getElementText(deleteProductPage.deleteMessageLabel)
-    ).toEqual(
-      `${deleteProductData.expectedDeleteConfirmationMessage} "${productName}" ${deleteProductData.deleteConfirmationSuffix}`
-    );
-
-    // Validate delete product success message.
+    // Validate the success message after deleting the product.
     await basePage.clickElement(deleteProductPage.deleteProductButton);
-    await basePage.waitForElementVisible(
-      deleteProductPage.deletedSuccessStatus
-    );
     expect(
-      await basePage.getElementText(deleteProductPage.deleteMessageLabel.last())
-    ).toEqual(
-      `${productName} ${deleteProductData.expectedDeleteSuccessMessage}`
-    );
+      await basePage.isElementVisible(
+        await deleteProductPage.getDeleteSuccessLocator(productName)
+      )
+    ).toBe(true);
 
-    // Validate product delete successfully.
+    // Validate that the product has been successfully deleted.
     await basePage.clickElement(deleteProductPage.confirmationButton);
     expect(
-      await basePage.getElementText(deleteProductPage.noResultsMessageContainer)
-    ).toContain(deleteProductData.expectedErrorMessages);
+      await basePage.isElementVisible(
+        await deleteProductPage.getNoResultsMessageLocator()
+      )
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -91,19 +81,21 @@ test("TC0093 - Verify that if the product is not associated with orders a confir
         await basePage.isElementVisible(deleteProductPage.alertDialog)
       ).toBe(true);
       expect(
-        await basePage.getElementText(deleteProductPage.deleteMessageLabel)
-      ).toContain(deleteProductData.expectedDeleteConfirmationMessage);
+        await basePage.isElementVisible(
+          deleteProductPage.deleteConfirmationMessageLabel
+        )
+      ).toBe(true);
       await basePage.clickElement(deleteProductPage.cancelProductButton);
-      await deleteProductPage.alertDialog.waitFor({ state: "hidden" });
+      await basePage.waitForElementHidden(deleteProductPage.alertDialog);
       expect(await deleteProductPage.alertDialog.isHidden()).toBe(true);
     };
 
     // Open delete popup and verify alert dialog behavior
-    await deleteProductPage.openDeletePopup();
+    await deleteProductPage.openDeletePopupRandomly();
     await verifyAlertDialogVisibleAndHidden();
 
     // Open delete popup again and verify alert dialog behavior
-    await deleteProductPage.openDeletePopup();
+    await deleteProductPage.openDeletePopupRandomly();
     await verifyAlertDialogVisibleAndHidden();
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -124,10 +116,11 @@ test("TC0094 - Verify that if the product is associated with orders or package a
     expect(
       await basePage.getElementText(deleteProductPage.alertDialog)
     ).not.toBeNull();
-
     expect(
-      await basePage.getAllTextContents(deleteProductPage.alertDialog)
-    ).toContain(deleteProductData.failedMessage);
+      await basePage.isElementVisible(
+        await deleteProductPage.getFailedMessageLocator()
+      )
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

@@ -3,45 +3,39 @@ import BasePage from "./basePage";
 
 export class adminDeleteProductPage extends BasePage {
   public searchInput: Locator;
-  public productInputText: Locator;
   public menuButton: Locator;
   public deleteButton: Locator;
   public deleteProductButton: Locator;
-  public deleteMessageLabel: Locator;
+  public deleteConfirmationMessageLabel: Locator;
   public confirmationButton: Locator;
-  public noResultsMessageContainer: Locator;
-  public deletedSuccessStatus: Locator;
   public alertDialog: Locator;
   public cancelProductButton: Locator;
-  public menuButtonWithLocationGreaterThanZero: Locator;
+  public menuButtonWithNonZeroIndex: Locator;
   public failedToDeleteProductLabel: Locator;
+  public nextButton: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.searchInput = page.locator('input[placeholder="Search"]');
-    this.productInputText = page.locator("//span[@title]");
+    this.searchInput = page.locator('//input[@placeholder="Search"]');
     this.menuButton = page.locator('td div button[aria-haspopup="menu"]');
     this.deleteButton = page.getByRole("menuitem", { name: "Delete" });
     this.deleteProductButton = page.getByRole("button", { name: "Delete" });
-    this.deleteMessageLabel = page.locator(
-      "//p[contains(@class,'text-ui-fg-subtle')]/label[1]"
+    this.deleteConfirmationMessageLabel = page.locator(
+      "//label[contains(text(), 'This will permanently delete')]"
     );
     this.confirmationButton = page.getByRole("button", {
       name: "Yeah, Thanks!",
     });
-    this.noResultsMessageContainer = page.locator(
-      ".flex.flex-col.items-center.gap-y-2"
-    );
-    this.deletedSuccessStatus = page.locator(
-      '//label[normalize-space()="Product deleted"]'
-    );
     this.alertDialog = page.getByRole("alertdialog");
     this.cancelProductButton = page.getByRole("button", { name: "Cancel" });
-    this.menuButtonWithLocationGreaterThanZero = page.locator(
+    this.menuButtonWithNonZeroIndex = page.locator(
       '//tr[td[6] > 0]//button[@aria-haspopup="menu"]'
     );
     this.failedToDeleteProductLabel = page.getByText(
       "Failed to delete product"
+    );
+    this.nextButton = page.locator(
+      '//button[contains(text(), "Next") and @disabled]'
     );
   }
 
@@ -49,17 +43,51 @@ export class adminDeleteProductPage extends BasePage {
     return this.page.locator(
       `//tr[td[normalize-space() = '${productName}']]//button[@aria-haspopup="menu"]`
     );
-}
+  }
 
-  async openDeletePopup(): Promise<void> {
-    await this.clickElement(this.menuButton.first());
+  async getProductName(productName: string): Promise<Locator> {
+    return this.page.locator(`//span[text()='${productName}']`);
+  }
+
+  async getDeleteConfirmationLocator(productName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), 'This will permanently delete the product "${productName}" and cannot be undone.')]`
+    );
+  }
+
+  async getDeleteSuccessLocator(productName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), '${productName} was successfully deleted.')]`
+    );
+  }
+
+  async getNoResultsMessageLocator(): Promise<Locator> {
+    return this.page.locator('//p[contains(text(), "No results")]');
+  }
+
+  async openDeletePopupByProductName(productName: string): Promise<void> {
+    await this.clickElement(await this.menuButtonByProductName(productName));
+    await this.clickElement(this.deleteButton);
+    await this.waitForElementVisible(this.deleteProductButton);
+  }
+
+  async openDeletePopupRandomly(): Promise<void> {
+    await this.selectRandomItemFromMultiSelectList(this.menuButton);
     await this.clickElement(this.deleteButton);
     await this.waitForElementVisible(this.deleteProductButton);
   }
 
   async deleteReferredProduct(): Promise<void> {
-    await this.clickElement(this.menuButtonWithLocationGreaterThanZero.first());
+    await this.selectRandomItemFromMultiSelectList(
+      this.menuButtonWithNonZeroIndex
+    );
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deleteProductButton);
+  }
+
+  async getFailedMessageLocator(): Promise<Locator> {
+    return this.page.locator(
+      '//label[contains(text(), "An error occurred while deleted product.")]'
+    );
   }
 }
