@@ -20,6 +20,7 @@ export class shopAddItemInCartPage extends BasePage {
   public updateInCartButton: Locator;
   public eventsListLocator: Locator;
   public removePackageButton: Locator;
+  public showMoreButton: Locator;
 
   // Packages page locator
   public packagesButton: Locator;
@@ -69,6 +70,9 @@ export class shopAddItemInCartPage extends BasePage {
     );
     this.removePackageButton = page.locator(
       "//button[@aria-label='Delete Package']"
+    );
+    this.showMoreButton = page.locator(
+      "//button[@aria-label='Load More Events Button']"
     );
   }
 
@@ -193,7 +197,18 @@ export class shopAddItemInCartPage extends BasePage {
     return { availableQty, maxQtyPerOrder };
   }
 
-  // Add multiple Package in cart
+  /**
+   * Adds a random selection of packages to the shopping cart.
+   *
+   * Selects a random number of packages (up to 10) to add to the cart. It verifies that each package is not out of stock
+   * and that it has not already been added to the cart. The method tracks the total amount of the added packages
+   * and the names of those packages, and then returns this information in an object.
+   *
+   *
+   * @returns {Promise<{ listOfAddedPackage: string[], totalAmount: number }>}
+   * - `listOfAddedPackage`: An array of package titles that were added to the cart.
+   * - `totalAmount`: The total price of the added packages.
+   */
   async addMultiplePackagesToCart(): Promise<{
     listOfAddedPackage: string[];
     totalAmount: number;
@@ -229,13 +244,11 @@ export class shopAddItemInCartPage extends BasePage {
       // Click on View Package button
       await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
 
-      // Check package is not out of stock
-      let isPackageOutofStock = await this.outOfStockButton.isVisible();
-
-      // Check package is already added or not
-      let isPackageAlreadyAdded = await this.updateInCartButton.isVisible();
-
-      if (!isPackageOutofStock && !isPackageAlreadyAdded) {
+      // Check package is not out of stock and already added
+      if (
+        !(await this.outOfStockButton.isVisible()) &&
+        !(await this.updateInCartButton.isVisible())
+      ) {
         // Get price of package
         const packagePrice: number = parseFloat(
           (await this.packagePriceLabel.allTextContents())
@@ -248,11 +261,13 @@ export class shopAddItemInCartPage extends BasePage {
 
         // Click on Add to Cart button
         await this.clickElement(this.addToCartButton);
-
-        await this.waitForPageToBeReady();
         await this.page.waitForTimeout(3000);
 
         totalOrderAmount += packagePrice;
+        addedPackageNames.push(packageTitle);
+
+        await this.waitForPageToBeReady();
+        await this.clickElement(this.closeCartDrawerButton);
       }
 
       // Close cart pop up
@@ -263,44 +278,6 @@ export class shopAddItemInCartPage extends BasePage {
       listOfAddedPackage: addedPackageNames,
       totalAmount: totalOrderAmount,
     };
-  }
-
-  // Add all available package in cart
-  async addAllPackageInCart(): Promise<string[]> {
-    await this.waitForPageToBeReady();
-
-    await this.waitForElementVisible(this.viewPackageButton.first());
-
-    let addedPackageNames: string[] = [];
-
-    let totalPackage = (await this.viewPackageButton.all()).length;
-
-    for (let index: number = 0; index < totalPackage; index++) {
-      // Click on View Package button
-      await this.clickElement(this.viewPackageButton.nth(index));
-
-      // Check package is not out of stock
-      let isPackageOutofStock = await this.outOfStockButton.isVisible();
-
-      if (!isPackageOutofStock) {
-        // Get title of package title
-        const packageTitle: string = await this.packageTitleLabel.innerText();
-
-        // Click on Add to Cart button
-        await this.clickElement(this.addToCartButton);
-
-        await this.waitForPageToBeReady();
-        await this.page.waitForTimeout(3000);
-
-        // Check if the value is already in  the array
-        if (!addedPackageNames.includes(packageTitle))
-          addedPackageNames.push(packageTitle);
-      } else {
-        // Close cart pop up
-        await this.clickElement(this.closeCartDrawerButton);
-      }
-    }
-    return addedPackageNames;
   }
 
   /**
@@ -469,5 +446,96 @@ export class shopAddItemInCartPage extends BasePage {
       // Wait before polling again
       await this.page.waitForTimeout(500);
     }
+  }
+
+  // Add all available package in cart
+  async addAllPackageInCart(): Promise<string[]> {
+    await this.waitForPageToBeReady();
+
+    await this.waitForElementVisible(this.viewPackageButton.first());
+
+    let addedPackageNames: string[] = [];
+
+    let totalPackage = (await this.viewPackageButton.all()).length;
+
+    for (let index: number = 0; index < totalPackage; index++) {
+      // Click on View Package button
+      await this.clickElement(this.viewPackageButton.nth(index));
+
+      // Check package is not out of stock
+      let isPackageOutofStock = await this.outOfStockButton.isVisible();
+
+      if (!isPackageOutofStock) {
+        // Get title of package title
+        const packageTitle: string = await this.packageTitleLabel.innerText();
+
+        // Click on Add to Cart button
+        await this.clickElement(this.addToCartButton);
+
+        await this.waitForPageToBeReady();
+        await this.page.waitForTimeout(3000);
+
+        addedPackageNames.push(packageTitle);
+      } else {
+        // Close cart pop up
+        await this.clickElement(this.closeCartDrawerButton);
+      }
+    }
+    return addedPackageNames;
+  }
+
+  // Add all available package in cart
+  async addAllPackageInCartForMultipleEvent(): Promise<string[]> {
+    await this.waitForPageToBeReady();
+
+    // Continuously click on show more button for load all events
+    while ((await this.showMoreButton.count()) > 0) {
+      await this.clickElement(this.showMoreButton);
+
+      await this.page.waitForTimeout(500);
+    }
+
+    let addedPackageNames: string[] = [];
+
+    // Get total Events count
+    let totalEvents = (await this.eventsListLocator.all()).length;
+
+    for (let index: number = 0; index < totalEvents; index++) {
+      // Click on order for expand view
+      await this.clickElement(this.eventsListLocator.nth(index));
+
+      await this.page.waitForTimeout(1000);
+
+      // Get total package count inside event
+      let totalPackage = (await this.viewPackageButton.all()).length;
+
+      for (let index: number = 0; index < totalPackage; index++) {
+        // Click on View Package button
+        await this.clickElement(this.viewPackageButton.nth(index));
+
+        // Check package is not out of stock
+        let isPackageOutofStock = await this.outOfStockButton.isVisible();
+
+        if (!isPackageOutofStock) {
+          // Get title of package title
+          const packageTitle: string = await this.packageTitleLabel.innerText();
+
+          // Click on Add to Cart button
+          await this.clickElement(this.addToCartButton);
+
+          await this.waitForPageToBeReady();
+          await this.page.waitForTimeout(3000);
+
+          addedPackageNames.push(packageTitle);
+
+          // Close cart pop up
+          await this.clickElement(this.closeCartDrawerButton);
+        } else {
+          // Close cart pop up
+          await this.clickElement(this.closeCartDrawerButton);
+        }
+      }
+    }
+    return addedPackageNames;
   }
 }
