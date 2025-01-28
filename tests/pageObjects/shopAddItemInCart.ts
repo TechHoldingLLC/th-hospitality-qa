@@ -77,7 +77,7 @@ export class shopAddItemInCartPage extends BasePage {
   }
 
   async getPackageQuantityField(packageName: string) {
-    return `//p[text()='${packageName}']/parent::div/../..//input[@aria-label='Package Quantity']`;
+    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Package Card"]//input`;
   }
 
   async getAvailableQuantityLabel(packageName: string) {
