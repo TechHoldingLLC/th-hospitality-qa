@@ -11,12 +11,12 @@ export class adminDeletePackagesPage extends BasePage {
   public packageNameFromTable: Locator;
   public nextButton: Locator;
   public deleteMessageLabel: Locator;
-  public packageDeleteSuccessLabel: Locator;
   public confirmationButton: Locator;
-  public packageInputText: Locator;
+  public packageDeleteSuccessLabel: Locator;
   public cancelPackageButton: Locator;
   public deletePackageButton: Locator;
   public failedToDeletePackageLabel: Locator;
+  public orderPackagesButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -24,44 +24,60 @@ export class adminDeletePackagesPage extends BasePage {
     this.deleteButton = page.getByRole("menuitem", { name: "Delete" });
     this.alertDialog = page.getByRole("alertdialog");
     this.orderButton = page.locator("//a[@href='/orders']");
-    this.orderListLink = page.locator("//table//tr/td[1]//a");
+    this.orderListLink = page.locator("tbody tr");
     this.packagesButton = page.locator(
       "//div[@role='tablist']/button[text()='Packages']"
     );
     this.packageNameFromTable = page.locator(
-      "//div[contains(@id,'package')]//table//tr/td[1]"
+      "tbody tr:nth-child(1) td:nth-child(1)"
     );
     this.nextButton = page.locator("//button[text()='Next']");
-    this.deleteMessageLabel = page.locator(
-      "//p[contains(@class,'text-ui-fg-subtle')]/label[1]"
+    this.deleteMessageLabel = page.locator("label.font-sans.text-center");
+    this.packageDeleteSuccessLabel = page.locator(
+      '//label[text()="Package deleted"]/following::label[1]'
     );
     this.deletePackageButton = page.getByRole("button", { name: "Delete" });
-    this.packageDeleteSuccessLabel = page.locator("label", {
-      hasText: "Package deleted",
-    });
     this.confirmationButton = page.getByRole("button", {
       name: "Yeah, Thanks!",
     });
-    this.packageInputText = page.locator("//td//a//span[text()]");
     this.cancelPackageButton = page.getByRole("button", { name: "Cancel" });
     this.deletePackageButton = page.getByRole("button", { name: "Delete" });
     this.failedToDeletePackageLabel = page.getByText(
       "Failed to delete package"
     );
+    this.orderPackagesButton = page.locator("//a[@href='/packages']");
   }
 
   async menuButtonByPackageName(packageName: string): Promise<Locator> {
     return this.page.locator(
-      `//tr[td[1][normalize-space() = '${packageName}']]//button[@aria-haspopup="menu"]`
+      `//tr[td[normalize-space() = '${packageName}']]//button[@aria-haspopup="menu"]`
     );
   }
 
-  async openDeletePopup(packageName?: string): Promise<void> {
-    if (packageName) {
-      await this.clickElement(await this.menuButtonByPackageName(packageName));
-    } else {
-      await this.clickElement(this.menuButton.first());
-    }
+  async getPackageName(packageName: string): Promise<Locator> {
+    return this.page.locator(`//span[text()='${packageName}']`);
+  }
+
+  async getDeleteConfirmationLocator(packageName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), 'This will permanently delete the package "${packageName}" and cannot be undone.')]`
+    );
+  }
+
+  async getDeleteSuccessLocator(packageName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), '${packageName} was successfully deleted.')]`
+    );
+  }
+
+  async openDeletePopupByPackageName(packageName: string): Promise<void> {
+    await this.clickElement(await this.menuButtonByPackageName(packageName));
+    await this.clickElement(this.deleteButton);
+    await this.waitForElementVisible(this.deletePackageButton);
+  }
+
+  async openDeletePopupRandomly(): Promise<void> {
+    await this.selectRandomItemFromMultiSelectList(this.menuButton);
     await this.clickElement(this.deleteButton);
     await this.waitForElementVisible(this.deletePackageButton);
   }
@@ -69,33 +85,36 @@ export class adminDeletePackagesPage extends BasePage {
   async getPackageNameFromOrderPage(): Promise<string | null> {
     await this.waitForPageToBeReady();
     await this.clickElement(this.orderButton);
-    await this.clickElement(this.orderListLink.last());
+    await this.selectRandomItemFromMultiSelectList(this.orderListLink);
     await this.clickElement(this.packagesButton);
-    await this.waitForElementVisible(this.packageNameFromTable.first());
-    await this.clickElement(this.packageNameFromTable.first());
-    return (
-      await this.getAllTextContents(this.packageNameFromTable.first())
-    ).join(" ");
+    await this.clickElement(this.packageNameFromTable);
+    const packageName = await this.getElementText(this.packageNameFromTable);
+    await this.clickElement(this.orderPackagesButton);
+    return packageName;
   }
 
-  async clickPackageMenuButton(packageName: string): Promise<void> {
-    const clickPackageButton = this.page.locator(
-      `//div[normalize-space()='${packageName}']/ancestor::td/following-sibling::td//button`
-    );
-    await this.page.waitForTimeout(2000);
-    let isPackageVisible = await clickPackageButton.isVisible();
-    if (!isPackageVisible) {
-      let isNextEnabled = await this.nextButton.isEnabled();
-      if (isNextEnabled) {
-        await this.clickElement(this.nextButton);
+  async clickPackageMenuButton(packageName: string | null): Promise<void> {
+    while (packageName) {
+      const packageButton = this.page.locator(
+        `//div[normalize-space()='${packageName}']/ancestor::td/following-sibling::td//button`
+      );
+      if (await packageButton.isVisible()) {
+        await this.clickElement(packageButton);
         await this.waitForPageToBeReady();
-        await this.clickPackageMenuButton(packageName);
-      } else {
-        console.error(`${packageName} not found on the page`);
+        break;
       }
-    } else {
-      await this.clickElement(clickPackageButton);
-      await this.waitForPageToBeReady();
+      if (await this.nextButton.isEnabled()) {
+        await this.clickElement(this.nextButton);
+        await this.page.waitForTimeout(1000);
+      } else {
+        console.error(`${packageName} not found on the page.`);
+        console.log("Fetching a new package name...");
+        packageName = await this.getPackageNameFromOrderPage();
+        if (!packageName) {
+          console.error("No packages available to attempt selection.");
+          break;
+        }
+      }
     }
   }
 
@@ -104,5 +123,11 @@ export class adminDeletePackagesPage extends BasePage {
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deletePackageButton);
     await this.waitForElementVisible(this.failedToDeletePackageLabel);
+  }
+
+  async getErrorMessageLocator(): Promise<Locator> {
+    return this.page.locator(
+      '//label[text()="This package can\'t be deleted because it is referenced in one or more orders."]'
+    );
   }
 }

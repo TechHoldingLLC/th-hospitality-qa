@@ -1,6 +1,0 @@
-{
-  "expectedDeleteConfirmationMessage": "This will permanently delete the package",
-  "deleteConfirmationSuffix": "and cannot be undone.",
-  "expectedDeleteSuccessMessage": "was successfully deleted.",
-  "failedMessage": "Failed to delete packageThis package can't be deleted because it is referenced in one or more orders.Got it"
-}
