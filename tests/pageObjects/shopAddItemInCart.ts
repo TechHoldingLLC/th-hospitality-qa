@@ -249,12 +249,10 @@ export class shopAddItemInCartPage extends BasePage {
         await this.page.waitForTimeout(3000);
 
         totalOrderAmount += packagePrice;
-
-        await this.clickElement(this.closeCartDrawerButton);
-      } else {
-        // Close cart pop up
-        await this.clickElement(this.closeCartDrawerButton);
       }
+
+      // Close cart pop up
+      await this.clickElement(this.closeCartDrawerButton);
     }
 
     await this.waitForPageToBeReady();
@@ -331,7 +329,7 @@ export class shopAddItemInCartPage extends BasePage {
     if (eventsCount > 0) {
       const randomOrder = Math.floor(Math.random() * (eventsCount - 0) + 0);
 
-      // Click on order for expand view
+      // Click on event for expand view
       await this.clickElement(this.eventsListLocator.nth(randomOrder));
 
       eventExpanded =
