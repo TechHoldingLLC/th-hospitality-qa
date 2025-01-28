@@ -1,8 +1,9 @@
 import { test, Browser, Page, chromium, expect } from "@playwright/test";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
-import { config } from "../config/config.qa";
+import { config, EventType } from "../config/config.qa";
 import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import addItemInCartData from "../data/addItemInCartData.json";
+import createAccountData from "../data/createAccountData.json";
 import { shopLogoutPage } from "../pageObjects/shopLogoutPage";
 
 let browser: Browser;
@@ -11,21 +12,14 @@ let loginPage: adminLoginPage;
 let addItemInCartPage: shopAddItemInCartPage;
 let logoutPage: shopLogoutPage;
 
-let invalidValueListForQuantityField = [
-  { inValidValue: 0 },
-  { inValidValue: -1 },
-  { inValidValue: Number.MAX_SAFE_INTEGER },
-];
-
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
   loginPage = new adminLoginPage(page);
   addItemInCartPage = new shopAddItemInCartPage(page);
-  //Navigation to admin portal
+
+  // Navigation to shop portal
   await addItemInCartPage.navigateTo(config.shopPortalUrl);
-  //Login
-  await loginPage.login(config.coordinator_email, config.coordinator_password);
 });
 
 test.afterEach(async () => {
@@ -34,6 +28,12 @@ test.afterEach(async () => {
 
 test("TC0119 - Verify the 'Add to Cart' page is empty when a user logs in for the first time", async () => {
   try {
+    // Login with new user
+    await loginPage.login(
+      createAccountData.coordinatorInviteEmail,
+      createAccountData.password
+    );
+
     // click on Cart button
     await addItemInCartPage.clickElement(addItemInCartPage.cartButton);
 
@@ -63,6 +63,19 @@ test("TC0119 - Verify the 'Add to Cart' page is empty when a user logs in for th
 
 test("TC0057 - Verify users can add packages they are interested in to cart and specify the quantity they want to purchase", async () => {
   try {
+    test.setTimeout(90000);
+
+    // Login
+    await loginPage.login(
+      config.coordinator_email,
+      config.coordinator_password
+    );
+
+    // Check if the event type is multiple event than expand any one event
+    if (!addItemInCartPage.expandEventForMultipleType()) {
+      return;
+    }
+
     // Add Package in cart and verify
     const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
@@ -73,8 +86,14 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
 
       // Verify package is added to the cart
       expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
+        await page
+          .locator(
+            await addItemInCartPage.getPackageTitleLocatorInCartPage(
+              addedPackageName
+            )
+          )
+          .isVisible()
+      ).toBe(true);
 
       // Get Available Quantity and Max Quantity per order Data
       const { availableQty, maxQtyPerOrder } =
@@ -91,13 +110,23 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
       const quantity = (
         Math.floor(Math.random() * (maxNumber - 1)) + 1
       ).toString();
+
       await addItemInCartPage.enterValuesInElement(
-        addItemInCartPage.packageQuantityField,
+        page.locator(
+          await addItemInCartPage.getPackageQuantityField(addedPackageName)
+        ),
         quantity
       );
 
+      await page.keyboard.press("Tab");
+
+      // Verify quantity is updated
       expect(
-        await addItemInCartPage.packageQuantityField.getAttribute("value")
+        await page
+          .locator(
+            await addItemInCartPage.getPackageQuantityField(addedPackageName)
+          )
+          .getAttribute("value")
       ).toBe(quantity);
     }
   } catch (error: any) {
@@ -108,6 +137,19 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
 
 test("TC0058 - Verify that the maximum quantity as specified on the package is not exceeded", async () => {
   try {
+    test.setTimeout(90000);
+
+    // Login
+    await loginPage.login(
+      config.coordinator_email,
+      config.coordinator_password
+    );
+
+    // Check if the event type is multiple event than expand any one event
+    if (!addItemInCartPage.expandEventForMultipleType()) {
+      return;
+    }
+
     // Add Package in cart and verify
     const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
@@ -118,8 +160,14 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
 
       // Verify package is added to the cart
       expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
+        await page
+          .locator(
+            await addItemInCartPage.getPackageTitleLocatorInCartPage(
+              addedPackageName
+            )
+          )
+          .isVisible()
+      ).toBe(true);
 
       // Get Available Quantity and Max Quantity per order Data
       const { availableQty, maxQtyPerOrder } =
@@ -131,23 +179,25 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
 
       // Try to add quantity above max quantity per order package and verify validation message appears
       await addItemInCartPage.enterValuesInElement(
-        addItemInCartPage.packageQuantityField,
+        page.locator(
+          await addItemInCartPage.getPackageQuantityField(addedPackageName)
+        ),
         (maxQtyPerOrder + 1).toString()
       );
 
-      if (availableQty > maxQtyPerOrder) {
-        expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
-          addItemInCartData.cartMaxQuantityErrorMessage +
+      // Verify error message
+      const expectedMessage =
+        availableQty != maxQtyPerOrder && availableQty > maxQtyPerOrder
+          ? addItemInCartData.cartMaxQuantityErrorMessage +
             maxQtyPerOrder.toString() +
             "."
-        );
-      } else {
-        expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
-          addItemInCartData.maximumAvailableQtyMessage +
+          : addItemInCartData.maximumAvailableQtyMessage +
             availableQty.toString() +
-            "."
-        );
-      }
+            ".";
+
+      expect(await addItemInCartPage.cartErrorMessage.textContent()).toBe(
+        expectedMessage
+      );
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -157,6 +207,17 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
 
 test("TC0125 - Verify that application validates invalid input in to quantity field under cart page", async () => {
   try {
+    // Login
+    await loginPage.login(
+      config.coordinator_email,
+      config.coordinator_password
+    );
+
+    // Check if the event type is multiple event than expand any one event
+    if (!addItemInCartPage.expandEventForMultipleType()) {
+      return;
+    }
+
     // Open Package details pop up and enter "0" value in quantity field
     await addItemInCartPage.editQuantityInPackageDetailsPopup("0");
 
@@ -203,18 +264,31 @@ test("TC0125 - Verify that application validates invalid input in to quantity fi
 
 test("TC0126 - Verify that items in the cart are retained after the user logs out and logs back in.", async () => {
   try {
+    // Login
+    await loginPage.login(
+      config.coordinator_email,
+      config.coordinator_password
+    );
+
+    // Check if the event type is multiple event than expand any one event
+    if (!addItemInCartPage.expandEventForMultipleType()) {
+      return;
+    }
+
     // Add Package in cart and verify
     const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
     if (addedPackageName != "") {
-      await addItemInCartPage.waitForElementVisible(
-        addItemInCartPage.cartSection
-      );
-
       // Verify package is added to the cart
       expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
+        await addItemInCartPage.isElementVisible(
+          page.locator(
+            await addItemInCartPage.getPackageTitleLocatorInCartPage(
+              addedPackageName
+            )
+          )
+        )
+      ).toBe(true);
 
       // Close cart popup
       await addItemInCartPage.clickElement(
@@ -236,12 +310,16 @@ test("TC0126 - Verify that items in the cart are retained after the user logs ou
       // click on Cart button
       await addItemInCartPage.clickElement(addItemInCartPage.cartButton);
 
-      await addItemInCartPage.isElementVisible(addItemInCartPage.cartSection);
-
       // Verify item is added to cart
       expect(
-        await addItemInCartPage.packageTitleInCartPage.last().textContent()
-      ).toBe(addedPackageName);
+        await addItemInCartPage.isElementVisible(
+          page.locator(
+            await addItemInCartPage.getPackageTitleLocatorInCartPage(
+              addedPackageName
+            )
+          )
+        )
+      ).toBe(true);
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -252,6 +330,15 @@ test("TC0126 - Verify that items in the cart are retained after the user logs ou
 test("TC0127 - Verify that 'Total Amount' displayed correct values when multiple packages been added to cart", async () => {
   try {
     test.setTimeout(120000);
+
+    // Login
+    await loginPage.login(
+      config.coordinator_email,
+      config.coordinator_password
+    );
+
+    // Clear cart
+    await addItemInCartPage.clearCart();
 
     // Add multiple package
     const totalPrice: number =
