@@ -263,6 +263,7 @@ export class shopAddItemInCartPage extends BasePage {
         addedPackageNames.push(packageTitle);
 
         await this.page.waitForLoadState("domcontentloaded");
+        await this.page.waitForTimeout(2000);
       }
 
       // Close cart pop up

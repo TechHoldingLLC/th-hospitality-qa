@@ -2,7 +2,6 @@ import { Page, Locator } from "@playwright/test";
 import BasePage from "./basePage";
 
 export class shopViewAndEditCartPage extends BasePage {
-  public removePackageButton: Locator;
   public checkOutButton: Locator;
   public closeCartSectionButton: Locator;
   public checkoutPageTitleLabel: Locator;
@@ -12,9 +11,6 @@ export class shopViewAndEditCartPage extends BasePage {
   constructor(page: Page) {
     super(page);
 
-    this.removePackageButton = page.locator(
-      "//button[@aria-label='Delete Package']"
-    );
     this.checkOutButton = page.locator("//button[text()='Checkout']");
     this.closeCartSectionButton = page.locator(
       "//button[@aria-label='Close Cart Drawer']"
