@@ -36,7 +36,7 @@ const currentEnv = environments[ENV as keyof typeof environments];
 // Directories and paths
 const logsDir = path.resolve("logs");
 const allureResultsDir = path.resolve("allure-results");
-const allureReportDir = path.resolve("allure-report");
+const allureReportDir = path.resolve("allure-results/allure-report");
 const logFilePath = path.join(logsDir, "test-case.log");
 const playwrightResultsDir = path.resolve("test-results");
 
@@ -114,17 +114,20 @@ const generateAllureFiles = async () => {
   }
 };
 
-// Execute Tests
 const executeTests = async () => {
   const playwrightCommand = `ENV=${ENV} npx playwright test ${testFiles} ${headedMode}`;
-
   try {
     logMessage(`🚀 Executing command: ${playwrightCommand}`);
     execSync(playwrightCommand, {
       stdio: "inherit",
       env: { ...process.env, ENV },
     });
-    logMessage(`✅ Test execution completed successfully.`);
+    logMessage("✅ Test execution completed successfully. Generating Allure report...");
+    execSync(`allure generate ./allure-results --clean -o ./allure-results/allure-report`, {
+      stdio: "inherit",
+    });
+
+    logMessage("✅ Allure report successfully generated.");
   } catch (error: any) {
     logMessage(`❌ Error occurred during execution: ${error.message}`);
     process.exit(1);
@@ -138,10 +141,10 @@ const executeTests = async () => {
   await executeTests();
   logMessage("To generate the Allure report:");
   logMessage(
-    "    ✅ allure generate ./allure-results --clean -o ./allure-report"
+    "    ✅ allure generate ./allure-results --clean -o ./allure-results/allure-report"
   );
   logMessage("To open the Allure report:");
-  logMessage("    📊 allure open ./allure-report");
+  logMessage("    📊 allure open ./allure-results/allure-report");
 
   logMessage("To open the HTML report:");
   logMessage("    📊 npx playwright show-report");
@@ -168,7 +171,7 @@ const executeTests = async () => {
 //      b) ENV=qa npx ts-node utils/runTests.ts tests/
 //
 // 4) Generate Allure Report:
-//      a) allure generate ./allure-results --clean -o ./allure-report
+//      a) allure generate ./allure-results --clean -o ./allure-results/allure-report
 //
 // 5) Open Allure Report:
-//      a) allure open ./allure-report
+//      a) allure open ./allure-results/allure-report
