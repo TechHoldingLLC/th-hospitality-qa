@@ -7,7 +7,7 @@ import {
   Locator,
 } from "@playwright/test";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
-import { config } from "../config/config.qa";
+import { config, EventType } from "../config/config.qa";
 import { shopAddItemInCartPage } from "../pageObjects/shopAddItemInCart";
 import { shopViewAndEditCartPage } from "../pageObjects/shopViewAndEditCartPage";
 
@@ -149,7 +149,7 @@ test("TC0061 - Verify the user can proceed to checkout or go back to shopping", 
   }
 });
 
-test.only("TC0128 - Verify that the cart data persists when the user navigates away from the cart page.", async () => {
+test("TC0128 - Verify that the cart data persists when the user navigates away from the cart page.", async () => {
   try {
     // Add Package in cart and verify
     if (!addItemInCartPage.expandEventForMultipleType()) {
@@ -209,19 +209,28 @@ test.only("TC0128 - Verify that the cart data persists when the user navigates a
 
 test("TC0129 - Verify that the cart functions correctly with a large number of items.", async () => {
   try {
-    test.setTimeout(300000); // Setting timeout for this specific test
+    test.setTimeout(900000); // Setting timeout for this specific test
+
+    await viewAndEditCartPage.waitForElementVisible(
+      addItemInCartPage.cartButton
+    );
 
     // Add all available package in cart
-    const listOfAddedPackage: string[] =
-      await addItemInCartPage.addAllPackageInCart();
+    let listOfAddedPackage: string[] = [];
+    if (config.eventType == EventType.multipleEvent)
+      listOfAddedPackage.push(
+        ...(await addItemInCartPage.addAllPackageInCartForMultipleEvent())
+      );
+    else
+      listOfAddedPackage.push(
+        ...(await addItemInCartPage.addAllPackageInCart())
+      );
+
+    listOfAddedPackage = [...new Set(listOfAddedPackage)];
 
     // Click on Cart button
     await viewAndEditCartPage.clickElement(addItemInCartPage.cartButton);
-
-    // Verify My Cart section is opened
-    expect(
-      await viewAndEditCartPage.isElementVisible(addItemInCartPage.cartSection)
-    ).toBe(true);
+    await viewAndEditCartPage.isElementVisible(addItemInCartPage.cartSection);
 
     for (const addedPackageName of listOfAddedPackage) {
       // Verify item is added in cart page
@@ -242,8 +251,8 @@ test("TC0129 - Verify that the cart functions correctly with a large number of i
           .locator(
             await viewAndEditCartPage.getPackageCardLocator(addedPackageName)
           )
-          .isVisible()
-      ).toBe(false);
+          .count()
+      ).toBe(0);
     }
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);

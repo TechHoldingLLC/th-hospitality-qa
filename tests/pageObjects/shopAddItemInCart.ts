@@ -262,8 +262,7 @@ export class shopAddItemInCartPage extends BasePage {
         totalOrderAmount += packagePrice;
         addedPackageNames.push(packageTitle);
 
-        await this.waitForPageToBeReady();
-        await this.clickElement(this.closeCartDrawerButton);
+        await this.page.waitForLoadState("domcontentloaded");
       }
 
       // Close cart pop up
@@ -444,11 +443,13 @@ export class shopAddItemInCartPage extends BasePage {
     }
   }
 
-  // Add all available package in cart
+  /**
+   * Adds all available packages to the cart and returns an array of the added package names.
+   *
+   * @returns {Promise<string[]>} - A promise that resolves to an array of package names that were added to the cart.
+   */
   async addAllPackageInCart(): Promise<string[]> {
     await this.waitForPageToBeReady();
-
-    await this.waitForElementVisible(this.viewPackageButton.first());
 
     let addedPackageNames: string[] = [];
 
@@ -467,29 +468,24 @@ export class shopAddItemInCartPage extends BasePage {
 
         // Click on Add to Cart button
         await this.clickElement(this.addToCartButton);
-
-        await this.waitForPageToBeReady();
-        await this.page.waitForTimeout(3000);
+        await this.waitForElementVisible(this.cartSection);
+        await this.page.waitForTimeout(1000);
 
         addedPackageNames.push(packageTitle);
-      } else {
-        // Close cart pop up
-        await this.clickElement(this.closeCartDrawerButton);
       }
+      // Close cart pop up
+      await this.clickElement(this.closeCartDrawerButton);
     }
     return addedPackageNames;
   }
 
-  // Add all available package in cart
+  /**
+   * Adds all available packages from all events to the cart and returns an array of the added package names.
+   *
+   * @returns {Promise<string[]>} - A promise that resolves to an array of package names that were added to the cart from all events.
+   */
   async addAllPackageInCartForMultipleEvent(): Promise<string[]> {
     await this.waitForPageToBeReady();
-
-    // Continuously click on show more button for load all events
-    while ((await this.showMoreButton.count()) > 0) {
-      await this.clickElement(this.showMoreButton);
-
-      await this.page.waitForTimeout(500);
-    }
 
     let addedPackageNames: string[] = [];
 
@@ -502,35 +498,11 @@ export class shopAddItemInCartPage extends BasePage {
 
       await this.page.waitForTimeout(1000);
 
-      // Get total package count inside event
-      let totalPackage = (await this.viewPackageButton.all()).length;
+      // Add all package in cart
+      let addedPackageNamesForEvent: string[] =
+        await this.addAllPackageInCart();
 
-      for (let index: number = 0; index < totalPackage; index++) {
-        // Click on View Package button
-        await this.clickElement(this.viewPackageButton.nth(index));
-
-        // Check package is not out of stock
-        let isPackageOutofStock = await this.outOfStockButton.isVisible();
-
-        if (!isPackageOutofStock) {
-          // Get title of package title
-          const packageTitle: string = await this.packageTitleLabel.innerText();
-
-          // Click on Add to Cart button
-          await this.clickElement(this.addToCartButton);
-
-          await this.waitForPageToBeReady();
-          await this.page.waitForTimeout(3000);
-
-          addedPackageNames.push(packageTitle);
-
-          // Close cart pop up
-          await this.clickElement(this.closeCartDrawerButton);
-        } else {
-          // Close cart pop up
-          await this.clickElement(this.closeCartDrawerButton);
-        }
-      }
+      addedPackageNames.push(...addedPackageNamesForEvent);
     }
     return addedPackageNames;
   }

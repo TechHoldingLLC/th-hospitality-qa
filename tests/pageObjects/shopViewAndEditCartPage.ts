@@ -52,6 +52,7 @@ export class shopViewAndEditCartPage extends BasePage {
       "2"
     );
 
+    await this.page.keyboard.press("Tab");
     await this.page.waitForTimeout(1000);
 
     // Click on Delete button
@@ -59,6 +60,8 @@ export class shopViewAndEditCartPage extends BasePage {
       this.page.locator(await this.getRemovePackageButton(packageName))
     );
 
-    await this.page.waitForTimeout(5000);
+    await this.waitForElementHidden(
+      this.page.locator(await this.getRemovePackageButton(packageName))
+    );
   }
 }
