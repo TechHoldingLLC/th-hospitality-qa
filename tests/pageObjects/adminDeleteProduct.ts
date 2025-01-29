@@ -12,7 +12,8 @@ export class adminDeleteProductPage extends BasePage {
   public cancelProductButton: Locator;
   public menuButtonWithNonZeroIndex: Locator;
   public failedToDeleteProductLabel: Locator;
-  public nextButton: Locator;
+  public getFailedMessage: Locator;
+  public getNoResultsMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -34,8 +35,11 @@ export class adminDeleteProductPage extends BasePage {
     this.failedToDeleteProductLabel = page.getByText(
       "Failed to delete product"
     );
-    this.nextButton = page.locator(
-      '//button[contains(text(), "Next") and @disabled]'
+    this.getFailedMessage = page.locator(
+      '(//label[contains(text(), "This product can\'t be deleted because it is referenced in one or more orders.")])'
+    );
+    this.getNoResultsMessage = page.locator(
+      '//p[contains(text(), "No results")]'
     );
   }
 
@@ -61,10 +65,6 @@ export class adminDeleteProductPage extends BasePage {
     );
   }
 
-  async getNoResultsMessageLocator(): Promise<Locator> {
-    return this.page.locator('//p[contains(text(), "No results")]');
-  }
-
   async openDeletePopupByProductName(productName: string): Promise<void> {
     await this.clickElement(await this.menuButtonByProductName(productName));
     await this.clickElement(this.deleteButton);
@@ -83,11 +83,5 @@ export class adminDeleteProductPage extends BasePage {
     );
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deleteProductButton);
-  }
-
-  async getFailedMessageLocator(): Promise<Locator> {
-    return this.page.locator(
-      '//label[contains(text(), "An error occurred while deleted product.")]'
-    );
   }
 }
