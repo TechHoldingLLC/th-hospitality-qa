@@ -39,7 +39,6 @@ export default defineConfig({
     launchOptions: {
       args: ['--start-maximized"'],
     },
-    screenshot: "on",
   },
 
   /* Configure projects for major browsers */
