@@ -17,6 +17,7 @@ export class adminDeletePackagesPage extends BasePage {
   public deletePackageButton: Locator;
   public failedToDeletePackageLabel: Locator;
   public orderPackagesButton: Locator;
+  public getErrorMessageLocator: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -46,7 +47,9 @@ export class adminDeletePackagesPage extends BasePage {
       "Failed to delete package"
     );
     this.orderPackagesButton = page.locator("//a[@href='/packages']");
-  }
+    this.getErrorMessageLocator = page.locator(
+      '//label[text()="This package can\'t be deleted because it is referenced in one or more orders."]'
+    );  }
 
   async menuButtonByPackageName(packageName: string): Promise<Locator> {
     return this.page.locator(
@@ -123,11 +126,5 @@ export class adminDeletePackagesPage extends BasePage {
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deletePackageButton);
     await this.waitForElementVisible(this.failedToDeletePackageLabel);
-  }
-
-  async getErrorMessageLocator(): Promise<Locator> {
-    return this.page.locator(
-      '//label[text()="This package can\'t be deleted because it is referenced in one or more orders."]'
-    );
   }
 }

@@ -14,7 +14,6 @@ let deletePackagesPage: adminDeletePackagesPage;
 
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
-  test.setTimeout(110000);
   page = await browser.newPage();
   basePage = new BasePage(page);
   loginPage = new adminLoginPage(page);
@@ -54,12 +53,11 @@ test("TC0089 - Verify that an admin can successfully delete a package that is no
       )
     ).toBe(true);
 
-    // Validate successful package deleted.
+    // Validate package deletion success.
     await basePage.clickElement(deletePackagesPage.confirmationButton);
     await deletePackagesPage.page.reload();
     expect(
-      (await (await deletePackagesPage.getPackageName(packageName)).all())
-        .length
+      await (await deletePackagesPage.getPackageName(packageName)).count()
     ).toBe(0);
   } catch (error: any) {
     console.log(`Test failed: ${error.message}`);
@@ -109,9 +107,7 @@ test("TC0091 - Verify that if the package is associated with orders an error mes
       await basePage.getElementText(deletePackagesPage.alertDialog)
     ).not.toBeNull();
     expect(
-      await basePage.isElementVisible(
-        await deletePackagesPage.getErrorMessageLocator()
-      )
+      await basePage.isElementVisible(deletePackagesPage.getErrorMessageLocator)
     ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
