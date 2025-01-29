@@ -108,6 +108,7 @@ test("TC0060 - Verify the user can edit the cart quantities and remove items fro
 
 test("TC0061 - Verify the user can proceed to checkout or go back to shopping", async () => {
   try {
+    // Check if the event type is multiple event than expand any one event
     if (!addItemInCartPage.expandEventForMultipleType()) {
       return;
     }
@@ -151,7 +152,7 @@ test("TC0061 - Verify the user can proceed to checkout or go back to shopping", 
 
 test("TC0128 - Verify that the cart data persists when the user navigates away from the cart page.", async () => {
   try {
-    // Add Package in cart and verify
+    // Check if the event type is multiple event than expand any one event
     if (!addItemInCartPage.expandEventForMultipleType()) {
       return;
     }
