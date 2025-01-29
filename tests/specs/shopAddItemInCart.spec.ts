@@ -80,10 +80,6 @@ test("TC0057 - Verify users can add packages they are interested in to cart and 
     const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
     if (addedPackageName != "") {
-      await addItemInCartPage.waitForElementVisible(
-        addItemInCartPage.cartSection
-      );
-
       // Verify package is added to the cart
       expect(
         await page
@@ -154,10 +150,6 @@ test("TC0058 - Verify that the maximum quantity as specified on the package is n
     const addedPackageName: string = await addItemInCartPage.addItemInCart();
 
     if (addedPackageName != "") {
-      await addItemInCartPage.waitForElementVisible(
-        addItemInCartPage.cartSection
-      );
-
       // Verify package is added to the cart
       expect(
         await page
