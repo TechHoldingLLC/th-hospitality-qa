@@ -2,25 +2,25 @@ import { Page, Locator } from "@playwright/test";
 import BasePage from "./basePage";
 
 export class shopViewAndEditCartPage extends BasePage {
-  public removePackageButton: Locator;
   public checkOutButton: Locator;
   public closeCartSectionButton: Locator;
   public checkoutPageTitleLabel: Locator;
   public backToCartPageButton: Locator;
+  public packageTitleInCartPage: Locator;
 
   constructor(page: Page) {
     super(page);
 
-    this.removePackageButton = page.locator(
-      "//button[@aria-label='Delete Package']"
-    );
-    this.checkOutButton = page.locator("//a[text()='Checkout']");
+    this.checkOutButton = page.locator("//button[text()='Checkout']");
     this.closeCartSectionButton = page.locator(
       "//button[@aria-label='Close Cart Drawer']"
     );
     this.checkoutPageTitleLabel = page.locator("//h1[text()='Checkout']");
     this.backToCartPageButton = page.locator(
-      "//nav/a/span[text()='Back to shopping cart']"
+      "//nav//a/span[text()='Back to shopping cart']"
+    );
+    this.packageTitleInCartPage = page.locator(
+      "//p[@aria-label='Package Name']"
     );
   }
   async getRemovePackageButton(packageName: string) {
@@ -48,6 +48,7 @@ export class shopViewAndEditCartPage extends BasePage {
       "2"
     );
 
+    await this.page.keyboard.press("Tab");
     await this.page.waitForTimeout(1000);
 
     // Click on Delete button
@@ -55,8 +56,8 @@ export class shopViewAndEditCartPage extends BasePage {
       this.page.locator(await this.getRemovePackageButton(packageName))
     );
 
-    await this.waitForPageToBeReady();
-
-    await this.page.waitForTimeout(5000);
+    await this.waitForElementHidden(
+      this.page.locator(await this.getRemovePackageButton(packageName))
+    );
   }
 }

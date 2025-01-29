@@ -1,6 +1,6 @@
 import { chromium, Locator, Page } from "@playwright/test";
 import BasePage from "./basePage";
-import { config } from "../config/config.qa";
+import { config, EventType } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
 
 export class shopAddItemInCartPage extends BasePage {
@@ -8,10 +8,7 @@ export class shopAddItemInCartPage extends BasePage {
   public packageTitleLabel: Locator;
   public quantityInputField: Locator;
   public addToCartButton: Locator;
-  public notificationLabel: Locator;
   public cartButton: Locator;
-  public packageQuantityField: Locator;
-  public packageTitleInCartPage: Locator;
   public cartSection: Locator;
   public cartErrorMessage: Locator;
   public emptyCartTitle: Locator;
@@ -21,11 +18,13 @@ export class shopAddItemInCartPage extends BasePage {
   public packagePriceLabel: Locator;
   public outOfStockButton: Locator;
   public updateInCartButton: Locator;
+  public eventsListLocator: Locator;
+  public removePackageButton: Locator;
+  public showMoreButton: Locator;
 
   // Packages page locator
   public packagesButton: Locator;
   public nextButton: Locator;
-  public availableQuantityLabel: Locator;
   public maxQuantityPerOrderLabel: Locator;
 
   constructor(page: Page) {
@@ -41,22 +40,10 @@ export class shopAddItemInCartPage extends BasePage {
     this.addToCartButton = page.locator(
       "//button[@aria-label='Add/Update to Cart Button']"
     );
-    this.notificationLabel = page.locator(
-      "(//section[contains(@aria-label,'Notifications')]//span)[2]"
-    );
     this.cartButton = page.locator("//button[@aria-label='Cart Button']");
-    this.packageQuantityField = page.locator(
-      "//input[@aria-label='Package Quantity']"
-    );
-    this.packageTitleInCartPage = page.locator(
-      "//p[@aria-label='Package Name']"
-    );
     this.cartSection = page.locator("//section[@aria-label='Cart Drawer']");
     this.packagesButton = page.locator("//a[@href='/packages']");
     this.nextButton = page.locator("//button[text()='Next']");
-    this.availableQuantityLabel = page.locator(
-      "//label[text()='Total Quantity Available']/following-sibling::label[number(text()) > 0]"
-    );
     this.maxQuantityPerOrderLabel = page.locator(
       "//label[text()='Max Quantity Per Order']/following-sibling::label[number(text()) > 0]"
     );
@@ -71,16 +58,43 @@ export class shopAddItemInCartPage extends BasePage {
       "//p[text()='Total Amount']/following-sibling::p"
     );
     this.closeCartDrawerButton = page.locator(
-      "//button[@aria-label='Close Cart Drawer']"
+      "//header/button[@aria-label='Close Cart Drawer']"
     );
     this.packagePriceLabel = page.locator(
       "//p[text()='Package Price']/following-sibling::p"
     );
     this.outOfStockButton = page.locator("//button[text()='Out of Stock']");
     this.updateInCartButton = page.locator("//button[text()='Update in Cart']");
+    this.eventsListLocator = page.locator(
+      "//div[contains(@aria-label,'Program')]//button[@aria-label='Event Accordion Trigger']"
+    );
+    this.removePackageButton = page.locator(
+      "//button[@aria-label='Delete Package']"
+    );
+    this.showMoreButton = page.locator(
+      "//button[@aria-label='Load More Events Button']"
+    );
   }
 
-  // Add item to cart
+  async getPackageTitleLocatorInCartPage(packageName: string) {
+    return `//p[@aria-label='Package Name' and text()='${packageName}']`;
+  }
+
+  async getPackageQuantityField(packageName: string) {
+    return `//p[text()='${packageName}']//ancestor::div[@aria-label="Cart Package Card"]//input`;
+  }
+
+  async getAvailableQuantityLabel(packageName: string) {
+    return `//span[text()="${packageName}"]/ancestor::tr/td[7]//span`;
+  }
+
+  /**
+   * Adds a random item to the cart by selecting a package, checking if it's available,
+   * and clicking on the "Add to Cart" button. If the item is out of stock,
+   * it attempts to add another item.
+   *
+   * @returns {Promise<string>} Resolves to the title of the added package.
+   */
   async addItemInCart(): Promise<string> {
     let packageTitle: string = "";
 
@@ -106,16 +120,22 @@ export class shopAddItemInCartPage extends BasePage {
       console.log(packageTitle);
       // Click on Add to Cart button
       await this.clickElement(this.addToCartButton);
-      await this.page.waitForTimeout(3000);
 
-      // click on Cart button
-      await this.clickElement(this.cartButton);
+      await this.waitForElementVisible(this.cartSection);
     }
 
     return packageTitle;
   }
 
-  // Get Available Quantity and Max Quantity per order from Admin panel
+  /**
+   * Retrieves the available quantity and the maximum quantity per order of a package by its name.
+   *
+   * This function searches for a package by name, handles pagination if the package is not found on the current page,
+   * and extracts the available and maximum quantities from the package details
+   *
+   * @param {string} packageName - The name of the package to search for.
+   * @returns {Promise<{ availableQty: number; maxQtyPerOrder: number }>} Resolves to an object containing available quantity and max quantity per order.
+   */
   async retrievePackageData(
     packageName: string
   ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
@@ -155,16 +175,20 @@ export class shopAddItemInCartPage extends BasePage {
 
     // If package is found, navigate to its details and retrieve the quantities
     if (packageFound) {
+      // Get available quantity max quantity per order
+      availableQty = Number(
+        await this.page
+          .locator(await this.getAvailableQuantityLabel(packageName))
+          .textContent()
+      );
+
       // Click on package link
       await this.clickElement(packageLocator);
 
-      // Wait for the page to be ready
-      this.waitForPageToBeReady();
-      await this.page.waitForTimeout(5000);
+      // Wait for element visible
+      await this.isElementVisible(this.maxQuantityPerOrderLabel);
 
-      // Get available quantity and max quantity per order
-      availableQty = Number(await this.availableQuantityLabel.textContent());
-
+      // Get max quantity per order
       maxQtyPerOrder = Number(
         await this.maxQuantityPerOrderLabel.textContent()
       );
@@ -173,37 +197,54 @@ export class shopAddItemInCartPage extends BasePage {
     return { availableQty, maxQtyPerOrder };
   }
 
-  // Add multiple Package in cart
+  /**
+   * Adds a random selection of packages to the shopping cart.
+   *
+   * Selects a random number of packages (up to 10) to add to the cart. It verifies that each package is not out of stock
+   * and that it has not already been added to the cart. The method tracks the total amount of the added packages
+   * and the names of those packages, and then returns this information in an object.
+   *
+   *
+   * @returns {Promise<{ listOfAddedPackage: string[], totalAmount: number }>}
+   * - `listOfAddedPackage`: An array of package titles that were added to the cart.
+   * - `totalAmount`: The total price of the added packages.
+   */
   async addMultiplePackagesToCart(): Promise<{
     listOfAddedPackage: string[];
     totalAmount: number;
   }> {
     await this.waitForPageToBeReady();
 
-    await this.waitForElementVisible(this.viewPackageButton.first());
-
     let totalOrderAmount: number = 0;
     let addedPackageNames: string[] = [];
 
-    let totalPackage = (await this.viewPackageButton.all()).length;
+    let totalPackageOrEvent =
+      config.eventType == EventType.multipleEvent
+        ? (await this.eventsListLocator.all()).length
+        : (await this.viewPackageButton.all()).length;
 
-    totalPackage = totalPackage > 10 ? 10 : totalPackage;
+    totalPackageOrEvent = totalPackageOrEvent > 10 ? 10 : totalPackageOrEvent;
 
     // Generate random number
     const randomNumber: number =
-      Math.floor(Math.random() * (totalPackage - 1)) + 1;
+      Math.floor(Math.random() * (totalPackageOrEvent - 1)) + 1;
 
     for (let index: number = 0; index < randomNumber; index++) {
+      if (config.eventType == EventType.multipleEvent) {
+        await this.expandEventRandomly();
+        await this.page.waitForTimeout(2000);
+
+        if ((await this.viewPackageButton.all()).length == 0) continue;
+      }
+
       // Click on View Package button
       await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
 
-      // Check package is not out of stock
-      let isPackageOutofStock = await this.outOfStockButton.isVisible();
-
-      // Check package is already added or not
-      let isPackageAlreadyAdded = await this.updateInCartButton.isVisible();
-
-      if (!isPackageOutofStock && !isPackageAlreadyAdded) {
+      // Check package is not out of stock and already added
+      if (
+        !(await this.outOfStockButton.isVisible()) &&
+        !(await this.updateInCartButton.isVisible())
+      ) {
         // Get price of package
         const packagePrice: number = parseFloat(
           (await this.packagePriceLabel.allTextContents())
@@ -216,19 +257,17 @@ export class shopAddItemInCartPage extends BasePage {
 
         // Click on Add to Cart button
         await this.clickElement(this.addToCartButton);
-
-        await this.waitForPageToBeReady();
-        await this.page.waitForTimeout(3000);
+        await this.waitForElementVisible(this.cartSection);
 
         totalOrderAmount += packagePrice;
+        addedPackageNames.push(packageTitle);
 
-        // Check if the value is already in  the array
-        if (!addedPackageNames.includes(packageTitle))
-          addedPackageNames.push(packageTitle);
-      } else {
-        // Close cart pop up
-        await this.clickElement(this.closeCartDrawerButton);
+        await this.page.waitForLoadState("domcontentloaded");
+        await this.page.waitForTimeout(2000);
       }
+
+      // Close cart pop up
+      await this.clickElement(this.closeCartDrawerButton);
     }
 
     return {
@@ -237,45 +276,12 @@ export class shopAddItemInCartPage extends BasePage {
     };
   }
 
-  // Add all available package in cart
-  async addAllPackageInCart(): Promise<string[]> {
-    await this.waitForPageToBeReady();
-
-    await this.waitForElementVisible(this.viewPackageButton.first());
-
-    let addedPackageNames: string[] = [];
-
-    let totalPackage = (await this.viewPackageButton.all()).length;
-
-    for (let index: number = 0; index < totalPackage; index++) {
-      // Click on View Package button
-      await this.clickElement(this.viewPackageButton.nth(index));
-
-      // Check package is not out of stock
-      let isPackageOutofStock = await this.outOfStockButton.isVisible();
-
-      if (!isPackageOutofStock) {
-        // Get title of package title
-        const packageTitle: string = await this.packageTitleLabel.innerText();
-
-        // Click on Add to Cart button
-        await this.clickElement(this.addToCartButton);
-
-        await this.waitForPageToBeReady();
-        await this.page.waitForTimeout(3000);
-
-        // Check if the value is already in  the array
-        if (!addedPackageNames.includes(packageTitle))
-          addedPackageNames.push(packageTitle);
-      } else {
-        // Close cart pop up
-        await this.clickElement(this.closeCartDrawerButton);
-      }
-    }
-    return addedPackageNames;
-  }
-
-  // Get Available Quantity and Max Quantity per order from Admin panel
+  /**
+   * Retrieves the available quantity and maximum quantity per order for a specified package from the admin portal.
+   *
+   * @param {string} packageName - The name of the package for which the quantities are to be retrieved.
+   * @returns {Promise<{ availableQty: number; maxQtyPerOrder: number }>} - Resolves to an object containing the available quantity and maximum quantity per order of the specified package.
+   */
   async getNumberOfAvialableQtyAndMaxQtyPerOrderFromAdmin(
     packageName: string
   ): Promise<{ availableQty: number; maxQtyPerOrder: number }> {
@@ -305,5 +311,200 @@ export class shopAddItemInCartPage extends BasePage {
     await newTab.close();
 
     return { availableQty, maxQtyPerOrder };
+  }
+
+  /**
+   * Opens the package detail popup and updates the quantity.
+   *
+   * @param {string} inputValue - The value to set in the quantity input field for the package.
+   *
+   */
+  async editQuantityInPackageDetailsPopup(inputValue: string): Promise<void> {
+    // Click on View Package button
+    await this.selectRandomItemFromMultiSelectList(this.viewPackageButton);
+
+    await this.waitForPageToBeReady();
+
+    // Enter value in quantity field
+    await this.enterValuesInElement(this.quantityInputField, inputValue);
+  }
+
+  /**
+   * This method expands a random event from a list of events and checks if the expansion was successful.
+   *
+   * @returns {Promise<boolean>} - Returns a promise that resolves to `true` if the random event was successfully expanded, `false` otherwise.
+   */
+  async expandEventRandomly(): Promise<boolean> {
+    let eventExpanded = false;
+
+    // Wait for loading events
+    await this.waitForElementVisible(this.eventsListLocator.first());
+
+    // Get count of visible events
+    const eventsCount: number = (await this.eventsListLocator.all()).length;
+
+    if (eventsCount > 0) {
+      const randomOrder = Math.floor(Math.random() * (eventsCount - 0) + 0);
+
+      // Click on event for expand view
+      await this.clickElement(this.eventsListLocator.nth(randomOrder));
+
+      eventExpanded =
+        (await this.eventsListLocator
+          .nth(randomOrder)
+          .getAttribute("aria-expanded")) == "true";
+    }
+
+    return eventExpanded;
+  }
+
+  /**
+   * Expands events if the event type is 'multipleEvent' and ensures at least one package is present.
+   *
+   * @returns {Promise<boolean>} - A promise that resolves to `true` if the event expansion is successful
+   *                                or if the event type is not `multipleEvent`; otherwise, `false`.
+   */
+  async expandEventForMultipleType(): Promise<boolean> {
+    if (config.eventType == EventType.multipleEvent) {
+      await this.expandEventRandomly();
+
+      // If no package found after the first expansion attempt, try again
+      if (
+        (await this.viewPackageButton.all()).length == 0 &&
+        !(await this.expandEventRandomly())
+      )
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Clears all packages from the cart by removing them one by one.
+   */
+  async clearCart(): Promise<void> {
+    // Click on Cart button
+    await this.clickElement(this.cartButton);
+
+    await this.waitForPageToBeReady();
+
+    // Wait for open Cart section
+    await this.waitForElementVisible(this.totalAmountValueLabel);
+
+    // Get the initial count of packages in the cart
+    let countOfPackage: number = await this.removePackageButton.count();
+
+    while (countOfPackage > 0) {
+      // Click the first remove package button
+      await this.clickElement(this.removePackageButton.nth(0));
+
+      // Wait until the number of packages is reduced by one (with a timeout mechanism)
+      await this.waitForPackageCount(countOfPackage - 1, 5000);
+
+      countOfPackage--;
+    }
+
+    // Clost Cart section
+    await this.clickElement(this.closeCartDrawerButton);
+  }
+
+  /**
+   * Custom function to wait for the package count to match the expected count
+   *
+   * @param {number} expectedCount - The target package count to wait for.
+   * @param {number} timeout - The maximum time (in milliseconds) to wait for the count to match the expected value.
+   *
+   * @throws {Error} - If the timeout is exceeded without the package count matching the expected count.
+   */
+  async waitForPackageCount(
+    expectedCount: number,
+    timeout: number
+  ): Promise<void> {
+    const startTime = Date.now();
+
+    while (true) {
+      const currentCount = await this.removePackageButton.count();
+
+      // Check if the current count matches the expected count
+      if (currentCount === expectedCount) {
+        return;
+      }
+
+      // If the timeout has passed, throw an error
+      if (Date.now() - startTime > timeout) {
+        throw new Error(
+          `Timed out after ${
+            timeout / 1000
+          } seconds waiting for package count to become ${expectedCount}`
+        );
+      }
+
+      // Wait before polling again
+      await this.page.waitForTimeout(500);
+    }
+  }
+
+  /**
+   * Adds all available packages to the cart and returns an array of the added package names.
+   *
+   * @returns {Promise<string[]>} - A promise that resolves to an array of package names that were added to the cart.
+   */
+  async addAllPackageInCart(): Promise<string[]> {
+    await this.waitForPageToBeReady();
+
+    let addedPackageNames: string[] = [];
+
+    let totalPackage = (await this.viewPackageButton.all()).length;
+
+    for (let index: number = 0; index < totalPackage; index++) {
+      // Click on View Package button
+      await this.clickElement(this.viewPackageButton.nth(index));
+
+      // Check package is not out of stock
+      let isPackageOutofStock = await this.outOfStockButton.isVisible();
+
+      if (!isPackageOutofStock) {
+        // Get title of package title
+        const packageTitle: string = await this.packageTitleLabel.innerText();
+
+        // Click on Add to Cart button
+        await this.clickElement(this.addToCartButton);
+        await this.waitForElementVisible(this.cartSection);
+        await this.page.waitForTimeout(1000);
+
+        addedPackageNames.push(packageTitle);
+      }
+      // Close cart pop up
+      await this.clickElement(this.closeCartDrawerButton);
+    }
+    return addedPackageNames;
+  }
+
+  /**
+   * Adds all available packages from all events to the cart and returns an array of the added package names.
+   *
+   * @returns {Promise<string[]>} - A promise that resolves to an array of package names that were added to the cart from all events.
+   */
+  async addAllPackageInCartForMultipleEvent(): Promise<string[]> {
+    await this.waitForPageToBeReady();
+
+    let addedPackageNames: string[] = [];
+
+    // Get total Events count
+    let totalEvents = (await this.eventsListLocator.all()).length;
+
+    for (let index: number = 0; index < totalEvents; index++) {
+      // Click on order for expand view
+      await this.clickElement(this.eventsListLocator.nth(index));
+
+      await this.page.waitForTimeout(1000);
+
+      // Add all package in cart
+      let addedPackageNamesForEvent: string[] =
+        await this.addAllPackageInCart();
+
+      addedPackageNames.push(...addedPackageNamesForEvent);
+    }
+    return addedPackageNames;
   }
 }
