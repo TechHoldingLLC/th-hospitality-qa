@@ -120,8 +120,8 @@ export class shopAddItemInCartPage extends BasePage {
       console.log(packageTitle);
       // Click on Add to Cart button
       await this.clickElement(this.addToCartButton);
-      await this.waitForPageToBeReady();
-      await this.page.waitForTimeout(3000);
+
+      await this.waitForElementVisible(this.cartSection);
     }
 
     return packageTitle;
@@ -215,10 +215,6 @@ export class shopAddItemInCartPage extends BasePage {
   }> {
     await this.waitForPageToBeReady();
 
-    if (config.eventType == EventType.multipleEvent)
-      await this.waitForElementVisible(this.eventsListLocator.first());
-    else await this.waitForElementVisible(this.viewPackageButton.first());
-
     let totalOrderAmount: number = 0;
     let addedPackageNames: string[] = [];
 
@@ -261,7 +257,7 @@ export class shopAddItemInCartPage extends BasePage {
 
         // Click on Add to Cart button
         await this.clickElement(this.addToCartButton);
-        await this.page.waitForTimeout(3000);
+        await this.waitForElementVisible(this.cartSection);
 
         totalOrderAmount += packagePrice;
         addedPackageNames.push(packageTitle);
