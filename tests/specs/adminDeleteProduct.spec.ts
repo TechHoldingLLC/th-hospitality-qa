@@ -45,7 +45,6 @@ test("TC0092 - Verify that an admin can successfully delete a product that is no
       deleteProductPage.searchInput,
       productName
     );
-    // await basePage.waitForElementVisible(deleteProductPage.nextButton);
     await deleteProductPage.openDeletePopupByProductName(productName);
     expect(
       await basePage.isElementVisible(
