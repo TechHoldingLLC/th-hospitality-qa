@@ -18,7 +18,6 @@ const filePath = path.resolve(__dirname, "../data/createAccountData.json");
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  await page.setViewportSize({ width: 1380, height: 950 });
   basePage = new BasePage(page);
   loginPage = new adminLoginPage(page);
   inviteUserPage = new adminInviteUserPage(page);
@@ -115,11 +114,15 @@ test("TC0016 - Verify that the invited user is displayed in the user list", asyn
     const email = await basePage.generateNomenclatureEmail("Admin");
     //Fill up 'Invite User' form and send invite to admin user
     await inviteUserPage.inviteAdminUser(email);
-
+    await basePage.waitForElementToAppearAndDisappear(
+      inviteUserPage.inviteSuccessMessage
+    );
     await basePage.clickElement(inviteUserPage.usersButton);
+    await basePage.waitForPageToBeReady();
+
     //Verify invited user appears in list
-    const invitedEmailLocator = page.locator(`text=${email}`).first();
-    expect(await basePage.getElementText(invitedEmailLocator)).toEqual(email);
+    const invitedEmailLocator = page.locator(`span[title="${email}"]`).first();
+    expect(await basePage.isElementVisible(invitedEmailLocator)).toBe(true);
     expect(
       await basePage.getElementText(
         await inviteUserPage.generateLocatorByEmail(email)

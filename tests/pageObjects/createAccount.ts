@@ -60,12 +60,14 @@ export class createAccountPage extends BasePage {
       "//span[text()='City, state, and country must all be provided if any one is provided.']"
     );
     this.shopUILogo = page.locator(
-      "//a[@class='flex items-center gap-4 md:gap-6']"
+      "//a[@class='flex items-center gap-4 md:gap-6 ']"
     );
     this.createAccountSuccessMessage = page.locator(
       "//span[text()='Create account successfully']"
     );
-    this.passwordsDoNotMatchValidationMessage = page.locator("//span[text()='Passwords do not match.']");
+    this.passwordsDoNotMatchValidationMessage = page.locator(
+      "//span[text()='Passwords do not match.']"
+    );
   }
 
   async createAccount(email: string): Promise<void> {
@@ -89,13 +91,25 @@ export class createAccountPage extends BasePage {
     const selectedCountry = (await this.countryDropdown
       .locator("option:checked")
       .textContent()) as CountryKeys;
-    const countryData = createAccountData[selectedCountry];
-    await this.cityInput.waitFor();
-    if (typeof countryData === "object" && countryData !== null) {
-      await this.enterValuesInElement(this.cityInput, countryData.cityName);
-      await this.enterValuesInElement(this.stateInput, countryData.stateName);
+
+    if (
+      ["India", "United States", "United Kingdom"].includes(
+        selectedCountry.toLowerCase()
+      )
+    ) {
+      const countryData = createAccountData[selectedCountry];
+      await this.cityInput.waitFor();
+      if (typeof countryData === "object" && countryData !== null) {
+        await this.enterValuesInElement(this.cityInput, countryData.cityName);
+        await this.enterValuesInElement(this.stateInput, countryData.stateName);
+      } else {
+        throw new Error(`Invalid data for country: ${selectedCountry}`);
+      }
     } else {
-      throw new Error(`Invalid data for country: ${selectedCountry}`);
+      // Handle countries other than India, UK, and US
+      await this.cityInput.waitFor();
+      await this.enterValuesInElement(this.cityInput, "Automated_city");
+      await this.enterValuesInElement(this.stateInput, "Automated_state");
     }
     await this.clickElement(this.signUpButton);
   }

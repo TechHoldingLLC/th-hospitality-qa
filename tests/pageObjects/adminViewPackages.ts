@@ -34,7 +34,7 @@ export class adminViewPackagesPage {
       "//span[text()='Associated Program']"
     );
     this.productsLabel = page.locator("//span[text()='Products']");
-    this.departmentLabel = page.locator("//span[text()='Department']");
+    this.departmentLabel = page.locator("//span[text()='Departments']");
     this.groupsLabel = page.locator("//span[text()='Groups']");
     this.priceLabel = page.locator("//span[text()='Currency Price']");
     this.quantityAvailableLabel = page.locator(

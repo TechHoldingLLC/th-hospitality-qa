@@ -12,7 +12,6 @@ let basePage: BasePage;
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  await page.setViewportSize({ width: 1920, height: 1080 });
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
   await basePage.navigateTo(config.adminPortalUrl);

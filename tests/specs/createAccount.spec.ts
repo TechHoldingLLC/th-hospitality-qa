@@ -105,6 +105,7 @@ test("TC0111 - Verify that Admin user is created successfully after registration
   try {
     await basePage.yopmailLogin(createAccountData.adminInviteEmail);
     await basePage.openCreateAccountLinkFromEmail();
+
     //Create account successfully
     await createAccount.createAccount(createAccountData.adminInviteEmail);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);

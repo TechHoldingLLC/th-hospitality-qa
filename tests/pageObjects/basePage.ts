@@ -240,4 +240,17 @@ export default class BasePage {
     // Return the date in MM-DD-YYYY format
     return `${month}-${day}-${year}`;
   }
+
+  // Generate a random time (in hh:mm AM/PM format)
+  async generateRandomTime(): Promise<string> {
+    const randomHour = Math.floor(Math.random() * 12) + 1; // Random hour between 1 and 12
+    const randomMinute = Math.floor(Math.random() * 60); // Random minute between 0 and 59
+    const ampm = Math.random() > 0.5 ? "AM" : "PM"; // Randomly choose AM or PM
+
+    // Format the time as HH:MM AM/PM
+    const hour = String(randomHour).padStart(2, "0");
+    const minute = String(randomMinute).padStart(2, "0");
+
+    return `${hour}:${minute} ${ampm}`;
+  }
 }

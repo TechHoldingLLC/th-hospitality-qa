@@ -29,7 +29,7 @@ export class adminViewProgramsPage {
     this.programsButton = page.locator("//a[@href='/programs']");
     this.addProgramButton = page.locator("//a[@href='/programs/create']");
     this.programNameHeader = page.locator("//span[text()='Program Name']");
-    this.departmentHeader = page.locator("//span[text()='Department']");
+    this.departmentHeader = page.locator("//span[text()='Departments']");
     this.groupsHeader = page.locator("//span[text()='Groups']");
     this.eventDateRangeHeader = page.locator(
       "//span[text()='Event Date / Range']"
@@ -58,8 +58,6 @@ export class adminViewProgramsPage {
     this.editProgramHeader = page.locator("//h1[text()='Edit Program']");
     this.confirmDeleteButton = page.locator("//button[text()='Delete']");
     this.addProgramHeader = page.locator("//h1[text()='Add Program']");
-    this.deleteProgramConfirmation = page.locator(
-      "//button[text()='Delete']"
-    );
+    this.deleteProgramConfirmation = page.locator("//button[text()='Delete']");
   }
 }

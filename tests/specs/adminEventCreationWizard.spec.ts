@@ -170,7 +170,12 @@ test("TC0081 - Verify nested objects persist after abandoning event creation", a
     ).toEqual(createEventData.cancellationPopupText);
 
     await basePage.clickElement(eventCreationWizardPage.confirmCancelButton);
-    await basePage.clickElement(eventCreationWizardPage.nextButton);
+    await basePage.waitForPageToBeReady();
+    await eventCreationWizardPage.checkItemListAndNavigate(
+      eventCreationWizardPage.productList,
+      eventCreationWizardPage.nextButton,
+      eventCreationWizardPage.productsTab
+    );
 
     // Verify abandon while creating new package
     await basePage.clickElement(eventCreationWizardPage.addPackageButton);

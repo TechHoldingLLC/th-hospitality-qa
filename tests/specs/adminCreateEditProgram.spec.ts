@@ -15,7 +15,6 @@ let createEditProgram: adminCreateEditProgramPage;
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  await page.setViewportSize({ width: 1780, height: 720 });
   viewProgramsPage = new adminViewProgramsPage(page);
   loginPage = new adminLoginPage(page);
   basePage = new BasePage(page);
@@ -41,7 +40,7 @@ test("TC0097 - Verify that the user is able to create a program", async () => {
       await basePage.isElementVisible(createEditProgram.programNameLabel)
     ).toBe(true);
     expect(
-      await basePage.isElementVisible(createEditProgram.departmentLabel)
+      await basePage.isElementVisible(createEditProgram.departmentsLabel)
     ).toBe(true);
     expect(await basePage.isElementVisible(createEditProgram.groupsLabel)).toBe(
       true
@@ -58,8 +57,12 @@ test("TC0097 - Verify that the user is able to create a program", async () => {
       await basePage.isElementVisible(createEditProgram.createSuccessMessage)
     ).toBe(true);
     //Verify created program gets populated on program listing page
-    const createdProgramLocator = page.locator(`text=${programInputText}`).first();
-    expect(await basePage.getElementText(createdProgramLocator)).toEqual(programInputText);
+    const createdProgramLocator = page
+      .locator(`text=${programInputText}`)
+      .first();
+    expect(await basePage.getElementText(createdProgramLocator)).toEqual(
+      programInputText
+    );
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -76,6 +79,10 @@ test("TC0040 - Verify that the application validates program name is unique in t
     await basePage.enterValuesInElement(
       createEditProgram.programNameInput,
       existingProgramName
+    );
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      await basePage.generateRandomString()
     );
     await basePage.clickElement(createEditProgram.saveButton);
     //Verify validation message for non unique program name
@@ -108,22 +115,22 @@ test("TC0043 - Verify that users can successfully create and edit programs.", as
     //Edit an existing program
     await basePage.clickElement(viewProgramsPage.kebabMenuIcon);
     await basePage.clickElement(viewProgramsPage.editButton);
-    await basePage.waitForElementVisible(createEditProgram.departmentLabel);
-    await basePage.clickOnRandomOptionFromDropdown(
-      createEditProgram.departmentDropdown
+    const editedName = programInputText + "-Edited";
+    await basePage.enterValuesInElement(
+      createEditProgram.programNameInput,
+      editedName
     );
-    const selectedValue =
-      await createEditProgram.departmentDropdown.inputValue();
     await basePage.clickElement(createEditProgram.saveButton);
     expect(
       await basePage.isElementVisible(
-        createEditProgram.editProgramSuccessMesaage
+        createEditProgram.editProgramSuccessMessage
       )
     ).toBe(true);
+
     //Verify changes made to the program are reflected and saved successfully
     expect(
-      await basePage.getElementText(createEditProgram.departmentValue)
-    ).toEqual(selectedValue);
+      await basePage.getElementText(createEditProgram.nameOnDetailsPage)
+    ).toEqual(editedName);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -172,6 +179,10 @@ test("TC0042 - Verify required and optional fields while creation of new Program
     await basePage.enterValuesInElement(
       createEditProgram.programNameInput,
       programInputText
+    );
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      await basePage.generateRandomString()
     );
     expect(await basePage.isElementEnabled(createEditProgram.saveButton)).toBe(
       true

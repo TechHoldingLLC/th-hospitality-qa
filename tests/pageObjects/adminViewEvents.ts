@@ -35,7 +35,7 @@ export class adminViewEventsPage {
     this.eventNameLabel = page.locator("//span[text()='Event Name']");
     this.programNameLabel = page.locator("//span[text()='Program Name']");
     this.eventDateLabel = page.locator("//span[text()='Event Date']");
-    this.departmentLabel = page.locator("//span[text()='Department']");
+    this.departmentLabel = page.locator("//span[text()='Departments']");
     this.groupsLabel = page.locator("//span[text()='Groups']");
     this.noOfPackagesLabel = page.locator(
       "//span[text()='Number of packages ']"
