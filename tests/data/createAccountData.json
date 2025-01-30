@@ -13,6 +13,5 @@
   "United Kingdom": {
     "cityName": "London",
     "stateName": "England"
-  },
-  "expectedLoginBaseURL": "https://shop.qa.hospitality.thinfra.net/us/auth/login"
+  }
 }

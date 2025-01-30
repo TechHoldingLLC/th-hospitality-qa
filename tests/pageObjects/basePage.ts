@@ -53,9 +53,11 @@ export default class BasePage {
     await this.page.screenshot({ path: fileName });
   }
 
-  async waitForElementToAppearAndDisappear(selector: string | Locator): Promise<void> {
+  async waitForElementToAppearAndDisappear(
+    selector: string | Locator
+  ): Promise<void> {
     // If the selector is a string, use waitForSelector, otherwise directly use the locator
-    if (typeof selector === 'string') {
+    if (typeof selector === "string") {
       // Wait for the selector to be visible
       await this.page.waitForSelector(selector, { state: "visible" });
       // Wait for the selector to be hidden
@@ -65,7 +67,7 @@ export default class BasePage {
       await selector.waitFor({ state: "visible" });
       await selector.waitFor({ state: "hidden" });
     }
-  }  
+  }
 
   async waitForPageToBeReady(): Promise<void> {
     await this.page.waitForLoadState("networkidle");
@@ -101,6 +103,22 @@ export default class BasePage {
   // Function to generate a random 2-digit number
   async generateTwoRandomDigits(): Promise<string> {
     return Math.floor(10 + Math.random() * 90).toString(); // ensures 2 digits
+  }
+
+  /**
+   * Generates a random integer between the specified minimum and maximum values.
+   *
+   * @param minValue - The minimum value that the random number can be.
+   * @param maxValue - The maximum value that the random number can be.
+   *
+   * @returns A random integer between `minValue` and `maxValue`, inclusive.
+   */
+  async generateRandomNumber(
+    minValue: number,
+    maxValue: number
+  ): Promise<number> {
+    // Generate a random number within the specified range
+    return Math.floor(Math.random() * (maxValue - minValue + 1)) + minValue;
   }
 
   // Function to generate a random 5-character alphanumeric string

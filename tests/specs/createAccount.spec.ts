@@ -3,6 +3,7 @@ import BasePage from "../pageObjects/basePage";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
 import createAccountData from "../data/createAccountData.json";
 import { createAccountPage } from "../pageObjects/createAccount";
+import { config } from "../config/config.qa";
 
 let browser: Browser;
 let page: Page;
@@ -137,9 +138,9 @@ test("TC0112 - Verify that Coordinator user is created successfully after regist
       await basePage.isElementVisible(createAccount.createAccountSuccessMessage)
     ).toBe(true);
 
-    await page.waitForURL(createAccountData.expectedLoginBaseURL);
+    await page.waitForURL(config.shopPortalUrl);
     expect(await basePage.isElementVisible(loginPage.loginButton)).toBe(true);
-    expect(page.url()).toEqual(createAccountData.expectedLoginBaseURL);
+    expect(page.url()).toEqual(config.shopPortalUrl);
 
     //Verify login as newly registered coordinator
     await loginPage.login(
