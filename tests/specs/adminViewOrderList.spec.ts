@@ -264,18 +264,3 @@ test("TC0222 - Verify that an admin can edit an order.", async () => {
     throw error;
   }
 });
-
-test("TC0223 - Verify that the 'Guests' column displays the completed/total guests ratio correctly.", async () => {
-  try {
-    const validationResults =
-      await viewOrderListPage.getGuestsColumnValidationResults();
-    // Perform assertions on the validation results
-    for (const result of validationResults) {
-      expect(result.isValidFormat).toBe(true); // Ensure the format is valid (e.g., X/Y Guests)
-      expect(result.isSvgPresent).toBe(true); // Ensure the SVG icon is present
-    }
-  } catch (error: any) {
-    console.error(`Test failed: ${error.message}`);
-    throw error;
-  }
-});

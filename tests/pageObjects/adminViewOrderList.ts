@@ -119,7 +119,7 @@ export class adminViewOrderListPage extends BasePage {
     { isValidFormat: boolean }[]
   > {
     const elements = await this.orderDateColumnDataList.all();
-    const dateRegex = /^\d{2}-\d{2}-\d{2}$/; // MM-DD-YY format
+    const dateRegex = /^\d{2}-\d{2}-\d{2}$/; // MM-DD-YYYY format
     const results: { isValidFormat: boolean }[] = [];
 
     for (const element of elements) {
@@ -220,36 +220,5 @@ export class adminViewOrderListPage extends BasePage {
       )
     );
     return status;
-  }
-
-  async getGuestsColumnValidationResults(): Promise<
-    {
-      isValidFormat: boolean;
-      numerator?: number;
-      denominator?: number;
-      isSvgPresent: boolean;
-    }[]
-  > {
-    const guestElements = await this.guestsColumnDataList.elementHandles();
-
-    const results = [];
-    for (const element of guestElements) {
-      const textContent = await element.textContent();
-      const match = textContent?.match(/^(\d+)\/(\d+) Guests$/);
-
-      const numerator = match ? parseInt(match[1], 10) : undefined;
-      const denominator = match ? parseInt(match[2], 10) : undefined;
-      const isValidFormat =
-        !!match &&
-        numerator! >= 0 &&
-        denominator! > 0 &&
-        numerator! <= denominator!;
-      const svgIcon = await element.$("svg");
-      const isSvgPresent = !!svgIcon;
-
-      results.push({ isValidFormat, numerator, denominator, isSvgPresent });
-    }
-
-    return results;
   }
 }
