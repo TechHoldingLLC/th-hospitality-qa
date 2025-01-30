@@ -195,9 +195,7 @@ test("TC0026 - Verify that the user can create and edit products", async () => {
     await basePage.clickElement(createEditProductPage.saveButton);
     expect(
       await basePage.isElementVisible(
-        page.locator(
-          await createEditProductPage.getProductEditedLocator(productname)
-        )
+        createEditProductPage.productUpdateSuccessMessage
       )
     ).toBe(true);
   } catch (error: any) {

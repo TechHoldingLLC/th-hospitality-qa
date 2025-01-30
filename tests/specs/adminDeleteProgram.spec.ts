@@ -38,7 +38,6 @@ test("TC0086 - Verify that an admin can successfully delete a program that is no
     deleteProgramData.programNamePrefix
   );
   const expectedDeleteConfirmationMessage = `${deleteProgramData.expectedDeleteConfirmationMessage} "${programName}" ${deleteProgramData.deleteConfirmationSuffix}`;
-  const expectedDeleteSuccessMessage = `${programName} ${deleteProgramData.expectedDeleteSuccessMessage}`;
 
   try {
     await basePage.clickElement(viewProgramsPage.addProgramButton);
@@ -50,6 +49,7 @@ test("TC0086 - Verify that an admin can successfully delete a program that is no
       deleteProgramPage.searchInput,
       programName
     );
+    await page.keyboard.press("Enter");
     await basePage.waitForElementVisible(deleteProgramPage.paginationStatus);
     expect(
       await basePage.getElementText(deleteProgramPage.programInputText.first())
@@ -68,8 +68,12 @@ test("TC0086 - Verify that an admin can successfully delete a program that is no
       deleteProgramPage.programDeleteSuccessLabel
     );
     expect(
-      await basePage.getElementText(deleteProgramPage.deleteMessageLabel)
-    ).toEqual(expectedDeleteSuccessMessage);
+      await basePage.isElementVisible(
+        page.locator(
+          await deleteProgramPage.getDeletedProgramMessageLocator(programName)
+        )
+      )
+    ).toBe(true);
 
     // Validate program delete successfully.
     await basePage.clickElement(deleteProgramPage.confirmationButton);

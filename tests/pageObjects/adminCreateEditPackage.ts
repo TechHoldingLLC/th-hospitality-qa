@@ -25,7 +25,6 @@ export class adminCreateEditPackagePage extends BasePage {
   public productsTab: Locator;
   public packageNameValidation: Locator;
   public associatedProgramValidation: Locator;
-  public packageDescriptionValidation: Locator;
   public maxQuantityPerOrderValidation: Locator;
   public thumbnailValidation: Locator;
   public mediaValidation: Locator;
@@ -46,6 +45,8 @@ export class adminCreateEditPackagePage extends BasePage {
   public addNewProductButton: Locator;
   public continueButton: Locator;
   public packageUpdateMessage: Locator;
+  public detailsTab: Locator;
+  public departmentRestrictionsButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -59,7 +60,9 @@ export class adminCreateEditPackagePage extends BasePage {
       "//div[@data-placeholder='Enter package Description']"
     );
     this.noOfGuestsDropdown = page.locator("//select[@name='total_guests']");
-    this.departmentDropdown = page.locator("//select[@name='department']");
+    this.departmentDropdown = page.locator(
+      "//div[@class='absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto']"
+    );
     this.groupRestrictionsButton = page.locator(
       "//div[@class='relative']//button"
     );
@@ -90,9 +93,6 @@ export class adminCreateEditPackagePage extends BasePage {
     );
     this.associatedProgramValidation = page.locator(
       "//span[text()='Program is required.']"
-    );
-    this.packageDescriptionValidation = page.locator(
-      "//span[text()='Package Description is required.']"
     );
     this.maxQuantityPerOrderValidation = page.locator(
       "//div[@class='flex flex-col space-y-2 mt-1'][2]/descendant::span[text()='Required']"
@@ -140,17 +140,20 @@ export class adminCreateEditPackagePage extends BasePage {
     this.packageUpdateMessage = page.locator(
       "//span[text()='Package Updated Successfully']"
     );
+    this.detailsTab = page.locator("//button[text()='Details']");
+    this.departmentRestrictionsButton = page.locator(
+      "//label[text()='Department Restrictions']/parent::label/parent::div/following-sibling::div//button"
+    );
   }
 
   async addPackage(packagename: string): Promise<void> {
+    await this.waitForPageToBeReady();
     await this.addPackageDetailsForm(packagename);
     await this.addPackageProductForm();
     await this.clickElement(this.submitButton);
   }
 
   async addPackageDetailsForm(packagename: string): Promise<void> {
-    await this.clickElement(viewProgramsPage.programsButton);
-    const programName = await this.getElementText(this.firstProgramText);
     await this.clickElement(this.packagesButton);
     await this.clickElement(this.addPackageButton);
 
@@ -161,13 +164,14 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.enterValuesInElement(this.packageNameInput, packagename);
     await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
-    await this.associatedProgramDropdown.selectOption(programName);
     await this.enterValuesInElement(
       this.packageDescriptionInput,
       packageDescription
     );
     await this.clickOnRandomOptionFromDropdown(this.noOfGuestsDropdown);
-    await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
+    await this.clickElement(this.departmentRestrictionsButton);
+    await this.selectRandomItemFromMultiSelectList(this.departmentDropdown);
+    await this.clickElement(this.departmentRestrictionsButton);
     await this.clickElement(this.currencyAndPriceInput);
     const totalQuantity = await this.generateTwoRandomDigits();
     await this.enterValuesInElement(
@@ -199,6 +203,27 @@ export class adminCreateEditPackagePage extends BasePage {
     await this.page.waitForTimeout(2000);
     await this.clickElement(this.selectProductButton);
     await this.page.waitForTimeout(2000);
+
+    // Continue looping as long as the selectProductDropdown is empty
+    while (
+      (await this.page.$('option[value="no-products"][disabled]')) !== null
+    ) {
+      await this.page.mouse.click(10, 10);
+      await this.detailsTab.click();
+      await this.page.waitForTimeout(2000);
+      await this.waitForPageToBeReady();
+      await this.clickOnRandomOptionFromDropdown(
+        this.associatedProgramDropdown
+      );
+      await this.clickElement(this.nextButton);
+
+      // Re-enter the search value and click the select product button again
+      await this.enterValuesInElement(this.productSearchInput, "a");
+      await this.page.waitForTimeout(2000);
+      await this.clickElement(this.selectProductButton);
+      await this.page.waitForTimeout(2000);
+    }
+
     await this.clickOnRandomOptionFromDropdown(this.selectProductDropdown);
     await this.page.mouse.click(10, 10);
     const totalProductQuantity = await this.getElementText(
@@ -237,6 +262,7 @@ export class adminCreateEditPackagePage extends BasePage {
       createEditProductPage.productDescriptionInput,
       await this.generateNomenclatureDescription("Product_Under_package")
     );
+    await this.waitForPageToBeReady();
     await this.clickElement(createEditProductPage.airportTransferIcon);
     await this.enterValuesInElement(
       createEditProductPage.totalQuantityAvailable,

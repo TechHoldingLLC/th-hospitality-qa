@@ -56,7 +56,7 @@ export class adminEventCreationWizardpage extends BasePage {
       "//span[text()='Event name must be provided.']"
     );
     this.eventStartDateValidation = page.locator(
-      "//span[text()='Start date must be provided']"
+      "//span[text()='Start date/time is invalid']"
     );
     this.eventEndDateValidation = page.locator(
       "//span[text()='End date must be provided']"
@@ -142,10 +142,12 @@ export class adminEventCreationWizardpage extends BasePage {
   }
 
   async fillEventInformationForm(eventname: string) {
+    await this.waitForPageToBeReady();
     await this.enterValuesInElement(this.eventNameInput, eventname);
 
-    // Generate start date & end date
+    // Generate start date - time & end date
     const startDate = await this.getRandomFutureDate();
+    const randomTime = await this.generateRandomTime();
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 5); // Add 5 days to the start date
     const endDateFormatted = `${String(endDate.getMonth() + 1).padStart(
@@ -155,12 +157,13 @@ export class adminEventCreationWizardpage extends BasePage {
 
     await this.clickElement(this.eventStartDateInput);
     await this.page.keyboard.type(startDate);
+    await this.page.keyboard.type(randomTime);
     await this.clickElement(this.eventEndDateInput);
     await this.page.keyboard.type(endDateFormatted);
 
-    await this.page.waitForTimeout(3000);
+    await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.eventVenueDropdown);
-    await this.page.waitForTimeout(3000);
+    await this.page.waitForTimeout(2000);
     await this.clickOnRandomOptionFromDropdown(this.associatedProgramDropdown);
 
     await this.thumbnailUploadInput.setInputFiles(
@@ -210,6 +213,7 @@ export class adminEventCreationWizardpage extends BasePage {
   }
 
   async createEventWithNewObjects(eventname: string) {
+    await this.waitForPageToBeReady();
     await this.fillEventInformationFormWithNewProgram(eventname);
     await this.clickElement(this.addProductButton);
     await createEditPackagePage.createProductUnderPackage(
@@ -223,6 +227,7 @@ export class adminEventCreationWizardpage extends BasePage {
   }
 
   async createPackageUnderEvent() {
+    await this.waitForPageToBeReady();
     await this.waitForElementVisible(this.packageNameInput);
     await this.enterValuesInElement(
       this.packageNameInput,
@@ -235,9 +240,11 @@ export class adminEventCreationWizardpage extends BasePage {
     await this.clickOnRandomOptionFromDropdown(
       createEditPackagePage.noOfGuestsDropdown
     );
-    await this.clickOnRandomOptionFromDropdown(
+    await this.clickElement(createEditPackagePage.departmentRestrictionsButton);
+    await this.selectRandomItemFromMultiSelectList(
       createEditPackagePage.departmentDropdown
     );
+    await this.clickElement(createEditPackagePage.departmentRestrictionsButton);
     await this.clickElement(createEditPackagePage.currencyAndPriceInput);
     const totalQuantity = await createEditPackagePage.generateTwoRandomDigits();
     await this.enterValuesInElement(
@@ -270,10 +277,12 @@ export class adminEventCreationWizardpage extends BasePage {
   }
 
   async fillEventInformationFormWithNewProgram(eventname: string) {
+    await this.waitForPageToBeReady();
     await this.enterValuesInElement(this.eventNameInput, eventname);
 
     // Generate start date & end date
     const startDate = await this.getRandomFutureDate();
+    const randomTime = await this.generateRandomTime();
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 5); // Add 5 days to the start date
     const endDateFormatted = `${String(endDate.getMonth() + 1).padStart(
@@ -283,6 +292,7 @@ export class adminEventCreationWizardpage extends BasePage {
 
     await this.clickElement(this.eventStartDateInput);
     await this.page.keyboard.type(startDate);
+    await this.page.keyboard.type(randomTime);
     await this.clickElement(this.eventEndDateInput);
     await this.page.keyboard.type(endDateFormatted);
 

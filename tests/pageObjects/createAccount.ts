@@ -18,10 +18,10 @@ export class createAccountPage extends BasePage {
   public confirmPasswordValidationMessage: Locator;
   public cityValidationMessage: Locator;
   public stateValidationMessage: Locator;
-  public countryValidationMessage: Locator;
   public locationValidationMessage: Locator;
   public shopUILogo: Locator;
   public createAccountSuccessMessage: Locator;
+  public passwordsDoNotMatchValidationMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -50,9 +50,6 @@ export class createAccountPage extends BasePage {
     this.confirmPasswordValidationMessage = page.locator(
       "//span[text()='Please check your password and try again.']"
     );
-    this.countryValidationMessage = page.locator(
-      "//span[text()='Country is required']"
-    );
     this.stateValidationMessage = page.locator(
       "//span[text()='State is required']"
     );
@@ -63,10 +60,13 @@ export class createAccountPage extends BasePage {
       "//span[text()='City, state, and country must all be provided if any one is provided.']"
     );
     this.shopUILogo = page.locator(
-      "//a[@class='flex items-center gap-4 md:gap-6']"
+      "//a[@class='flex items-center gap-4 md:gap-6 ']"
     );
     this.createAccountSuccessMessage = page.locator(
       "//span[text()='Create account successfully']"
+    );
+    this.passwordsDoNotMatchValidationMessage = page.locator(
+      "//span[text()='Passwords do not match.']"
     );
   }
 
@@ -74,6 +74,7 @@ export class createAccountPage extends BasePage {
     const username = email.split("@")[0];
     const firstname = username.split("_")[0];
     const lastname = username.split("_").slice(1).join("_");
+    await this.waitForPageToBeReady();
     await this.enterValuesInElement(this.firstNameInput, firstname);
     await this.enterValuesInElement(this.lastNameInput, lastname);
     await this.enterValuesInElement(
@@ -90,13 +91,25 @@ export class createAccountPage extends BasePage {
     const selectedCountry = (await this.countryDropdown
       .locator("option:checked")
       .textContent()) as CountryKeys;
-    const countryData = createAccountData[selectedCountry];
-    await this.cityInput.waitFor();
-    if (typeof countryData === "object" && countryData !== null) {
-      await this.enterValuesInElement(this.cityInput, countryData.cityName);
-      await this.enterValuesInElement(this.stateInput, countryData.stateName);
+
+    if (
+      ["India", "United States", "United Kingdom"].includes(
+        selectedCountry.toLowerCase()
+      )
+    ) {
+      const countryData = createAccountData[selectedCountry];
+      await this.cityInput.waitFor();
+      if (typeof countryData === "object" && countryData !== null) {
+        await this.enterValuesInElement(this.cityInput, countryData.cityName);
+        await this.enterValuesInElement(this.stateInput, countryData.stateName);
+      } else {
+        throw new Error(`Invalid data for country: ${selectedCountry}`);
+      }
     } else {
-      throw new Error(`Invalid data for country: ${selectedCountry}`);
+      // Handle countries other than India, UK, and US
+      await this.cityInput.waitFor();
+      await this.enterValuesInElement(this.cityInput, "Automated_city");
+      await this.enterValuesInElement(this.stateInput, "Automated_state");
     }
     await this.clickElement(this.signUpButton);
   }

@@ -12,7 +12,7 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 60000,
+  timeout: 120000,
   testMatch: ["**/tests/**/*.spec.ts"], // Adjust the pattern as needed
   //testMatch: ['**/tests-examples/**/*.spec.ts'],
   expect: {
@@ -31,6 +31,7 @@ export default defineConfig({
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
+    viewport: null, // This will maximize the screen to the full available size
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
 

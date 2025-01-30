@@ -13,7 +13,6 @@ let viewEventsPage: adminViewEventsPage;
 test.beforeEach(async () => {
   browser = await chromium.launch({ headless: false, channel: "chrome" });
   page = await browser.newPage();
-  await page.setViewportSize({ width: 1792, height: 1080 });
   basePage = new BasePage(page);
   loginPage = new adminLoginPage(page);
   viewEventsPage = new adminViewEventsPage(page);

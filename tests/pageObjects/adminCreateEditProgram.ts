@@ -3,7 +3,7 @@ import BasePage from "./basePage";
 
 export class adminCreateEditProgramPage extends BasePage {
   public programNameLabel: Locator;
-  public departmentLabel: Locator;
+  public departmentsLabel: Locator;
   public groupsLabel: Locator;
   public programNameInput: Locator;
   public departmentDropdown: Locator;
@@ -14,19 +14,27 @@ export class adminCreateEditProgramPage extends BasePage {
   public createSuccessMessage: Locator;
   public firstProgramName: Locator;
   public uniqueProgramNameErrorMessage: Locator;
-  public editProgramSuccessMesaage: Locator;
-  public departmentValue: Locator;
+  public editProgramSuccessMessage: Locator;
   public closeIconOnAddProgram: Locator;
   public confirmCloseAddProgram: Locator;
+  public slugInput: Locator;
+  public departmentsButton: Locator;
+  public nameOnDetailsPage: Locator;
 
   constructor(page: Page) {
     super(page);
     this.programNameLabel = page.locator("//label[text()='Program Name']");
-    this.departmentLabel = page.locator("//label[text()='Department']");
+    this.departmentsLabel = page.locator("//label[text()='Departments']");
     this.groupsLabel = page.locator("//label[text()='Groups']");
-    this.programNameInput = page.locator("//label[text()='Program Name']/following-sibling::div//input[@name='name']");
-    this.departmentDropdown = page.locator("//select[@name='department']");
-    this.groupsDropdown = page.locator("//div[@class='relative']//button");
+    this.programNameInput = page.locator(
+      "//label[text()='Program Name']/following-sibling::div//input[@name='name']"
+    );
+    this.departmentDropdown = page.locator(
+      "//div[@class='absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto']"
+    );
+    this.groupsDropdown = page.locator(
+      "//label[text()='Groups']/following-sibling::div/button"
+    );
     this.groupsDropdownList = page.locator(
       "//div[@class='absolute z-10 w-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto']//div"
     );
@@ -41,22 +49,32 @@ export class adminCreateEditProgramPage extends BasePage {
     this.uniqueProgramNameErrorMessage = page.locator(
       "//span[text()='The program name must be unique.']"
     );
-    this.editProgramSuccessMesaage = page.locator(
-      "//span[text()='Program has been updated successfully']"
-    );
-    this.departmentValue = page.locator(
-      "//p[text()='Department']/following-sibling::p"
+    this.editProgramSuccessMessage = page.locator(
+      "//span[text()='Program has been edited successfully']"
     );
     this.closeIconOnAddProgram = page.locator(
       "//div[@role='dialog']//div[@class='flex items-center gap-x-2']//button"
     );
     this.confirmCloseAddProgram = page.locator("//button[text()='Continue']");
+    this.slugInput = page.locator("//input[@name='slug']");
+    this.departmentsButton = page.locator(
+      "//label[text()='Departments']/following-sibling::div/button"
+    );
+    this.nameOnDetailsPage = page.locator(
+      "//p[@class='font-sans txt-large font-medium mr-2']"
+    );
   }
 
   async createProgram(programName: string): Promise<void> {
     await this.programNameInput.fill(programName);
+    await this.enterValuesInElement(
+      this.slugInput,
+      await this.generateRandomString()
+    );
     // Select the random option by its value
-    await this.clickOnRandomOptionFromDropdown(this.departmentDropdown);
+    await this.clickElement(this.departmentsButton);
+    await this.selectRandomItemFromMultiSelectList(this.departmentDropdown);
+    await this.clickElement(this.programNameLabel);
     await this.groupsDropdown.click();
     //Select random item from list
     await this.selectRandomItemFromMultiSelectList(this.groupsDropdownList);

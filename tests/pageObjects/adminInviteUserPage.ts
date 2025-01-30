@@ -28,7 +28,7 @@ export class adminInviteUserPage extends BasePage {
     this.inviteUserButton = page.locator("//a[@href='/users/invite']");
     this.emailInput = page.locator("//input[@type='email']");
     this.roleSelect = page.locator("//span[text()='Select a role']");
-    this.roleAdmin = page.locator("//span[text()='Admin']");
+    this.roleAdmin = page.locator("//div[@role='presentation']//span[text()='Admin']");
     this.roleCoordinator = page.locator("//span[text()='Coordinator']");
 
     this.departmentDropdown = page.locator(
@@ -83,7 +83,7 @@ export class adminInviteUserPage extends BasePage {
   }
 
   async generateLocatorByEmail(email: string): Promise<Locator> {
-    const xpath = `//*[text()='${email}']/../../../following-sibling::td[4]`;
+    const xpath = `//span[@title='${email}']/ancestor::td/following-sibling::td[4]`;
     return this.page.locator(xpath);
   }
 }

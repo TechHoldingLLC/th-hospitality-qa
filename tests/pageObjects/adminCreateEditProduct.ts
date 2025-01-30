@@ -23,8 +23,10 @@ export class adminCreateEditProductPage extends BasePage {
   public associatedEventButton: Locator;
   public associatedEventList: Locator;
   public roomTypeRadioGroup: Locator;
-  public dateInput: Locator;
   public editProduct: Locator;
+  public stayStartDate: Locator;
+  public stayEndDate: Locator;
+  public productUpdateSuccessMessage: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -74,10 +76,16 @@ export class adminCreateEditProductPage extends BasePage {
       "//div[@data-test-id='create-product__associated-events']"
     );
     this.roomTypeRadioGroup = page.locator("//div[@role='radiogroup']//button");
-    this.dateInput = page.locator(
-      "//input[@name='additional_data.date_range']"
-    );
     this.editProduct = page.locator("//span[text()='Edit']");
+    this.stayStartDate = page.locator(
+      "//label[text()='Stay Start Date']/following-sibling::div"
+    );
+    this.stayEndDate = page.locator(
+      "//label[text()='Stay End Date']/following-sibling::div"
+    );
+    this.productUpdateSuccessMessage = page.locator(
+      "//span[text()='Product has been updated successfully']"
+    );
   }
 
   async createProductWithGift(): Promise<string> {
@@ -93,7 +101,7 @@ export class adminCreateEditProductPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.associateProgramList);
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.clickElement(this.saveButton);
     return productName;
@@ -111,7 +119,7 @@ export class adminCreateEditProductPage extends BasePage {
 
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
 
     let programHasEvent = false;
@@ -133,6 +141,7 @@ export class adminCreateEditProductPage extends BasePage {
         );
       }
     }
+
     await this.page.waitForTimeout(2000);
     await this.clickElement(this.saveButton);
     return productName;
@@ -151,13 +160,24 @@ export class adminCreateEditProductPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.associateProgramList);
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.selectRandomRadioOption(this.roomTypeRadioGroup);
-    await this.enterValuesInElement(
-      this.dateInput,
-      await this.getRandomFutureDate()
-    );
+
+    // Generate start date & end date
+    const startDate = await this.getRandomFutureDate();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 5); // Add 5 days to the start date
+    const endDateFormatted = `${String(endDate.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(endDate.getDate()).padStart(2, "0")}-${endDate.getFullYear()}`;
+
+    await this.page.locator("//div[@aria-label='month, ']").first().click();
+    await this.page.keyboard.type(startDate);
+    await this.page.locator("//div[@aria-label='month, ']").last().click();
+    await this.page.keyboard.type(endDateFormatted);
+
     await this.clickElement(this.saveButton);
     return productName;
   }
@@ -175,7 +195,7 @@ export class adminCreateEditProductPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.associateProgramList);
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.clickElement(this.saveButton);
     return productName;
@@ -194,7 +214,7 @@ export class adminCreateEditProductPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.associateProgramList);
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.clickElement(this.saveButton);
     return productName;
@@ -213,7 +233,7 @@ export class adminCreateEditProductPage extends BasePage {
     await this.selectRandomItemFromMultiSelectList(this.associateProgramList);
     await this.enterValuesInElement(
       this.totalQuantityAvailable,
-      await this.generate4RandomDigits()
+      await this.generateFourRandomDigits()
     );
     await this.clickElement(this.saveButton);
     return productName;
@@ -221,10 +241,6 @@ export class adminCreateEditProductPage extends BasePage {
 
   async getProductCreatedLocator(productName: string) {
     return `//span[text()='Product ${productName} was created successfully']`;
-  }
-
-  async getProductEditedLocator(productName: string) {
-    return `//span[text()='Product ${productName} was successfully updated.']`;
   }
 
   async getCreatedProductKebabIcon(productName: string) {
