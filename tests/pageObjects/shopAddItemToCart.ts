@@ -3,7 +3,7 @@ import BasePage from "./basePage";
 import { config, EventType } from "../config/config.qa";
 import { adminLoginPage } from "./adminLoginPage";
 
-export class shopAddItemInCartPage extends BasePage {
+export class shopAddItemToCartPage extends BasePage {
   public viewPackageButton: Locator;
   public packageTitleLabel: Locator;
   public quantityInputField: Locator;
@@ -91,7 +91,7 @@ export class shopAddItemInCartPage extends BasePage {
    *
    * @returns {Promise<string>} Resolves to the title of the added package.
    */
-  async addItemInCart(): Promise<string> {
+  async addItemToCart(): Promise<string> {
     let packageTitle: string = "";
 
     // Click on View Package button
@@ -270,7 +270,7 @@ export class shopAddItemInCartPage extends BasePage {
     // Open new tab
     const newTab: Page = await browser.newPage();
     const login: adminLoginPage = new adminLoginPage(newTab);
-    const addItemInCart: shopAddItemInCartPage = new shopAddItemInCartPage(
+    const addItemInCart: shopAddItemToCartPage = new shopAddItemToCartPage(
       newTab
     );
 
@@ -381,7 +381,7 @@ export class shopAddItemInCartPage extends BasePage {
       countOfPackage--;
     }
 
-    // Clost Cart section
+    // Close Cart section
     await this.clickElement(this.closeCartDrawerButton);
   }
 
