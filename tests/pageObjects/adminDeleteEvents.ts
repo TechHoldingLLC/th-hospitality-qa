@@ -3,60 +3,78 @@ import BasePage from "./basePage";
 
 export class adminDeleteEventPage extends BasePage {
   public searchInput: Locator;
-  public eventInputText: Locator;
   public menuButtons: Locator;
   public deleteButton: Locator;
   public deleteEventButton: Locator;
-  public deleteMessageLabel: Locator;
-  public eventDeleteSuccessLabel: Locator;
   public confirmationButton: Locator;
-  public noResultsMessageContainer: Locator;
   public alertDialog: Locator;
   public cancelEventButton: Locator;
-  public menuButtonWithLocationGreaterThanZero: Locator;
+  public menuButtonWithNonZeroIndex: Locator;
   public failedToDeleteEventLabel: Locator;
+  public getNoResultsMessage: Locator;
+  public deleteConfirmationMessageLabel: Locator;
+  public getFailedMessage: Locator;
 
   constructor(page: Page) {
     super(page);
     this.searchInput = page.locator('input[placeholder="Search"]');
-    this.eventInputText = page.locator("//td//span[text()]");
     this.menuButtons = page.locator('td div button[aria-haspopup="menu"]');
     this.deleteButton = page.getByRole("menuitem", { name: "Delete" });
     this.deleteEventButton = page.getByRole("button", { name: "Delete" });
-    this.deleteMessageLabel = page.locator(
-      "//p[contains(@class,'text-ui-fg-subtle')]/label[1]"
-    );
-    this.eventDeleteSuccessLabel = page.locator("label", {
-      hasText: "Event deleted",
-    });
     this.confirmationButton = page.getByRole("button", {
       name: "Yeah, Thanks!",
     });
-    this.noResultsMessageContainer = page.locator(
-      ".flex.flex-col.items-center.gap-y-2"
-    );
     this.alertDialog = page.getByRole("alertdialog");
     this.cancelEventButton = page.getByRole("button", { name: "Cancel" });
-    this.failedToDeleteEventLabel = page.getByText("Failed to delete product");
-    this.menuButtonWithLocationGreaterThanZero = page.locator(
+    this.failedToDeleteEventLabel = page.getByText("Failed to delete event");
+    this.menuButtonWithNonZeroIndex = page.locator(
       '//tr[td[6] > 0]//button[@aria-haspopup="menu"]'
+    );
+    this.getNoResultsMessage = page.locator(
+      '//p[contains(text(), "No results")]'
+    );
+    this.deleteConfirmationMessageLabel = page.locator(
+      "//label[contains(text(), 'This will permanently delete')]"
+    );
+    this.getFailedMessage = page.locator(
+      '(//label[contains(text(),"This event can\'t be deleted because it is referenced by one or more ticket products.")])'
     );
   }
 
   async menuButtonByEventName(eventName: string): Promise<Locator> {
     return this.page.locator(
-      `//tr[td[normalize-space() = '${eventName}']]//button[@aria-haspopup="menu"]`
+      `//tr[td//span[contains(@title, '${eventName}')]]//button[@aria-haspopup="menu"]`
     );
   }
 
-  async openDeletePopup(): Promise<void> {
-    await this.clickElement(this.menuButtons.first());
+  async getDeleteConfirmationLocator(eventName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), 'This will permanently delete the event "${eventName}" and cannot be undone.')]`
+    );
+  }
+
+  async getDeleteSuccessLocator(eventName: string): Promise<Locator> {
+    return this.page.locator(
+      `//label[contains(text(), '${eventName} was successfully deleted.')]`
+    );
+  }
+
+  async openDeletePopupByEventName(eventName: string): Promise<void> {
+    await this.clickElement(await this.menuButtonByEventName(eventName));
+    await this.clickElement(this.deleteButton);
+    await this.waitForElementVisible(this.deleteEventButton);
+  }
+
+  async openDeletePopupRandomly(): Promise<void> {
+    await this.selectRandomItemFromMultiSelectList(this.menuButtons);
     await this.clickElement(this.deleteButton);
     await this.waitForElementVisible(this.deleteEventButton);
   }
 
   async deleteReferredEvent(): Promise<void> {
-    await this.clickElement(this.menuButtonWithLocationGreaterThanZero.first());
+    await this.selectRandomItemFromMultiSelectList(
+      this.menuButtonWithNonZeroIndex
+    );
     await this.clickElement(this.deleteButton);
     await this.clickElement(this.deleteEventButton);
   }

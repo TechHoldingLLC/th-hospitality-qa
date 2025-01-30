@@ -3,7 +3,6 @@ import BasePage from "../pageObjects/basePage";
 import { adminEventCreationWizardpage } from "../pageObjects/adminEventCreationWizard";
 import { config } from "../config/config.qa";
 import { adminLoginPage } from "../pageObjects/adminLoginPage";
-import deleteEventData from "../data/deleteEventData.json";
 import { adminDeleteEventPage } from "../pageObjects/adminDeleteEvents";
 
 let browser: Browser;
@@ -31,7 +30,7 @@ test.afterEach(async () => {
 
 test("TC0083 - Verify that an admin can successfully delete an event that is not associated with programs, products, Packages.", async () => {
   try {
-    // Create Event
+    // Create a event and validate its successful creation.
     const eventName = await basePage.generateNomenclatureName("Event");
     await basePage.clickElement(eventCreationWizardPage.addEventButton);
     await eventCreationWizardPage.createEvent(eventName);
@@ -41,63 +40,55 @@ test("TC0083 - Verify that an admin can successfully delete an event that is not
       )
     ).toBe(true);
 
-    // search and validate created event.
     await basePage.enterValuesInElement(deleteEventPage.searchInput, eventName);
-    await basePage.waitForElementVisible(
-      await deleteEventPage.menuButtonByEventName(eventName)
-    );
+    await deleteEventPage.openDeletePopupByEventName(eventName);
     expect(
-      await basePage.getElementText(deleteEventPage.eventInputText.first())
-    ).toEqual(eventName);
+      await basePage.isElementVisible(
+        await deleteEventPage.getDeleteConfirmationLocator(eventName)
+      )
+    ).toBe(true);
 
-    // Validate delete event confirmation.
-    await deleteEventPage.openDeletePopup();
-    expect(
-      await basePage.getElementText(deleteEventPage.deleteMessageLabel)
-    ).toEqual(
-      `${deleteEventData.expectedDeleteConfirmationMessage} "${eventName}" ${deleteEventData.deleteConfirmationSuffix}`
-    );
-
-    // Validate event delete success message.
+    // Validate the success message after deleting the event.
     await basePage.clickElement(deleteEventPage.deleteEventButton);
-    await basePage.waitForElementVisible(
-      deleteEventPage.eventDeleteSuccessLabel
-    );
     expect(
-      await basePage.getElementText(deleteEventPage.deleteMessageLabel.last())
-    ).toEqual(`${eventName} ${deleteEventData.expectedDeleteSuccessMessage}`);
+      await basePage.isElementVisible(
+        await deleteEventPage.getDeleteSuccessLocator(eventName)
+      )
+    ).toBe(true);
 
-    // Validate and delete event successfully.
+    // Validate that the event has been successfully deleted.
     await basePage.clickElement(deleteEventPage.confirmationButton);
     expect(
-      await basePage.getElementText(deleteEventPage.noResultsMessageContainer)
-    ).toContain(deleteEventData.expectedErrorMessages);
+      await basePage.isElementVisible(deleteEventPage.getNoResultsMessage)
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
   }
 });
 
-test("TC0084 - Verify that if the events is not associated with packages, products and orders a confirmation prompt appears.", async () => {
+test("TC0084 - Verify that if the event is not associated with orders a confirmation prompt appears", async () => {
   try {
     const verifyAlertDialogVisibleAndHidden = async () => {
       expect(await basePage.isElementVisible(deleteEventPage.alertDialog)).toBe(
         true
       );
       expect(
-        await basePage.getElementText(deleteEventPage.deleteMessageLabel)
-      ).toContain(deleteEventData.expectedDeleteConfirmationMessage);
+        await basePage.isElementVisible(
+          deleteEventPage.deleteConfirmationMessageLabel
+        )
+      ).toBe(true);
       await basePage.clickElement(deleteEventPage.cancelEventButton);
       await basePage.waitForElementHidden(deleteEventPage.alertDialog);
       expect(await deleteEventPage.alertDialog.isHidden()).toBe(true);
     };
 
     // Open delete popup and verify alert dialog behavior
-    await deleteEventPage.openDeletePopup();
+    await deleteEventPage.openDeletePopupRandomly();
     await verifyAlertDialogVisibleAndHidden();
 
     // Open delete popup again and verify alert dialog behavior
-    await deleteEventPage.openDeletePopup();
+    await deleteEventPage.openDeletePopupRandomly();
     await verifyAlertDialogVisibleAndHidden();
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
@@ -105,20 +96,18 @@ test("TC0084 - Verify that if the events is not associated with packages, produc
   }
 });
 
-test("TC0085 - verify that if the events is associated with packages, products and orders an error message appears.", async () => {
+test("TC0085 - Verify that if the event is associated with orders or package an error message appears", async () => {
   try {
     await deleteEventPage.deleteReferredEvent();
     expect(
       await basePage.isElementVisible(deleteEventPage.failedToDeleteEventLabel)
     ).toBe(true);
-
     expect(
       await basePage.getElementText(deleteEventPage.alertDialog)
     ).not.toBeNull();
-
     expect(
-      await basePage.getAllTextContents(deleteEventPage.alertDialog)
-    ).toContain(deleteEventData.failedMessage);
+      await basePage.isElementVisible(deleteEventPage.getFailedMessage)
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
