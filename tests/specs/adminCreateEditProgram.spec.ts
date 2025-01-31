@@ -58,8 +58,12 @@ test("TC0097 - Verify that the user is able to create a program", async () => {
       await basePage.isElementVisible(createEditProgram.createSuccessMessage)
     ).toBe(true);
     //Verify created program gets populated on program listing page
-    const createdProgramLocator = page.locator(`text=${programInputText}`).first();
-    expect(await basePage.getElementText(createdProgramLocator)).toEqual(programInputText);
+    const createdProgramLocator = page
+      .locator(`text=${programInputText}`)
+      .first();
+    expect(await basePage.getElementText(createdProgramLocator)).toEqual(
+      programInputText
+    );
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;
@@ -195,6 +199,162 @@ test("TC0042 - Verify required and optional fields while creation of new Program
     expect(await basePage.isElementEnabled(createEditProgram.saveButton)).toBe(
       true
     );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0334 - Verify slug field is present in the program form", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    expect(await basePage.isElementVisible(createEditProgram.slugInput)).toBe(
+      true
+    );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0336 - Verify slug validation for invalid characters", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      "slug!name@"
+    );
+    expect(await createEditProgram.slugInput.inputValue()).toEqual("slugname");
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0337 - Verify slug validation for spaces", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      "slug name"
+    );
+    expect(await createEditProgram.slugInput.inputValue()).toEqual("slugname");
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0338 - Verify slug validation for minimum length", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.programNameInput,
+      await basePage.generateNomenclatureName("Program")
+    );
+    await basePage.enterValuesInElement(createEditProgram.slugInput, "slu");
+    await basePage.clickElement(createEditProgram.saveButton);
+    expect(
+      await basePage.isElementVisible(createEditProgram.slugMinLengthValidation)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0339 - Verify slug validation for maximum length", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.programNameInput,
+      await basePage.generateNomenclatureName("Program")
+    );
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      "Automated-Program-slug-name"
+    );
+    await basePage.clickElement(createEditProgram.saveButton);
+    expect(
+      await basePage.isElementVisible(createEditProgram.slugMaxLengthValidation)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0347 - Verify slug is saved in lowercase", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      "SlugName"
+    );
+    expect(await createEditProgram.slugInput.inputValue()).toEqual("slugname");
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0348 - Verify slug uniqueness across programs", async () => {
+  try {
+    const exisitingSlug = await createEditProgram.getExistingSlug();
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    await basePage.enterValuesInElement(
+      createEditProgram.programNameInput,
+      await basePage.generateNomenclatureName("Program")
+    );
+    await basePage.enterValuesInElement(
+      createEditProgram.slugInput,
+      exisitingSlug
+    );
+    await basePage.clickElement(createEditProgram.saveButton);
+    expect(
+      await basePage.isElementVisible(createEditProgram.slugUniqueValidation)
+    ).toBe(true);
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0349 - Verify slug cannot be edited", async () => {
+  try {
+    await createEditProgram.openEditFormForExistingProgram();
+    expect(await basePage.isElementDisabled(createEditProgram.slugInput)).toBe(
+      true
+    );
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0332 - Verify the presence of the Template Type dropdown", async () => {
+  try {
+    await basePage.clickElement(viewProgramsPage.addProgramButton);
+    expect(
+      await basePage.isElementVisible(createEditProgram.templateTypeButton)
+    );
+
+    // Verify all expected options are present
+    for (const option of createEditProgram.expectedOptions) {
+      expect(createEditProgram.expectedOptions).toContain(option);
+    }
+  } catch (error: any) {
+    console.error(`Test failed: ${error.message}`);
+    throw error;
+  }
+});
+
+test("TC0350 - Verify the Template Type dropdown is disabled in EDIT mode", async () => {
+  try {
+    await createEditProgram.openEditFormForExistingProgram();
+    expect(
+      await basePage.isElementDisabled(createEditProgram.templateTypeButton)
+    ).toBe(true);
   } catch (error: any) {
     console.error(`Test failed: ${error.message}`);
     throw error;

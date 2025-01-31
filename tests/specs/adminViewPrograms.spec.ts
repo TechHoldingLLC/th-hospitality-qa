@@ -59,7 +59,7 @@ test("TC0037 - Verify the program list displays the expected data", async () => 
       expect(textContent).not.toBeNull();
     }
 
-    //Verifying department column content text
+    //Verifying # of Events column content text
     await basePage.validateColumnData(viewProgramsPage.noOfEventsColumnData);
 
     //Verifying event # of Packages column content text
